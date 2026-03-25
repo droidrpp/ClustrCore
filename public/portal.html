@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Portal – ClustrCore</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+
+    :root {
+      --bg-primary:#f4f1ec; --bg-secondary:#eae6df; --bg-card:#ffffff;
+      --text-primary:#1a1714; --text-secondary:#5c5650; --text-muted:#9c958d;
+      --accent-1:#c8623a; --accent-2:#3a6bc8; --accent-green:#3a9c5a;
+      --accent-gradient:linear-gradient(135deg,#c8623a 0%,#e08c4a 50%,#3a6bc8 100%);
+      --accent-glow:rgba(200,98,58,0.2);
+      --border:rgba(26,23,20,0.09); --border-strong:rgba(26,23,20,0.18);
+      --shadow-sm:0 2px 8px rgba(26,23,20,0.07);
+      --shadow-md:0 8px 28px rgba(26,23,20,0.11);
+      --shadow-lg:0 24px 60px rgba(26,23,20,0.16);
+      --sidebar-w:260px; --transition:0.3s cubic-bezier(0.4,0,0.2,1);
+      --tech-glow:rgba(58,107,200,0.18);
+      --events-glow:rgba(200,98,58,0.18);
+      --digital-glow:rgba(139,92,246,0.18);
+    }
+    [data-theme="dark"] {
+      --bg-primary:#0f0e0d; --bg-secondary:#161412; --bg-card:#1c1916;
+      --text-primary:#f0ece6; --text-secondary:#a09890; --text-muted:#6b6358;
+      --accent-1:#e07a50; --accent-2:#6a9be8;
+      --accent-gradient:linear-gradient(135deg,#e07a50 0%,#e8a060 50%,#6a9be8 100%);
+      --accent-glow:rgba(224,122,80,0.15);
+      --border:rgba(240,236,230,0.07); --border-strong:rgba(240,236,230,0.14);
+      --shadow-sm:0 2px 8px rgba(0,0,0,0.3);
+      --shadow-md:0 8px 28px rgba(0,0,0,0.4);
+      --shadow-lg:0 24px 60px rgba(0,0,0,0.55);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background var(--transition),color var(--transition);overflow-x:hidden}
+    body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:0.022;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg-secondary)}::-webkit-scrollbar-thumb{background:var(--accent-1);border-radius:3px}
+
+    .screen{display:none;min-height:100vh;position:relative}
+    .screen.active{display:flex}
+    #screen-select{flex-direction:column;align-items:center;justify-content:center;padding:2rem 1rem}
+    #screen-auth{align-items:center;justify-content:center;padding:2rem 1rem}
+
+    #screen-select::before,#screen-auth::before{
+      content:'';position:fixed;inset:0;
+      background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+      background-size:56px 56px;opacity:0.5;pointer-events:none;animation:gridDrift 25s linear infinite;
+    }
+    @keyframes gridDrift{from{background-position:0 0}to{background-position:56px 56px}}
+    .orb{position:fixed;border-radius:50%;pointer-events:none;filter:blur(80px);opacity:0.28;animation:orbFloat 10s ease-in-out infinite}
+    .orb-1{width:380px;height:380px;background:radial-gradient(circle,rgba(200,98,58,0.4),transparent 70%);top:-80px;right:-60px}
+    .orb-2{width:320px;height:320px;background:radial-gradient(circle,rgba(58,107,200,0.35),transparent 70%);bottom:-60px;left:-50px;animation-delay:-5s;animation-direction:reverse}
+    @keyframes orbFloat{0%,100%{transform:scale(1) translate(0,0)}33%{transform:scale(1.08) translate(10px,-14px)}66%{transform:scale(0.94) translate(-8px,10px)}}
+
+    /* ── TOP BAR ── */
+    .top-bar{position:fixed;top:0;left:0;right:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.5rem}
+    .home-btn{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;font-weight:500;color:var(--text-secondary);text-decoration:none;padding:.35rem .85rem;border:1px solid var(--border);border-radius:100px;background:var(--bg-card);transition:all var(--transition);box-shadow:var(--shadow-sm)}
+    .home-btn:hover{border-color:var(--border-strong);color:var(--text-primary);transform:translateY(-1px)}
+    .top-bar-right{display:flex;align-items:center;gap:.5rem}
+    .theme-btn-float{width:40px;height:40px;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.95rem;color:var(--text-primary);transition:all var(--transition);box-shadow:var(--shadow-sm)}
+    .theme-btn-float:hover{background:var(--bg-secondary);transform:scale(1.08) rotate(15deg)}
+
+    .select-header{text-align:center;margin-bottom:3rem;position:relative;z-index:2;animation:fadeUp .7s ease both;margin-top:3rem}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+    .select-logo{display:inline-flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;text-decoration:none}
+    .select-logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;letter-spacing:-0.03em;background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .select-header h1{font-family:'Syne',sans-serif;font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-0.04em;margin-bottom:.5rem}
+    .select-header h1 span{background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .select-header p{color:var(--text-muted);font-size:1rem;font-weight:300}
+
+    .team-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;max-width:860px;width:100%;position:relative;z-index:2;animation:fadeUp .7s ease .15s both}
+    .team-card{background:var(--bg-card);border:1px solid var(--border);border-radius:22px;padding:2.25rem 1.5rem 2rem;text-align:center;cursor:pointer;transition:all var(--transition);position:relative;overflow:hidden;box-shadow:var(--shadow-sm)}
+    .team-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;opacity:0;transition:opacity var(--transition)}
+    .team-card.tech::before{background:linear-gradient(90deg,#3a6bc8,#6a9be8)}
+    .team-card.events::before{background:linear-gradient(90deg,#c8623a,#e08c4a)}
+    .team-card.digital::before{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+    .team-card:hover{transform:translateY(-8px);box-shadow:var(--shadow-lg);border-color:var(--border-strong)}
+    .team-card:hover::before{opacity:1}
+    .team-card.tech:hover{box-shadow:var(--shadow-lg),0 0 40px var(--tech-glow)}
+    .team-card.events:hover{box-shadow:var(--shadow-lg),0 0 40px var(--events-glow)}
+    .team-card.digital:hover{box-shadow:var(--shadow-lg),0 0 40px var(--digital-glow)}
+    .team-icon{width:72px;height:72px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 1.25rem;transition:transform var(--transition)}
+    .team-card:hover .team-icon{transform:scale(1.1) rotate(-5deg)}
+    .team-card.tech .team-icon{background:linear-gradient(135deg,#3a6bc8,#6a9be8);color:white}
+    .team-card.events .team-icon{background:linear-gradient(135deg,#c8623a,#e08c4a);color:white}
+    .team-card.digital .team-icon{background:linear-gradient(135deg,#8b5cf6,#a78bfa);color:white}
+    .team-card h2{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:.4rem}
+    .team-card p{font-size:.82rem;color:var(--text-muted);line-height:1.6;margin-bottom:1.25rem}
+    .team-badge{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .75rem;border-radius:100px}
+    .team-card.tech .team-badge{background:rgba(58,107,200,0.12);color:#3a6bc8;border:1px solid rgba(58,107,200,0.25)}
+    .team-card.events .team-badge{background:rgba(200,98,58,0.12);color:#c8623a;border:1px solid rgba(200,98,58,0.25)}
+    .team-card.digital .team-badge{background:rgba(139,92,246,0.12);color:#8b5cf6;border:1px solid rgba(139,92,246,0.25)}
+    .member-count{position:absolute;top:1rem;right:1rem;font-size:.68rem;font-weight:600;color:var(--text-muted);background:var(--bg-secondary);border:1px solid var(--border);padding:.2rem .5rem;border-radius:6px}
+
+    .auth-card{background:var(--bg-card);border:1px solid var(--border);border-radius:24px;padding:2.5rem 2.25rem;width:100%;max-width:440px;box-shadow:var(--shadow-lg);position:relative;z-index:2;animation:cardIn .55s cubic-bezier(0.4,0,0.2,1) both}
+    @keyframes cardIn{from{opacity:0;transform:translateY(28px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+    .auth-card::before{content:'';position:absolute;top:0;left:2rem;right:2rem;height:2px;border-radius:0 0 4px 4px}
+    .auth-card.tech::before{background:linear-gradient(90deg,#3a6bc8,#6a9be8)}
+    .auth-card.events::before{background:linear-gradient(90deg,#c8623a,#e08c4a)}
+    .auth-card.digital::before{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+
+    .back-btn{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:var(--text-muted);background:none;border:none;cursor:pointer;margin-bottom:1.5rem;transition:color var(--transition);font-family:'DM Sans',sans-serif}
+    .back-btn:hover{color:var(--accent-1)}
+
+    .auth-team-header{display:flex;align-items:center;gap:.875rem;margin-bottom:1.75rem}
+    .auth-team-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:white}
+    .auth-team-icon.tech{background:linear-gradient(135deg,#3a6bc8,#6a9be8)}
+    .auth-team-icon.events{background:linear-gradient(135deg,#c8623a,#e08c4a)}
+    .auth-team-icon.digital{background:linear-gradient(135deg,#8b5cf6,#a78bfa)}
+    .auth-team-name{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;letter-spacing:-0.02em}
+    .auth-team-sub{font-size:.78rem;color:var(--text-muted)}
+
+    .auth-field{margin-bottom:1rem}
+    .auth-field label{display:block;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.4rem}
+    .field-wrap{position:relative}
+    .field-wrap i.fi{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:.82rem;pointer-events:none;transition:color var(--transition)}
+    .field-wrap:focus-within i.fi{color:var(--accent-1)}
+    .field-wrap input,.field-wrap select{width:100%;padding:.72rem 1rem .72rem 2.5rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--text-primary);outline:none;transition:all var(--transition);appearance:none}
+    .field-wrap input::placeholder{color:var(--text-muted)}
+    .field-wrap input:focus,.field-wrap select:focus{border-color:var(--accent-1);background:var(--bg-card);box-shadow:0 0 0 3px var(--accent-glow)}
+    .sel-wrap::after{content:'\f078';font-family:'Font Awesome 6 Free';font-weight:900;position:absolute;right:13px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--text-muted);font-size:.7rem}
+
+    .auth-error{font-size:.8rem;color:#ef4444;min-height:1.2em;margin-bottom:.5rem;text-align:center}
+
+    .primary-btn{width:100%;padding:.85rem;margin-top:.25rem;background:var(--accent-gradient);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:all var(--transition);box-shadow:0 4px 16px var(--accent-glow);display:flex;align-items:center;justify-content:center;gap:.5rem}
+    .primary-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px var(--accent-glow)}
+    .primary-btn:disabled{opacity:.65;cursor:not-allowed}
+    .btn-spin{width:15px;height:15px;border:2px solid rgba(255,255,255,.35);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;display:none}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .phone-hint{text-align:center;font-size:.8rem;color:var(--text-muted);margin-bottom:1rem;padding:.6rem .875rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;display:none}
+    .phone-hint.show{display:block}
+    .phone-hint strong{color:var(--text-primary)}
+
+    .otp-boxes{display:flex;justify-content:center;gap:.625rem;margin:.5rem 0 1rem}
+    .otp-box{width:46px;height:54px;text-align:center;background:var(--bg-secondary);border:1.5px solid var(--border);border-radius:10px;font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--text-primary);outline:none;transition:all var(--transition);caret-color:var(--accent-1)}
+    .otp-box:focus{border-color:var(--accent-1);background:var(--bg-card);box-shadow:0 0 0 3px var(--accent-glow)}
+    .otp-box.filled{border-color:var(--accent-1)}
+
+    .resend-row{text-align:center;margin-top:.875rem}
+    .resend-btn{background:none;border:none;color:var(--accent-1);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:color var(--transition)}
+    .resend-btn:hover:not(:disabled){color:var(--accent-2)}
+    .resend-btn:disabled{color:var(--text-muted);cursor:default}
+    .resend-timer{font-size:.8rem;color:var(--text-muted)}
+
+    .step{display:none}.step.active{display:block}
+
+    .auth-card.shake{animation:shake .45s cubic-bezier(.36,.07,.19,.97) both}
+    @keyframes shake{10%,90%{transform:translateX(-3px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}}
+
+    .redirect-overlay{position:fixed;inset:0;background:var(--bg-primary);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;opacity:0;pointer-events:none;transition:opacity .4s ease}
+    .redirect-overlay.show{opacity:1;pointer-events:all}
+    .redirect-spinner{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent-1);border-radius:50%;animation:spin .7s linear infinite}
+    .redirect-text{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text-primary)}
+    .redirect-sub{font-size:.82rem;color:var(--text-muted)}
+
+    .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:.7rem 1rem;display:flex;align-items:center;gap:.55rem;box-shadow:var(--shadow-lg);z-index:600;transform:translateY(120%);transition:transform .4s cubic-bezier(.34,1.56,.64,1);min-width:220px}
+    .toast.show{transform:translateY(0)}
+    .toast.success i{color:var(--accent-green)}.toast.error i{color:#ef4444}
+    .toast span{font-size:.83rem;font-weight:500}
+
+    @media(max-width:768px){.team-cards{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <a href="index.html" class="home-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+  <div class="top-bar-right">
+    <button class="theme-btn-float" id="themeBtn"><i class="fas fa-moon"></i></button>
+  </div>
+</div>
+
+<!-- ══ SCREEN 1: TEAM SELECT ════════════════════════════ -->
+<div id="screen-select" class="screen active">
+  <div class="orb orb-1"></div><div class="orb orb-2"></div>
+
+  <div class="select-header">
+    <a href="index.html" class="select-logo"><span class="select-logo-text">ClustrCore</span></a>
+    <h1>Team <span>Portal</span></h1>
+    <p>Select your team to continue</p>
+  </div>
+
+  <div class="team-cards">
+    <div class="team-card tech" onclick="selectTeam('tech')">
+      <span class="member-count" id="count-tech">— members</span>
+      <div class="team-icon"><i class="fas fa-code"></i></div>
+      <h2>Technical</h2>
+      <p>Manage dev tasks, repositories, technical sessions and infrastructure.</p>
+      <span class="team-badge">Engineering</span>
+    </div>
+    <div class="team-card events" onclick="selectTeam('events')">
+      <span class="member-count" id="count-events">— members</span>
+      <div class="team-icon"><i class="fas fa-calendar-star"></i></div>
+      <h2>Events</h2>
+      <p>Plan, coordinate and execute workshops, hackathons and competitions.</p>
+      <span class="team-badge">Operations</span>
+    </div>
+    <div class="team-card digital" onclick="selectTeam('digital')">
+      <span class="member-count" id="count-digital">— members</span>
+      <div class="team-icon"><i class="fas fa-palette"></i></div>
+      <h2>Digital</h2>
+      <p>Handle social media, branding, design assets and online presence.</p>
+      <span class="team-badge">Creative</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 2: OTP AUTH ════════════════════════════════ -->
+<div id="screen-auth" class="screen">
+  <div class="orb orb-1"></div><div class="orb orb-2"></div>
+
+  <div class="auth-card" id="authCard">
+    <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Choose different team</button>
+
+    <div class="auth-team-header">
+      <div class="auth-team-icon" id="authIcon"><i class="fas fa-code"></i></div>
+      <div>
+        <div class="auth-team-name" id="authTeamName">Technical Team</div>
+        <div class="auth-team-sub" id="authTeamSub">Select your name to receive OTP</div>
+      </div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="step active" id="step-1">
+      <div class="auth-field">
+        <label>Your Name</label>
+        <div class="field-wrap sel-wrap">
+          <i class="fas fa-user fi"></i>
+          <select id="memberSelect">
+            <option value="">— loading members... —</option>
+          </select>
+        </div>
+      </div>
+      <div class="auth-error" id="step1Error"></div>
+      <button class="primary-btn" id="sendOtpBtn" onclick="sendOtp()">
+        <div class="btn-spin" id="sendSpin"></div>
+        <span id="sendBtnText"><i class="fas fa-paper-plane"></i> Send OTP to my Phone</span>
+      </button>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step" id="step-2">
+      <div class="phone-hint show" id="phoneHint">
+        OTP sent to <strong id="maskedPhone">****</strong> — valid for 10 minutes
+      </div>
+      <div class="auth-field">
+        <label>Enter 6-digit OTP</label>
+        <div class="otp-boxes">
+          <input class="otp-box" maxlength="1" type="text" inputmode="numeric" id="o0" autocomplete="one-time-code">
+          <input class="otp-box" maxlength="1" type="text" inputmode="numeric" id="o1">
+          <input class="otp-box" maxlength="1" type="text" inputmode="numeric" id="o2">
+          <input class="otp-box" maxlength="1" type="text" inputmode="numeric" id="o3">
+          <input class="otp-box" maxlength="1" type="text" inputmode="numeric" id="o4">
+          <input class="otp-box" maxlength="1" type="text" inputmode="numeric" id="o5">
+        </div>
+      </div>
+      <div class="auth-error" id="step2Error"></div>
+      <button class="primary-btn" id="verifyOtpBtn" onclick="verifyOtp()">
+        <div class="btn-spin" id="verifySpin"></div>
+        <span id="verifyBtnText"><i class="fas fa-check-circle"></i> Verify & Enter</span>
+      </button>
+      <div class="resend-row">
+        <button class="resend-btn" id="resendBtn" onclick="resendOtp()" disabled>Resend OTP</button>
+        <span class="resend-timer" id="resendTimer">&nbsp;(wait <span id="timerCount">30</span>s)</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Redirect overlay -->
+<div class="redirect-overlay" id="redirectOverlay">
+  <div class="redirect-spinner"></div>
+  <div class="redirect-text" id="redirectText">Redirecting…</div>
+  <div class="redirect-sub" id="redirectSub">Taking you to your dashboard</div>
+</div>
+
+<div class="toast" id="toast"><i class="fas fa-circle-check"></i><span id="toastMsg">Done!</span></div>
+
+<script>
+(() => {
+  const API = 'http://localhost:5000/api';
+
+  /* ── TEAM PAGE MAP ─────────────────────────────────── */
+  const TEAM_PAGES = {
+    tech:    'tech-dashboard.html',
+    events:  'events-dashboard.html',
+    digital: 'digital-dashboard.html',
+  };
+
+  const TEAM_CFG = {
+    tech:    { name:'Technical Team',  icon:'fas fa-code'          },
+    events:  { name:'Events Team',     icon:'fas fa-calendar-star' },
+    digital: { name:'Digital Team',    icon:'fas fa-palette'       },
+  };
+
+  let currentTeam   = null;
+  let currentUserId = null;
+  let timerInterval = null;
+  let dbMembers     = {};
+
+  /* ── THEME ─────────────────────────────────────────── */
+  const htmlEl = document.documentElement;
+  applyTheme(localStorage.getItem('clustr-theme') || 'light');
+
+  function applyTheme(t) {
+    htmlEl.setAttribute('data-theme', t);
+    localStorage.setItem('clustr-theme', t);
+    const b = document.getElementById('themeBtn');
+    if (b) b.querySelector('i').className = t==='dark' ? 'fas fa-sun' : 'fas fa-moon';
+  }
+  document.getElementById('themeBtn').addEventListener('click', () => {
+    const next = htmlEl.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
+    applyTheme(next);
+  });
+
+  /* ── SCREEN SWITCH ─────────────────────────────────── */
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+  function showStep(n) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById(`step-${n}`).classList.add('active');
+  }
+
+  /* ── LOAD MEMBER COUNTS ────────────────────────────── */
+  async function loadAllMemberCounts() {
+    for (const team of ['tech','events','digital']) {
+      try {
+        const res  = await fetch(`${API}/team/members/${team}`);
+        const data = await res.json();
+        if (res.ok) {
+          dbMembers[team] = data.members;
+          const el = document.getElementById(`count-${team}`);
+          if (el) el.textContent = `${data.members.length} member${data.members.length!==1?'s':''}`;
+        }
+      } catch(_) {}
+    }
+  }
+  loadAllMemberCounts();
+
+  /* ── SELECT TEAM ───────────────────────────────────── */
+  window.selectTeam = async (team) => {
+    currentTeam = team;
+    const cfg   = TEAM_CFG[team];
+
+    document.getElementById('authCard').className    = `auth-card ${team}`;
+    document.getElementById('authIcon').className    = `auth-team-icon ${team}`;
+    document.getElementById('authIcon').innerHTML    = `<i class="${cfg.icon}"></i>`;
+    document.getElementById('authTeamName').textContent = cfg.name;
+    document.getElementById('authTeamSub').textContent  = 'Select your name to receive OTP';
+
+    showStep(1);
+    document.getElementById('step1Error').textContent = '';
+    document.getElementById('step2Error').textContent = '';
+    clearOtpBoxes();
+
+    const sel = document.getElementById('memberSelect');
+    sel.innerHTML = '<option value="">— pick your name —</option>';
+
+    const members = dbMembers[team] || [];
+    if (members.length > 0) {
+      members.forEach(m => {
+        const o = document.createElement('option');
+        o.value = m.name;
+        o.textContent = `${m.name} — ${m.teamRole}`;
+        sel.appendChild(o);
+      });
+    } else {
+      try {
+        const res  = await fetch(`${API}/team/members/${team}`);
+        const data = await res.json();
+        if (res.ok) {
+          dbMembers[team] = data.members;
+          data.members.forEach(m => {
+            const o = document.createElement('option');
+            o.value = m.name; o.textContent = `${m.name} — ${m.teamRole}`;
+            sel.appendChild(o);
+          });
+        }
+      } catch(_) {
+        sel.innerHTML = '<option value="">Could not load members</option>';
+      }
+    }
+
+    showScreen('screen-auth');
+  };
+
+  window.goBack = () => { clearTimer(); showScreen('screen-select'); };
+
+  /* ── SEND OTP ──────────────────────────────────────── */
+  window.sendOtp = async () => {
+    const name = document.getElementById('memberSelect').value;
+    if (!name) { setError(1,'Please select your name.'); return; }
+
+    setLoading('send', true);
+    try {
+      const res  = await fetch(`${API}/team/send-otp`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ name, team: currentTeam }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      currentUserId = data.userId;
+      document.getElementById('maskedPhone').textContent = data.masked;
+      showStep(2);
+      document.getElementById('authTeamSub').textContent = 'Enter the OTP sent to your phone';
+      document.getElementById('o0').focus();
+      startResendTimer();
+      showToast(`OTP sent to ${data.masked} ✓`, 'success');
+
+    } catch(err) {
+      setError(1, err.message || 'Failed to send OTP.');
+      shake();
+    } finally {
+      setLoading('send', false);
+    }
+  };
+
+  /* ── VERIFY OTP → REDIRECT ─────────────────────────── */
+  window.verifyOtp = async () => {
+    const otp = [...Array(6)].map((_,i) => document.getElementById(`o${i}`).value).join('');
+    if (otp.length < 6) { setError(2,'Enter all 6 digits.'); return; }
+
+    setLoading('verify', true);
+    try {
+      const res  = await fetch(`${API}/team/verify-otp`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ userId: currentUserId, otp }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      // ── Save session — SAME KEY for all dashboards ──
+      localStorage.setItem('clustr-session', JSON.stringify({
+        team: currentTeam,
+        user: data.user,
+      }));
+      // Also keep old key for backward compatibility
+      localStorage.setItem('clustr-team-session', JSON.stringify({
+        team: currentTeam,
+        user: data.user,
+      }));
+
+      clearTimer();
+
+      const overlay = document.getElementById('redirectOverlay');
+      document.getElementById('redirectText').textContent  = `Welcome, ${data.user.name}! 🎉`;
+      document.getElementById('redirectSub').textContent   = `Opening ${TEAM_CFG[currentTeam].name} dashboard…`;
+      overlay.classList.add('show');
+
+      setTimeout(() => {
+        window.location.href = TEAM_PAGES[currentTeam];
+      }, 1200);
+
+    } catch(err) {
+      setError(2, err.message || 'Invalid OTP.');
+      clearOtpBoxes();
+      shake();
+      document.getElementById('o0').focus();
+    } finally {
+      setLoading('verify', false);
+    }
+  };
+
+  window.resendOtp = async () => {
+    clearOtpBoxes();
+    document.getElementById('step2Error').textContent = '';
+    await sendOtp();
+  };
+
+  /* ── RESEND TIMER ──────────────────────────────────── */
+  function startResendTimer() {
+    clearTimer();
+    let secs = 30;
+    document.getElementById('resendBtn').disabled = true;
+    document.getElementById('resendTimer').style.display = '';
+    document.getElementById('timerCount').textContent = secs;
+    timerInterval = setInterval(() => {
+      secs--;
+      document.getElementById('timerCount').textContent = secs;
+      if (secs <= 0) {
+        clearTimer();
+        document.getElementById('resendBtn').disabled = false;
+        document.getElementById('resendTimer').style.display = 'none';
+      }
+    }, 1000);
+  }
+  function clearTimer() { if(timerInterval){clearInterval(timerInterval);timerInterval=null;} }
+
+  /* ── OTP BOX UX ────────────────────────────────────── */
+  for (let i=0; i<6; i++) {
+    const box = document.getElementById(`o${i}`);
+    box.addEventListener('input', e => {
+      const v = e.target.value.replace(/\D/g,'');
+      e.target.value = v ? v[0] : '';
+      e.target.classList.toggle('filled', !!v);
+      if (v && i < 5) document.getElementById(`o${i+1}`).focus();
+      if (i === 5 && v) verifyOtp();
+    });
+    box.addEventListener('keydown', e => {
+      if (e.key==='Backspace' && !e.target.value && i>0) document.getElementById(`o${i-1}`).focus();
+    });
+    box.addEventListener('paste', e => {
+      e.preventDefault();
+      const txt = (e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+      for (let j=0; j<txt.length; j++) {
+        const b = document.getElementById(`o${j}`);
+        if (b) { b.value=txt[j]; b.classList.add('filled'); }
+      }
+      const last = document.getElementById(`o${Math.min(txt.length,5)}`);
+      if (last) last.focus();
+      if (txt.length===6) verifyOtp();
+    });
+  }
+  function clearOtpBoxes() {
+    for(let i=0;i<6;i++){const b=document.getElementById(`o${i}`);b.value='';b.classList.remove('filled');}
+  }
+
+  /* ── HELPERS ───────────────────────────────────────── */
+  function setLoading(type, on) {
+    const id   = type==='send' ? 'sendOtpBtn'   : 'verifyOtpBtn';
+    const spin = type==='send' ? 'sendSpin'      : 'verifySpin';
+    const txt  = type==='send' ? 'sendBtnText'   : 'verifyBtnText';
+    document.getElementById(id).disabled         = on;
+    document.getElementById(spin).style.display  = on ? 'block' : 'none';
+    document.getElementById(txt).style.display   = on ? 'none'  : 'flex';
+  }
+  function setError(step, msg) {
+    const el = document.getElementById(`step${step}Error`);
+    el.textContent = msg;
+    setTimeout(() => { el.textContent=''; }, 4000);
+  }
+  function shake() {
+    const c = document.getElementById('authCard');
+    c.classList.add('shake');
+    setTimeout(() => c.classList.remove('shake'), 500);
+  }
+
+  window.showToast = (msg, type='success') => {
+    const t = document.getElementById('toast');
+    t.className = `toast ${type}`;
+    t.querySelector('i').className = type==='success' ? 'fas fa-circle-check' : 'fas fa-circle-exclamation';
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3200);
+  };
+
+
+})();
+</script>
+</body>
+</html>

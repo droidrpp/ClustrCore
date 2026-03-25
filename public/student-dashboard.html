@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard – ClustrCore</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+
+    :root {
+      --bg:#f4f1ec; --bg2:#eae6df; --card:#fff;
+      --ink:#1a1714; --ink2:#5c5650; --ink3:#9c958d;
+      --a1:#c8623a; --a2:#3a6bc8; --ag:#3a9c5a;
+      --grad:linear-gradient(135deg,#c8623a 0%,#e08c4a 50%,#3a6bc8 100%);
+      --glow:rgba(200,98,58,.18);
+      --line:rgba(26,23,20,.09); --line2:rgba(26,23,20,.18);
+      --sh1:0 2px 8px rgba(26,23,20,.07);
+      --sh2:0 8px 28px rgba(26,23,20,.12);
+      --sh3:0 20px 56px rgba(26,23,20,.16);
+      --sw:260px; --ease:cubic-bezier(.4,0,.2,1); --t:.28s;
+    }
+    [data-theme="dark"] {
+      --bg:#0f0e0d; --bg2:#161412; --card:#1c1916;
+      --ink:#f0ece6; --ink2:#a09890; --ink3:#6b6358;
+      --a1:#e07a50; --a2:#6a9be8;
+      --grad:linear-gradient(135deg,#e07a50 0%,#e8a060 50%,#6a9be8 100%);
+      --glow:rgba(224,122,80,.15);
+      --line:rgba(240,236,230,.07); --line2:rgba(240,236,230,.14);
+      --sh1:0 2px 8px rgba(0,0,0,.3); --sh2:0 8px 28px rgba(0,0,0,.4); --sh3:0 20px 56px rgba(0,0,0,.55);
+    }
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;transition:background var(--t),color var(--t);overflow-x:hidden}
+    body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:.022;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+    ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--a1);border-radius:2px}
+
+    /* ─── SIDEBAR ─────────────────────────────── */
+    .sidebar{position:fixed;left:0;top:0;width:var(--sw);height:100vh;background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:200;overflow:hidden}
+    .sidebar::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad)}
+    .sb-logo{padding:1.5rem 1.375rem 1.125rem;border-bottom:1px solid var(--line)}
+    .sb-brand{display:flex;align-items:center;gap:.5rem;text-decoration:none;margin-bottom:1.125rem}
+    .sb-brandname{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.02em}
+    .sb-profile{display:flex;align-items:center;gap:.75rem;padding:.75rem .875rem;border-radius:12px;border:1px solid var(--line);background:var(--bg2);cursor:pointer;transition:all var(--t)}
+    .sb-profile:hover{border-color:var(--a1);background:rgba(200,98,58,.06)}
+    .sb-av-wrap{position:relative;flex-shrink:0}
+    .sb-av{width:40px;height:40px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;overflow:hidden}
+    .sb-av img{width:100%;height:100%;object-fit:cover}
+    .sb-cam{position:absolute;bottom:-2px;right:-2px;width:15px;height:15px;background:var(--a1);border-radius:50%;border:2px solid var(--card);display:flex;align-items:center;justify-content:center;color:white;font-size:.4rem}
+    .sb-meta{min-width:0}
+    .sb-meta strong{display:block;font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sb-meta span{font-size:.68rem;color:var(--ink3);letter-spacing:.04em;text-transform:uppercase}
+    .sb-nav{flex:1;padding:.875rem .875rem;overflow-y:auto;display:flex;flex-direction:column;gap:.2rem}
+    .sb-label{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:.625rem .625rem .15rem}
+    .sb-item{display:flex;align-items:center;gap:.7rem;padding:.62rem .75rem;border-radius:10px;color:var(--ink2);text-decoration:none;font-size:.86rem;font-weight:500;transition:all var(--t);border:1px solid transparent;cursor:pointer;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif;position:relative}
+    .sb-item::before{content:'';position:absolute;left:0;top:18%;bottom:18%;width:3px;background:var(--grad);border-radius:0 3px 3px 0;transform:scaleY(0);transition:transform var(--t)}
+    .sb-item:hover,.sb-item.active{background:var(--bg2);color:var(--ink);border-color:var(--line)}
+    .sb-item.active::before{transform:scaleY(1)}
+    .sb-item i{width:17px;text-align:center;font-size:.8rem;color:var(--ink3);transition:color var(--t)}
+    .sb-item:hover i,.sb-item.active i{color:var(--a1)}
+    .sb-footer{padding:.875rem;border-top:1px solid var(--line)}
+    .sb-theme{display:flex;align-items:center;justify-content:space-between;padding:.55rem .75rem;background:var(--bg2);border:1px solid var(--line);border-radius:9px;cursor:pointer;margin-bottom:.5rem;transition:all var(--t)}
+    .sb-theme:hover{border-color:var(--line2)}
+    .sb-theme span{font-size:.8rem;font-weight:500;color:var(--ink2);display:flex;align-items:center;gap:.45rem}
+    .pill{width:36px;height:19px;background:var(--line2);border-radius:20px;position:relative;transition:background var(--t)}
+    .pill::after{content:'';position:absolute;width:13px;height:13px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform var(--t);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+    [data-theme="dark"] .pill{background:var(--a1)}
+    [data-theme="dark"] .pill::after{transform:translateX(17px)}
+    .sb-out{display:flex;align-items:center;gap:.55rem;padding:.6rem .75rem;background:none;border:1px solid var(--line);border-radius:9px;color:var(--ink3);font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;transition:all var(--t);width:100%}
+    .sb-out:hover{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.3);color:#ef4444}
+
+    /* ─── VIEWS ───────────────────────────────── */
+    .view{display:none}.view.active{display:block;animation:fadein .35s var(--ease) both}
+
+    /* ─── MAIN ────────────────────────────────── */
+    .main{margin-left:var(--sw);min-height:100vh;padding:1.75rem 2rem 0}
+
+    /* ─── TOPBAR ──────────────────────────────── */
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.75rem;animation:up .6s var(--ease) both}
+    @keyframes up{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadein{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .topbar-left h1{font-family:'Syne',sans-serif;font-size:clamp(1.25rem,2.5vw,1.7rem);font-weight:800;letter-spacing:-.04em;line-height:1.15;margin-bottom:.1rem}
+    .topbar-left h1 span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .topbar-left p{font-size:.82rem;color:var(--ink3);font-weight:300}
+    .topbar-right{display:flex;align-items:center;gap:.75rem}
+    .live-time{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:600;color:var(--ink2);background:var(--card);border:1px solid var(--line);border-radius:100px;padding:.3rem .875rem;letter-spacing:.04em}
+    .online-dot{display:inline-flex;align-items:center;gap:.35rem;font-size:.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;background:rgba(58,156,90,.1);color:var(--ag);border:1px solid rgba(58,156,90,.25);padding:.3rem .75rem;border-radius:100px}
+    .online-dot::before{content:'';width:5px;height:5px;background:var(--ag);border-radius:50%;animation:blink 2s ease-in-out infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .top-av{width:38px;height:38px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;overflow:hidden;border:2px solid var(--line);transition:border-color var(--t)}
+    .top-av:hover{border-color:var(--a1)}
+    .top-av img{width:100%;height:100%;object-fit:cover}
+
+    /* ─── STAT STRIP ──────────────────────────── */
+    .stat-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:1.75rem;animation:fadein .5s var(--ease) .08s both}
+    .stat-cell{background:var(--card);padding:1.25rem 1.5rem;transition:background var(--t);position:relative;overflow:hidden}
+    .stat-cell:hover{background:var(--bg2)}
+    .stat-cell::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;opacity:0;transition:opacity var(--t)}
+    .stat-cell:hover::after{opacity:1}
+    .sc-o::after{background:linear-gradient(90deg,#c8623a,#e08c4a)}
+    .sc-g::after{background:linear-gradient(90deg,#3a9c5a,#5ccf80)}
+    .sc-p::after{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+    .stat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.9rem;color:#fff;margin-bottom:.875rem}
+    .sc-o .stat-icon{background:linear-gradient(135deg,#c8623a,#e08c4a)}
+    .sc-g .stat-icon{background:linear-gradient(135deg,#3a9c5a,#5ccf80)}
+    .sc-p .stat-icon{background:linear-gradient(135deg,#8b5cf6,#a78bfa)}
+    .stat-num{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-.05em;line-height:1;margin-bottom:.2rem}
+    .stat-lbl{font-size:.72rem;color:var(--ink3)}
+
+    /* ─── REWARD BANNER ───────────────────────── */
+    .reward{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.25rem 1.625rem;margin-bottom:1.75rem;display:flex;align-items:center;gap:1.25rem;box-shadow:var(--sh1);position:relative;overflow:hidden;animation:fadein .5s var(--ease) .15s both}
+    .reward::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(200,98,58,.03),rgba(58,107,200,.03));pointer-events:none}
+    .reward-ico{width:50px;height:50px;border-radius:14px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.25rem;flex-shrink:0}
+    .reward-txt{flex:1}
+    .reward-txt h3{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:.2rem}
+    .reward-txt p{font-size:.78rem;color:var(--ink3);line-height:1.55}
+    .reward-right{flex-shrink:0;text-align:right}
+    .reward-count{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:.25rem}
+    .reward-sub{font-size:.65rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em}
+    .reward-bar{width:160px;height:7px;background:var(--bg2);border-radius:100px;overflow:hidden;margin-top:.5rem;border:1px solid var(--line)}
+    .reward-fill{height:100%;background:var(--grad);border-radius:100px;transition:width 1.2s var(--ease);width:0%}
+
+    /* ─── MAIN GRID ───────────────────────────── */
+    .grid-main{display:grid;grid-template-columns:1.4fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
+
+    /* ─── SECTION CARD ────────────────────────── */
+    .sc{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:1.5rem;box-shadow:var(--sh1)}
+    .sc-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--line)}
+    .sc-hdr-left{display:flex;align-items:center;gap:.5rem}
+    .sc-hdr h2{font-family:'Syne',sans-serif;font-size:.92rem;font-weight:700}
+    .sc-hdr i.hi{color:var(--a1);font-size:.85rem}
+
+    /* ─── EVENT CARD (improved) ───────────────── */
+    .ev-card{border:1px solid var(--line);border-radius:14px;padding:0;margin-bottom:.75rem;transition:all var(--t);position:relative;overflow:hidden;background:var(--bg)}
+    .ev-card:hover{border-color:var(--line2);box-shadow:var(--sh2);transform:translateY(-1px)}
+    .ev-card-accent{height:3px;background:var(--grad);width:100%}
+    .ev-card-body{padding:1rem 1.125rem}
+    .ev-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;margin-bottom:.625rem}
+    .ev-card-title{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;line-height:1.3;flex:1}
+    .ev-chips{display:flex;gap:.35rem;flex-wrap:wrap;flex-shrink:0}
+    .chip{display:inline-flex;align-items:center;gap:.2rem;font-size:.6rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:.2rem .55rem;border-radius:5px}
+    .chip-open{background:rgba(200,98,58,.1);color:var(--a1);border:1px solid rgba(200,98,58,.25)}
+    .chip-completed{background:rgba(139,92,246,.1);color:#8b5cf6;border:1px solid rgba(139,92,246,.25)}
+    .chip-closed{background:rgba(239,68,68,.08);color:#ef4444;border:1px solid rgba(239,68,68,.2)}
+    .chip-free{background:rgba(58,156,90,.1);color:var(--ag);border:1px solid rgba(58,156,90,.25)}
+    .chip-paid{background:rgba(200,98,58,.08);color:var(--a1);border:1px solid rgba(200,98,58,.2)}
+    .ev-meta{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:.625rem}
+    .ev-meta span{font-size:.72rem;color:var(--ink3);display:flex;align-items:center;gap:.28rem}
+    .ev-meta i{color:var(--a1);font-size:.65rem}
+    .ev-desc{font-size:.78rem;color:var(--ink2);line-height:1.55;margin-bottom:.875rem}
+    .ev-footer{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding-top:.75rem;border-top:1px solid var(--line)}
+    .ev-cat{display:flex;align-items:center;gap:.3rem;font-size:.7rem;color:var(--ink3)}
+    .ev-cat i{color:var(--a1);font-size:.65rem}
+
+    /* Register button */
+    .btn-reg{display:inline-flex;align-items:center;gap:.35rem;font-size:.74rem;font-weight:700;padding:.42rem .875rem;border-radius:100px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--t);text-decoration:none;white-space:nowrap}
+    .btn-reg.open-reg{background:var(--grad);color:#fff;box-shadow:0 2px 10px var(--glow)}
+    .btn-reg.open-reg:hover{transform:translateY(-1px);box-shadow:0 4px 18px var(--glow)}
+    .btn-reg.already{background:rgba(58,156,90,.1);color:var(--ag);border:1px solid rgba(58,156,90,.3);cursor:default}
+    .btn-reg.closed-reg{background:var(--bg2);color:var(--ink3);border:1px solid var(--line);cursor:default;opacity:.7}
+
+    /* ─── PROGRESS ────────────────────────────── */
+    .prog-item{margin-bottom:1.125rem}
+    .prog-top{display:flex;justify-content:space-between;margin-bottom:.35rem}
+    .prog-top span{font-size:.8rem;color:var(--ink2);font-weight:500}
+    .prog-top .pct{font-size:.78rem;font-weight:700;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .prog-track{height:5px;background:var(--bg2);border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+    .prog-fill{height:100%;background:var(--grad);border-radius:6px;transition:width 1s var(--ease);width:0%}
+
+    /* ─── RESOURCES VIEW ──────────────────────── */
+    .res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-bottom:1.5rem}
+    .res-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.125rem;display:flex;flex-direction:column;gap:.75rem;transition:all var(--t);box-shadow:var(--sh1)}
+    .res-card:hover{border-color:var(--line2);box-shadow:var(--sh2);transform:translateY(-2px)}
+    .res-card-top{display:flex;align-items:center;gap:.75rem}
+    .res-icon{width:42px;height:42px;border-radius:11px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;flex-shrink:0}
+    .res-icon.pdf{background:linear-gradient(135deg,#ef4444,#f87171)}
+    .res-icon.ppt{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
+    .res-icon.doc{background:linear-gradient(135deg,#3a6bc8,#60a5fa)}
+    .res-icon.zip{background:linear-gradient(135deg,#8b5cf6,#a78bfa)}
+    .res-icon.img{background:linear-gradient(135deg,#3a9c5a,#5ccf80)}
+    .res-icon.other{background:linear-gradient(135deg,#c8623a,#e08c4a)}
+    .res-info{flex:1;min-width:0}
+    .res-name{font-size:.84rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.15rem}
+    .res-meta{font-size:.68rem;color:var(--ink3)}
+    .res-msg{font-size:.78rem;color:var(--ink2);line-height:1.5;border-left:2px solid var(--a1);padding-left:.625rem}
+    .res-footer{display:flex;align-items:center;justify-content:space-between;padding-top:.625rem;border-top:1px solid var(--line)}
+    .res-date{font-size:.68rem;color:var(--ink3)}
+    .btn-dl{display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;font-weight:600;padding:.35rem .75rem;border-radius:100px;background:var(--grad);color:#fff;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--t);text-decoration:none;box-shadow:0 2px 8px var(--glow)}
+    .btn-dl:hover{transform:translateY(-1px);box-shadow:0 4px 14px var(--glow)}
+
+    /* ─── MERCH CARDS (in resources view) ──────── */
+    .merch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
+    .merch-card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:all var(--t);box-shadow:var(--sh1)}
+    .merch-card:hover{border-color:var(--line2);box-shadow:var(--sh2);transform:translateY(-2px)}
+    .merch-card-img{height:140px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.35rem;background:var(--bg2)}
+    .merch-card-img span:first-child{font-size:3rem}
+    .merch-card-img span:last-child{font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+    .merch-card-body{padding:1rem}
+    .merch-tag{display:inline-block;font-size:.58rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.16rem .45rem;border-radius:4px;background:var(--grad);color:#fff;margin-bottom:.4rem}
+    .merch-name{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;margin-bottom:.25rem}
+    .merch-desc{font-size:.75rem;color:var(--ink3);line-height:1.5;margin-bottom:.75rem}
+    .merch-footer{display:flex;align-items:center;justify-content:space-between}
+    .merch-price{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .btn-order{display:inline-flex;align-items:center;gap:.3rem;font-size:.72rem;font-weight:600;padding:.4rem .875rem;border-radius:100px;background:var(--grad);color:#fff;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--t);box-shadow:0 2px 8px var(--glow)}
+    .btn-order:hover{transform:translateY(-1px);box-shadow:0 4px 14px var(--glow)}
+
+    /* ─── MERCH SLIDESHOW (dashboard) ─────────── */
+    .merch-banner{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:1.5rem;box-shadow:var(--sh1);margin-bottom:1.25rem}
+    .merch-banner-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--line)}
+    .merch-banner-hdr-l{display:flex;align-items:center;gap:.5rem}
+    .merch-banner-hdr-l h2{font-family:'Syne',sans-serif;font-size:.92rem;font-weight:700}
+    .merch-banner-hdr-l i{color:var(--a1);font-size:.85rem}
+    .merch-banner-hdr-r{font-size:.75rem;color:var(--ink3)}
+    .ss-wrap{position:relative;overflow:hidden;border-radius:12px}
+    .ss-track{display:flex;transition:transform .5s var(--ease)}
+    .ss-slide{min-width:100%;padding:0 2px}
+    .ss-inner{background:var(--bg2);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex}
+    .ss-img{width:190px;height:190px;flex-shrink:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.4rem;background:var(--bg)}
+    .ss-img span:first-child{font-size:3.5rem}
+    .ss-img span:last-child{font-size:.62rem;color:var(--ink3);font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+    .ss-info{padding:1.375rem;flex:1;display:flex;flex-direction:column;justify-content:space-between}
+    .ss-tag{display:inline-block;font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.18rem .5rem;border-radius:4px;background:var(--grad);color:#fff;margin-bottom:.5rem;width:fit-content}
+    .ss-name{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.35rem}
+    .ss-desc{font-size:.8rem;color:var(--ink3);line-height:1.55;flex:1;margin-bottom:.875rem}
+    .ss-btm{display:flex;align-items:center;justify-content:space-between}
+    .ss-price{font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .ss-buy{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:600;background:var(--grad);color:#fff;padding:.5rem 1rem;border-radius:100px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all var(--t);box-shadow:0 2px 12px var(--glow)}
+    .ss-buy:hover{transform:translateY(-1px);box-shadow:0 4px 20px var(--glow)}
+    .ss-controls{display:flex;align-items:center;justify-content:center;gap:.75rem;margin-top:.875rem}
+    .ss-dot{width:7px;height:7px;border-radius:50%;background:var(--line2);border:none;cursor:pointer;transition:all var(--t);padding:0}
+    .ss-dot.active{background:var(--a1);width:20px;border-radius:4px}
+    .ss-arr{width:30px;height:30px;background:var(--bg2);border:1px solid var(--line);border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:.72rem;transition:all var(--t)}
+    .ss-arr:hover{background:var(--a1);color:#fff;border-color:var(--a1)}
+
+    /* ─── ANNOUNCEMENTS ───────────────────────── */
+    .ann{display:flex;gap:.875rem;padding:.875rem 1rem;border:1px solid var(--line);border-radius:12px;margin-bottom:.625rem;transition:all var(--t);background:var(--bg)}
+    .ann:hover{border-color:var(--line2);background:var(--bg2)}
+    .ann-ico{width:34px;height:34px;border-radius:9px;background:var(--bg2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--a1);font-size:.8rem;flex-shrink:0;transition:all var(--t)}
+    .ann:hover .ann-ico{background:var(--a1);color:#fff;border-color:var(--a1)}
+    .ann h4{font-size:.84rem;font-weight:700;margin-bottom:.2rem}
+    .ann p{font-size:.77rem;color:var(--ink2);line-height:1.5;margin-bottom:.25rem}
+    .ann-time{font-size:.67rem;color:var(--ink3)}
+
+    /* ─── VIEW PAGE HEADER ────────────────────── */
+    .view-hdr{margin-bottom:1.5rem}
+    .view-hdr h2{font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.25rem}
+    .view-hdr p{font-size:.82rem;color:var(--ink3)}
+    .view-hdr-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+    .section-label{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem}
+    .section-label::after{content:'';flex:1;height:1px;background:var(--line)}
+
+    /* ─── EMPTY / SKELETON ────────────────────── */
+    .empty{text-align:center;padding:2.5rem 1rem;color:var(--ink3)}
+    .empty i{display:block;font-size:1.75rem;margin-bottom:.625rem;opacity:.25}
+    .empty p{font-size:.82rem}
+    .skel{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg) 50%,var(--bg2) 75%);background-size:200% 100%;animation:shim 1.4s infinite;border-radius:8px}
+    @keyframes shim{from{background-position:200% 0}to{background-position:-200% 0}}
+
+    /* ─── MODAL ───────────────────────────────── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity var(--t)}
+    .modal-overlay.open{opacity:1;pointer-events:all}
+    .modal{background:var(--card);border:1px solid var(--line);border-radius:20px;width:90%;max-width:400px;padding:1.625rem;box-shadow:var(--sh3);transform:translateY(16px) scale(.97);transition:transform var(--t)}
+    .modal-overlay.open .modal{transform:translateY(0) scale(1)}
+    .modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:.875rem;border-bottom:1px solid var(--line)}
+    .modal-hdr h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800}
+    .modal-x{width:30px;height:30px;background:var(--bg2);border:1px solid var(--line);border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:.8rem;transition:all var(--t)}
+    .modal-x:hover{background:#fee2e2;color:#ef4444;border-color:#fecaca}
+    .av-preview{width:110px;height:110px;border-radius:50%;margin:0 auto 1.375rem;overflow:hidden;border:3px solid var(--line)}
+    .av-preview img{width:100%;height:100%;object-fit:cover}
+    .av-init{width:100%;height:100%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:2.25rem;color:#fff}
+    .photo-drop{border:2px dashed var(--line2);border-radius:11px;padding:1.375rem;text-align:center;cursor:pointer;transition:all var(--t);margin-bottom:.875rem}
+    .photo-drop:hover{border-color:var(--a1);background:rgba(200,98,58,.04)}
+    .photo-drop i{font-size:1.4rem;color:var(--ink3);display:block;margin-bottom:.4rem}
+    .photo-drop p{font-size:.8rem;color:var(--ink3)}
+    .photo-drop strong{color:var(--a1)}
+    .btn-save{display:flex;align-items:center;justify-content:center;gap:.4rem;width:100%;padding:.7rem;background:var(--grad);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:all var(--t);box-shadow:0 2px 12px var(--glow)}
+    .btn-save:hover{transform:translateY(-1px);box-shadow:0 4px 20px var(--glow)}
+    .btn-save:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+    /* ─── TOAST ───────────────────────────────── */
+    .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem 1rem;display:flex;align-items:center;gap:.55rem;box-shadow:var(--sh3);z-index:600;transform:translateY(120%);transition:transform .4s cubic-bezier(.34,1.56,.64,1);min-width:230px}
+    .toast.show{transform:translateY(0)}
+    .toast.success i{color:var(--ag)}.toast.error i{color:#ef4444}.toast.info i{color:var(--a1)}
+    .toast span{font-size:.82rem;font-weight:500}
+
+    /* ─── FOOTER ──────────────────────────────── */
+    footer{background:#1a1714;color:#f0ece6;padding:3.5rem 0 1.5rem;margin-top:3rem}
+    footer .con{max-width:1200px;margin:0 auto;padding:0 2rem}
+    .ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:3rem;margin-bottom:2.5rem}
+    .ft-sec h3{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.875rem}
+    .ft-sec h4{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:#f0ece6;margin-bottom:.875rem}
+    .ft-sec p{font-size:.82rem;color:#a09890;line-height:1.7;margin-bottom:1rem}
+    .socials{display:flex;gap:.625rem}
+    .socials a{width:34px;height:34px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#a09890;font-size:.82rem;text-decoration:none;transition:all var(--t)}
+    .socials a:hover{background:var(--a1);border-color:var(--a1);color:#fff;transform:translateY(-2px)}
+    .ft-sec ul{list-style:none}
+    .ft-sec ul li{margin-bottom:.5rem}
+    .ft-sec ul li a{color:#a09890;text-decoration:none;font-size:.82rem;transition:color var(--t)}
+    .ft-sec ul li a:hover{color:var(--a1)}
+    .ft-contact li{display:flex;align-items:center;gap:.55rem;color:#a09890;font-size:.82rem;margin-bottom:.5rem;list-style:none}
+    .ft-contact li i{color:var(--a1);width:14px}
+    .nl-form{display:flex;gap:.45rem;margin-top:.5rem}
+    .nl-form input{flex:1;padding:.55rem .8rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#f0ece6;font-family:'DM Sans',sans-serif;font-size:.82rem;outline:none;transition:border-color var(--t)}
+    .nl-form input::placeholder{color:#6b6358}
+    .nl-form input:focus{border-color:var(--a1)}
+    .nl-form button{width:36px;height:36px;background:var(--grad);border:none;border-radius:8px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.82rem;flex-shrink:0;transition:all var(--t)}
+    .nl-form button:hover{transform:translateY(-1px)}
+    .ft-bottom{border-top:1px solid rgba(255,255,255,.07);padding-top:1.25rem;text-align:center}
+    .ft-bottom p{font-size:.78rem;color:#6b6358}
+
+    @media(max-width:1100px){.stat-strip{grid-template-columns:repeat(3,1fr)}.ft-grid{grid-template-columns:1fr 1fr;gap:2rem}}
+    @media(max-width:900px){.grid-main{grid-template-columns:1fr}}
+    @media(max-width:768px){.sidebar{transform:translateX(-100%)}.main{margin-left:0;padding:1rem}footer{margin-left:0}.ss-img{width:140px;height:140px}.ft-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <a href="index.html" class="sb-brand"><span class="sb-brandname">ClustrCore</span></a>
+    <div class="sb-profile" onclick="openModal('photoModal')">
+      <div class="sb-av-wrap">
+        <div class="sb-av" id="sbAv">S</div>
+        <div class="sb-cam"><i class="fas fa-camera"></i></div>
+      </div>
+      <div class="sb-meta">
+        <strong id="sbName">Student</strong>
+        <span>Student Portal</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sb-nav">
+    <span class="sb-label">Navigation</span>
+    <button class="sb-item active" onclick="showView('dashboard')"><i class="fas fa-home"></i> Dashboard</button>
+    <button class="sb-item" onclick="showView('events-view')"><i class="fas fa-calendar-alt"></i> My Events</button>
+    <button class="sb-item" onclick="showView('resources-view')"><i class="fas fa-folder-open"></i> Resources</button>
+    <button class="sb-item" onclick="showView('competitions')"><i class="fas fa-trophy"></i> Competitions</button>
+    <a class="sb-item" href="resume.html"><i class="fas fa-file-user"></i> My Resume</a>
+    <a class="sb-item" href="#"><i class="fas fa-user"></i> My Profile</a>
+  </nav>
+
+  <div class="sb-footer">
+    <div class="sb-theme" id="themeRow">
+      <span><i class="fas fa-moon" id="themeIcon"></i> <span id="themeLabel">Dark Mode</span></span>
+      <div class="pill"></div>
+    </div>
+    <button class="sb-out" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+  </div>
+</aside>
+
+<!-- ═══ MAIN ══════════════════════════════════════ -->
+<main class="main">
+
+  <!-- ── DASHBOARD VIEW ─────────────────────── -->
+  <div class="view active" id="view-dashboard">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1>Hey, <span id="userGreeting">Student</span> 👋</h1>
+        <p id="todayDate">Loading…</p>
+      </div>
+      <div class="topbar-right">
+        <div class="live-time" id="liveTime">--:--</div>
+        <span class="online-dot">Online</span>
+        <div class="top-av" id="topAv" onclick="openModal('photoModal')">S</div>
+      </div>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="stat-strip">
+      <div class="stat-cell sc-o">
+        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+        <div class="stat-num" id="statEvents">0</div>
+        <div class="stat-lbl">Events Registered</div>
+      </div>
+      <div class="stat-cell sc-g">
+        <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+        <div class="stat-num" id="statComp">0</div>
+        <div class="stat-lbl">Competitions Joined</div>
+      </div>
+      <div class="stat-cell sc-p">
+        <div class="stat-icon"><i class="fas fa-star"></i></div>
+        <div class="stat-num" id="statPoints">0</div>
+        <div class="stat-lbl">Points Earned</div>
+      </div>
+    </div>
+
+    <!-- Reward banner -->
+    <div class="reward">
+      <div class="reward-ico"><i class="fas fa-gift"></i></div>
+      <div class="reward-txt">
+        <h3 id="rewardTitle">Earn 100 points → Get a free workshop!</h3>
+        <p id="rewardDesc">Participate in events, win competitions and collect certificates to earn points. Reach 100 points to unlock your next workshop for free.</p>
+      </div>
+      <div class="reward-right">
+        <div class="reward-count" id="rewardCount">0/100</div>
+        <div class="reward-sub">points earned</div>
+        <div class="reward-bar"><div class="reward-fill" id="rewardFill"></div></div>
+      </div>
+    </div>
+
+    <!-- Main grid: events + progress -->
+    <div class="grid-main">
+      <!-- Upcoming Events -->
+      <div class="sc">
+        <div class="sc-hdr">
+          <div class="sc-hdr-left"><i class="fas fa-calendar-alt hi"></i><h2>Upcoming Events</h2></div>
+          <span style="font-size:.72rem;color:var(--ink3)" id="evCount"></span>
+        </div>
+        <div id="eventsContainer">
+          <div class="skel" style="height:110px;margin-bottom:.75rem"></div>
+          <div class="skel" style="height:110px;margin-bottom:.75rem"></div>
+          <div class="skel" style="height:110px"></div>
+        </div>
+      </div>
+
+      <!-- Progress + Announcements -->
+      <div style="display:flex;flex-direction:column;gap:1.25rem">
+        <div class="sc">
+          <div class="sc-hdr">
+            <div class="sc-hdr-left"><i class="fas fa-chart-line hi"></i><h2>My Progress</h2></div>
+          </div>
+          <div class="prog-item">
+            <div class="prog-top"><span>Event Participation</span><span class="pct" id="pct1">0%</span></div>
+            <div class="prog-track"><div class="prog-fill" id="bar1"></div></div>
+          </div>
+          <div class="prog-item">
+            <div class="prog-top"><span>Competition Success</span><span class="pct" id="pct2">0%</span></div>
+            <div class="prog-track"><div class="prog-fill" id="bar2"></div></div>
+          </div>
+          <div class="prog-item">
+            <div class="prog-top"><span>Overall Activity</span><span class="pct" id="pct3">0%</span></div>
+            <div class="prog-track"><div class="prog-fill" id="bar3"></div></div>
+          </div>
+        </div>
+
+        <div class="sc" style="flex:1">
+          <div class="sc-hdr">
+            <div class="sc-hdr-left"><i class="fas fa-bullhorn hi"></i><h2>Announcements</h2></div>
+          </div>
+          <div id="annContainer">
+            <div class="skel" style="height:64px;margin-bottom:.5rem"></div>
+            <div class="skel" style="height:64px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Merch Slideshow (dashboard preview) -->
+    <div class="merch-banner">
+      <div class="merch-banner-hdr">
+        <div class="merch-banner-hdr-l"><i class="fas fa-shirt"></i><h2>ClustrCore Merch</h2></div>
+        <button class="sb-item" style="width:auto;padding:.35rem .875rem;font-size:.75rem;border-radius:100px;border:1px solid var(--line)" onclick="showView('resources-view')">
+          View all <i class="fas fa-arrow-right" style="font-size:.65rem;margin-left:.2rem"></i>
+        </button>
+      </div>
+      <div class="ss-wrap">
+        <div class="ss-track" id="ssTrack">
+          <!-- slides injected by JS from API -->
+        </div>
+      </div>
+      <div class="ss-controls">
+        <button class="ss-arr" onclick="slideMove(-1)"><i class="fas fa-chevron-left"></i></button>
+        <div id="ssDots"></div>
+        <button class="ss-arr" onclick="slideMove(1)"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+  </div><!-- /dashboard view -->
+
+  <!-- ── EVENTS VIEW ─────────────────────────── -->
+  <div class="view" id="view-events-view">
+    <div class="view-hdr">
+      <h2>My Events</h2>
+      <p>All events you've registered for or that are currently open.</p>
+    </div>
+    <div id="allEventsContainer">
+      <div class="skel" style="height:110px;margin-bottom:.75rem;border-radius:14px"></div>
+      <div class="skel" style="height:110px;margin-bottom:.75rem;border-radius:14px"></div>
+      <div class="skel" style="height:110px;border-radius:14px"></div>
+    </div>
+  </div>
+
+  <!-- ── RESOURCES VIEW ─────────────────────── -->
+  <div class="view" id="view-resources-view">
+    <div class="view-hdr view-hdr-row">
+      <div>
+        <h2>Resources & Merch</h2>
+        <p>Study materials, event files and official ClustrCore merchandise uploaded by the Digital Team.</p>
+      </div>
+    </div>
+
+    <!-- Resources section -->
+    <div class="section-label"><i class="fas fa-file-alt" style="color:var(--a1)"></i> Study Resources & Files</div>
+    <div class="res-grid" id="resourcesGrid">
+      <div class="skel" style="height:140px;border-radius:14px"></div>
+      <div class="skel" style="height:140px;border-radius:14px"></div>
+      <div class="skel" style="height:140px;border-radius:14px"></div>
+    </div>
+
+    <!-- Merch section -->
+    <div class="section-label" style="margin-top:2rem"><i class="fas fa-shirt" style="color:var(--a1)"></i> Official Merch Store</div>
+    <div class="merch-grid" id="merchGrid">
+      <div class="skel" style="height:280px;border-radius:14px"></div>
+      <div class="skel" style="height:280px;border-radius:14px"></div>
+      <div class="skel" style="height:280px;border-radius:14px"></div>
+      <div class="skel" style="height:280px;border-radius:14px"></div>
+    </div>
+  </div>
+
+  <!-- ── COMPETITIONS VIEW ───────────────────── -->
+  <div class="view" id="view-competitions">
+    <div class="view-hdr">
+      <h2>Competitions</h2>
+      <p>Active and upcoming competitions you can join.</p>
+    </div>
+    <div class="empty" style="padding:4rem 1rem">
+      <i class="fas fa-trophy"></i>
+      <p>No competitions right now. Check back soon!</p>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══ FOOTER ════════════════════════════════════ -->
+<footer style="margin-left:var(--sw)">
+  <div class="con">
+    <div class="ft-grid">
+      <div class="ft-sec">
+        <h3>Cluster Core</h3>
+        <p>Empowering innovation and building a community of tech enthusiasts dedicated to learning and growth.</p>
+        <div class="socials">
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-linkedin"></i></a>
+          <a href="#"><i class="fab fa-github"></i></a>
+        </div>
+      </div>
+      <div class="ft-sec">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="events.html">Events</a></li>
+          <li><a href="index.html#team">Team</a></li>
+          <li><a href="resources.html">Resources</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="ft-sec">
+        <h4>Contact Us</h4>
+        <ul class="ft-contact">
+          <li><i class="fas fa-envelope"></i> info@clustercore.com</li>
+          <li><i class="fas fa-phone"></i> +91 98765 43210</li>
+          <li><i class="fas fa-map-marker-alt"></i> Tech Building, Room 301</li>
+        </ul>
+      </div>
+      <div class="ft-sec">
+        <h4>Newsletter</h4>
+        <p>Stay updated with our latest events and announcements.</p>
+        <form class="nl-form" onsubmit="return false">
+          <input type="email" placeholder="Enter your email">
+          <button type="submit"><i class="fas fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </div>
+    <div class="ft-bottom"><p>&copy; 2026 Cluster Core. All rights reserved.</p></div>
+  </div>
+</footer>
+
+<!-- Photo modal -->
+<div class="modal-overlay" id="photoModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h3><i class="fas fa-camera" style="color:var(--a1);margin-right:.4rem"></i>Profile Photo</h3>
+      <button class="modal-x" onclick="closeModal('photoModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="av-preview"><div id="avPreview" class="av-init">S</div></div>
+    <div class="photo-drop" id="photoDrop" onclick="document.getElementById('photoInput').click()">
+      <i class="fas fa-cloud-upload-alt"></i>
+      <p>Drop photo here or <strong>click to browse</strong></p>
+      <p style="font-size:.7rem;margin-top:.25rem">JPEG, PNG — max 2 MB</p>
+    </div>
+    <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" style="display:none">
+    <button class="btn-save" id="savePhotoBtn" onclick="savePhoto()" disabled>
+      <i class="fas fa-save"></i> Save Photo
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="fas fa-circle-check"></i><span id="toastMsg">Done!</span></div>
+
+<script>
+(() => {
+  const API           = 'http://localhost:5000/api';
+  const POINTS_TARGET = 100;
+
+  /* ── AUTH ───────────────────────────────────── */
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  if (!user) { window.location.href = 'index.html'; return; }
+  const name    = user.name || user.email.split('@')[0];
+  const initial = name[0].toUpperCase();
+
+  document.getElementById('userGreeting').textContent = name;
+  document.getElementById('sbName').textContent       = name;
+
+  /* ── VIEW SWITCHING ─────────────────────────── */
+  window.showView = (name) => {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(`view-${name}`).classList.add('active');
+    document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+
+    const map = { dashboard: 0, 'events-view': 1, 'resources-view': 2, competitions: 3 };
+    const idx = map[name];
+    if (idx !== undefined) document.querySelectorAll('.sb-item')[idx]?.classList.add('active');
+
+    if (name === 'resources-view') loadResources();
+    if (name === 'events-view')    loadAllEventsView();
+  };
+
+  /* ── THEME ──────────────────────────────────── */
+  const html = document.documentElement;
+  applyTheme(localStorage.getItem('clustr-theme') || 'light');
+  function applyTheme(t) {
+    html.setAttribute('data-theme', t);
+    localStorage.setItem('clustr-theme', t);
+    const ic = document.getElementById('themeIcon');
+    const lb = document.getElementById('themeLabel');
+    if (ic) ic.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    if (lb) lb.textContent = t === 'dark' ? 'Light Mode' : 'Dark Mode';
+  }
+  document.getElementById('themeRow').addEventListener('click', () =>
+    applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
+
+  /* ── LIVE CLOCK ─────────────────────────────── */
+  function tickClock() {
+    const now = new Date();
+    document.getElementById('liveTime').textContent =
+      `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  }
+  tickClock(); setInterval(tickClock, 10000);
+  document.getElementById('todayDate').textContent =
+    new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  /* ── PROFILE PHOTO ──────────────────────────── */
+  let pendingPhoto = null;
+  function loadPhoto() {
+    const saved = localStorage.getItem('clustr-profile-photo');
+    if (saved) setPhoto(saved); else setInitial();
+  }
+  function setPhoto(url) {
+    document.getElementById('sbAv').innerHTML  = `<img src="${url}" alt="">`;
+    document.getElementById('topAv').innerHTML = `<img src="${url}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  }
+  function setInitial() {
+    document.getElementById('sbAv').textContent  = initial;
+    document.getElementById('topAv').textContent = initial;
+  }
+  loadPhoto();
+
+  const photoInput = document.getElementById('photoInput');
+  photoInput.addEventListener('change', () => {
+    const f = photoInput.files[0]; if (!f) return;
+    if (f.size > 2 * 1024 * 1024) { showToast('Max 2 MB please', 'error'); return; }
+    const r = new FileReader();
+    r.onload = e => {
+      pendingPhoto = e.target.result;
+      const p = document.getElementById('avPreview');
+      p.className = ''; p.innerHTML = `<img src="${pendingPhoto}" style="width:100%;height:100%;object-fit:cover">`;
+      document.getElementById('savePhotoBtn').disabled = false;
+    };
+    r.readAsDataURL(f);
+  });
+  const pd = document.getElementById('photoDrop');
+  pd.addEventListener('dragover', e => { e.preventDefault(); pd.style.borderColor = 'var(--a1)'; });
+  pd.addEventListener('dragleave', () => pd.style.borderColor = '');
+  pd.addEventListener('drop', e => {
+    e.preventDefault(); pd.style.borderColor = '';
+    const f = e.dataTransfer.files[0];
+    if (f?.type.startsWith('image/')) { photoInput.files = e.dataTransfer.files; photoInput.dispatchEvent(new Event('change')); }
+  });
+  window.savePhoto = () => {
+    if (!pendingPhoto) return;
+    localStorage.setItem('clustr-profile-photo', pendingPhoto);
+    setPhoto(pendingPhoto); closeModal('photoModal');
+    showToast('Photo updated ✓', 'success');
+    pendingPhoto = null;
+    document.getElementById('savePhotoBtn').disabled = true;
+  };
+
+  /* ── REWARD ─────────────────────────────────── */
+  function updateReward(pts) {
+    const pct  = Math.min(100, Math.round((pts / POINTS_TARGET) * 100));
+    const done = pts >= POINTS_TARGET;
+    document.getElementById('rewardCount').textContent = done ? '✓ Unlocked' : `${pts}/${POINTS_TARGET}`;
+    if (done) {
+      document.getElementById('rewardTitle').textContent = '🎉 You unlocked a free workshop!';
+      document.getElementById('rewardDesc').textContent  = 'You have enough points. Contact the team to claim.';
+      document.getElementById('rewardFill').style.background = 'linear-gradient(90deg,#3a9c5a,#5ccf80)';
+    }
+    setTimeout(() => { document.getElementById('rewardFill').style.width = pct + '%'; }, 120);
+  }
+
+  /* ── PROGRESS BARS ──────────────────────────── */
+  function setBar(pId, bId, v) {
+    const val = Math.min(100, Math.max(0, Math.round(v)));
+    document.getElementById(pId).textContent = val + '%';
+    setTimeout(() => { document.getElementById(bId).style.width = val + '%'; }, 120);
+  }
+
+  /* ── REGISTERED EVENTS ──────────────────────── */
+  function getRegistered() {
+    try { return JSON.parse(localStorage.getItem('clustr-registered') || '[]'); } catch { return []; }
+  }
+  function markRegistered(eventId) {
+    const reg = getRegistered();
+    if (!reg.includes(eventId)) { reg.push(eventId); localStorage.setItem('clustr-registered', JSON.stringify(reg)); }
+  }
+
+  /* ── FILE TYPE ICON ─────────────────────────── */
+  function fileIcon(name = '') {
+    const ext = name.split('.').pop().toLowerCase();
+    if (['pdf'].includes(ext)) return { cls: 'pdf', icon: 'fa-file-pdf' };
+    if (['ppt','pptx'].includes(ext)) return { cls: 'ppt', icon: 'fa-file-powerpoint' };
+    if (['doc','docx'].includes(ext)) return { cls: 'doc', icon: 'fa-file-word' };
+    if (['zip','rar','7z'].includes(ext)) return { cls: 'zip', icon: 'fa-file-zipper' };
+    if (['jpg','jpeg','png','gif','webp'].includes(ext)) return { cls: 'img', icon: 'fa-file-image' };
+    return { cls: 'other', icon: 'fa-file' };
+  }
+
+  /* ── LOAD DASHBOARD ─────────────────────────── */
+  async function loadDashboard() {
+    try {
+      const [evRes, annRes, merchRes] = await Promise.all([
+        fetch(`${API}/events/public`),
+        fetch(`${API}/events/public/announcements`),
+        fetch(`${API}/digital/merch/public`),
+      ]);
+      const events = evRes.ok    ? await evRes.json()   : [];
+      const anns   = annRes.ok   ? await annRes.json()  : [];
+      const merch  = merchRes.ok ? await merchRes.json(): { items: [] };
+
+      renderEvents(events, 'eventsContainer');
+      renderAnn(anns);
+      renderMerchSlideshow(merch.items || []);
+      document.getElementById('evCount').textContent = events.length ? `${events.length} upcoming` : '';
+    } catch {
+      document.getElementById('eventsContainer').innerHTML =
+        '<div class="empty"><i class="fas fa-wifi"></i><p>Could not load. Is the server running?</p></div>';
+      document.getElementById('annContainer').innerHTML =
+        '<div class="empty"><i class="fas fa-bell-slash"></i><p>Could not load announcements.</p></div>';
+      // Fallback static merch if API down
+      renderMerchSlideshow([]);
+    }
+
+    document.getElementById('statEvents').textContent = 0;
+    document.getElementById('statComp').textContent   = 0;
+    document.getElementById('statPoints').textContent = 0;
+    setBar('pct1','bar1',0); setBar('pct2','bar2',0); setBar('pct3','bar3',0);
+    updateReward(0);
+  }
+
+  /* ── LOAD ALL EVENTS VIEW ───────────────────── */
+  async function loadAllEventsView() {
+    const c = document.getElementById('allEventsContainer');
+    c.innerHTML = '<div class="skel" style="height:110px;margin-bottom:.75rem;border-radius:14px"></div>'.repeat(3);
+    try {
+      const res = await fetch(`${API}/events/public`);
+      const events = res.ok ? await res.json() : [];
+      renderEvents(events, 'allEventsContainer');
+    } catch {
+      c.innerHTML = '<div class="empty"><i class="fas fa-wifi"></i><p>Could not load events.</p></div>';
+    }
+  }
+
+  /* ── RENDER EVENTS ──────────────────────────── */
+  function renderEvents(events, containerId) {
+    const c   = document.getElementById(containerId);
+    const reg = getRegistered();
+    if (!events.length) {
+      c.innerHTML = '<div class="empty"><i class="fas fa-calendar-xmark"></i><p>No upcoming events right now.</p></div>';
+      return;
+    }
+    c.innerHTML = events.map(e => {
+      const status   = (e.status || 'open').toLowerCase().replace(/\s+/g,'');
+      const isReg    = reg.includes(String(e._id));
+      const isClosed = status === 'closed' || status === 'completed';
+      const fee      = e.registrationFee || 0;
+      const regUrl   = `register.html?id=${e._id}&event=${encodeURIComponent(e.title)}&category=${e.category||'other'}&fee=${fee}`;
+
+      let btnHtml;
+      if (isReg) {
+        btnHtml = `<span class="btn-reg already"><i class="fas fa-check-circle"></i> Registered</span>`;
+      } else if (isClosed) {
+        btnHtml = `<span class="btn-reg closed-reg"><i class="fas fa-lock"></i> Closed</span>`;
+      } else {
+        btnHtml = `<a class="btn-reg open-reg" href="${regUrl}" onclick="markRegistered('${e._id}')" target="_blank">
+          <i class="fas fa-arrow-right"></i> Register Now</a>`;
+      }
+
+      return `
+        <div class="ev-card">
+          <div class="ev-card-accent"></div>
+          <div class="ev-card-body">
+            <div class="ev-card-top">
+              <div class="ev-card-title">${e.title}</div>
+              <div class="ev-chips">
+                <span class="chip chip-${status}">${e.status || 'Open'}</span>
+                ${fee > 0 ? `<span class="chip chip-paid">₹${fee}</span>` : `<span class="chip chip-free">Free</span>`}
+              </div>
+            </div>
+            ${(e.date || e.time) ? `
+            <div class="ev-meta">
+              ${e.date ? `<span><i class="fas fa-calendar"></i>${e.date}</span>` : ''}
+              ${e.time ? `<span><i class="fas fa-clock"></i>${e.time}</span>` : ''}
+              ${e.venue ? `<span><i class="fas fa-location-dot"></i>${e.venue}</span>` : ''}
+            </div>` : ''}
+            ${e.description ? `<div class="ev-desc">${e.description.slice(0,110)}${e.description.length>110?'…':''}</div>` : ''}
+            <div class="ev-footer">
+              <span class="ev-cat">${e.category ? `<i class="fas fa-tag"></i>${e.category}` : ''}</span>
+              ${btnHtml}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  /* ── RENDER ANNOUNCEMENTS ───────────────────── */
+  function renderAnn(anns) {
+    const c = document.getElementById('annContainer');
+    if (!anns.length) {
+      c.innerHTML = '<div class="empty"><i class="fas fa-bell-slash"></i><p>No announcements yet.</p></div>';
+      return;
+    }
+    c.innerHTML = anns.map(a => `
+      <div class="ann">
+        <div class="ann-ico"><i class="fas fa-${a.icon||'bullhorn'}"></i></div>
+        <div>
+          <h4>${a.title}</h4>
+          <p>${(a.body||a.content||'').slice(0,120)}${(a.body||a.content||'').length>120?'…':''}</p>
+          <span class="ann-time">${a.date||''} ${a.author?'· '+a.author:''}</span>
+        </div>
+      </div>`).join('');
+  }
+
+  /* ── LOAD RESOURCES VIEW ────────────────────── */
+  let resourcesLoaded = false;
+  async function loadResources() {
+    if (resourcesLoaded) return;
+    resourcesLoaded = true;
+
+    const resGrid   = document.getElementById('resourcesGrid');
+    const merchGrid = document.getElementById('merchGrid');
+
+    try {
+      const [resResp, merchResp] = await Promise.all([
+        fetch(`${API}/studentresources/resources`, { headers: { 'x-user-id': user.id } }),
+        fetch(`${API}/digital/merch/public`),
+      ]);
+
+      /* ── Resources ── */
+      const resData = resResp.ok ? await resResp.json() : { resources: [] };
+      const resources = resData.resources || [];
+
+      if (!resources.length) {
+        resGrid.innerHTML = '<div class="empty" style="grid-column:1/-1"><i class="fas fa-folder-open"></i><p>No resources uploaded yet.</p></div>';
+      } else {
+        resGrid.innerHTML = resources.map(r => {
+          const fi   = fileIcon(r.originalName || r.name || '');
+          const date = r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '';
+          const size = r.size ? `${(r.size/1024).toFixed(0)} KB` : '';
+          const dlUrl = `${API}/studentresources/resources/${r._id}/download`;
+          return `
+            <div class="res-card">
+              <div class="res-card-top">
+                <div class="res-icon ${fi.cls}"><i class="fas ${fi.icon}"></i></div>
+                <div class="res-info">
+                  <div class="res-name">${r.originalName || r.name || 'Resource'}</div>
+                  <div class="res-meta">${r.subject || ''}${size ? ' · '+size : ''}</div>
+                </div>
+              </div>
+              ${r.message ? `<div class="res-msg">${r.message.slice(0,100)}${r.message.length>100?'…':''}</div>` : ''}
+              <div class="res-footer">
+                <span class="res-date">${date}${r.sentBy?.name ? ' · by '+r.sentBy.name : ''}</span>
+                <a class="btn-dl" href="${dlUrl}" target="_blank"><i class="fas fa-download"></i> Download</a>
+              </div>
+            </div>`;
+        }).join('');
+      }
+
+      /* ── Merch ── */
+      const merchData = merchResp.ok ? await merchResp.json() : { items: [] };
+      renderMerchCards(merchData.items || [], merchGrid);
+
+    } catch (err) {
+      resGrid.innerHTML   = '<div class="empty" style="grid-column:1/-1"><i class="fas fa-wifi"></i><p>Could not load resources.</p></div>';
+      merchGrid.innerHTML = '<div class="empty" style="grid-column:1/-1"><i class="fas fa-wifi"></i><p>Could not load merch.</p></div>';
+    }
+  }
+
+  /* ── RENDER MERCH CARDS (resources view) ─────── */
+  function renderMerchCards(items, container) {
+    const staticItems = [
+      { emoji:'👕', label:'T-Shirt',  tag:'Bestseller', name:'ClustrCore T-Shirt',  description:'Premium 100% cotton unisex tee with the ClustrCore gradient logo. Available S–XL.', price:'₹399' },
+      { emoji:'🧥', label:'Hoodie',   tag:'Limited',    name:'ClustrCore Hoodie',    description:'Heavyweight fleece hoodie with embroidered logo on chest. Perfect for late-night hackathons.', price:'₹799' },
+      { emoji:'🎨', label:'Stickers', tag:'Popular',    name:'Sticker Pack ×10',     description:'10 high-quality vinyl stickers — ClustrCore artwork, tech memes and club mascots.', price:'₹99' },
+      { emoji:'☕', label:'Mug',      tag:'New',        name:'ClustrCore Mug',        description:'11oz ceramic mug with gradient ClustrCore logo. Fuel your coding sessions in style.', price:'₹299' },
+      { emoji:'🧢', label:'Cap',      tag:'Exclusive',  name:'ClustrCore Cap',        description:'Structured 6-panel cap with embroidered CC logo. One size fits all with adjustable strap.', price:'₹449' },
+      { emoji:'👜', label:'Tote Bag', tag:'Eco',        name:'ClustrCore Tote Bag',   description:'Heavy canvas tote with gradient print. Carry your laptop, books and gear sustainably.', price:'₹249' },
+    ];
+    const display = items && items.length ? items : staticItems;
+
+    container.innerHTML = display.map(m => {
+      const photo = m.photoUrl || (m.photoData ? `data:${m.photoMime};base64,${m.photoData}` : null);
+      return `
+      <div class="merch-card">
+        <div class="merch-card-img" style="background:${photo ? 'transparent' : ''};">
+          ${photo ? `<img src="${photo}" alt="${m.name}" style="width:100%;height:100%;object-fit:cover;"/>` : `<span>${m.emoji || '🛍️'}</span><span>${m.label || m.category || ''}</span>`}
+        </div>
+        <div class="merch-card-body">
+          <div class="merch-tag">${m.tag || m.badge || 'Available'}</div>
+          <div class="merch-name">${m.name}</div>
+          <div class="merch-desc">${m.description || m.desc || ''}</div>
+          <div class="merch-footer">
+            <span class="merch-price">${m.price ? `₹${m.price}` : (m.priceInr ? '₹'+m.priceInr : '')}</span>
+            <button class="btn-order" onclick="showToast('Contact the club to order!','info')">
+              <i class="fas fa-shopping-bag"></i> Order
+            </button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  /* ── RENDER MERCH SLIDESHOW (dashboard) ─────── */
+  function renderMerchSlideshow(items) {
+    const staticItems = [
+      { emoji:'👕', label:'T-Shirt',  tag:'Bestseller', name:'ClustrCore T-Shirt',  description:'Premium 100% cotton unisex tee with the ClustrCore gradient logo. Available S–XL.', price:'₹399' },
+      { emoji:'🧥', label:'Hoodie',   tag:'Limited',    name:'ClustrCore Hoodie',    description:'Heavyweight fleece hoodie with embroidered logo on chest. Perfect for late-night hackathons.', price:'₹799' },
+      { emoji:'🎨', label:'Stickers', tag:'Popular',    name:'Sticker Pack ×10',     description:'10 high-quality vinyl stickers — ClustrCore artwork, tech memes and club mascots.', price:'₹99' },
+      { emoji:'☕', label:'Mug',      tag:'New',        name:'ClustrCore Mug',        description:'11oz ceramic mug with gradient ClustrCore logo.', price:'₹299' },
+      { emoji:'🧢', label:'Cap',      tag:'Exclusive',  name:'ClustrCore Cap',        description:'Structured 6-panel cap with embroidered CC logo. One size fits all.', price:'₹449' },
+      { emoji:'👜', label:'Tote Bag', tag:'Eco',        name:'ClustrCore Tote Bag',   description:'Heavy canvas tote with gradient print.', price:'₹249' },
+    ];
+    const display = items && items.length ? items : staticItems;
+    const track = document.getElementById('ssTrack');
+    const dots  = document.getElementById('ssDots');
+
+    track.innerHTML = display.map(m => {
+      const photo = m.photoUrl || (m.photoData ? `data:${m.photoMime};base64,${m.photoData}` : null);
+      return `
+      <div class="ss-slide"><div class="ss-inner">
+        <div class="ss-img">${photo ? `<img src="${photo}" alt="${m.name}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;"/>` : `<span>${m.emoji||'🛍️'}</span><span>${m.label||''}</span>`}</div>
+        <div class="ss-info">
+          <div>
+            <span class="ss-tag">${m.tag||'Available'}</span>
+            <div class="ss-name">${m.name}</div>
+            <div class="ss-desc">${m.description||m.desc||''}</div>
+          </div>
+          <div class="ss-btm">
+            <span class="ss-price">${m.price ? '₹'+m.price : (m.priceInr?'₹'+m.priceInr:'')}</span>
+            <button class="ss-buy" onclick="showToast('Contact the club to order!','info')">
+              <i class="fas fa-shopping-bag"></i> Order Now
+            </button>
+          </div>
+        </div>
+      </div></div>`;
+    }).join('');
+
+    dots.innerHTML = '';
+    display.forEach((_, i) => {
+      const d = document.createElement('button');
+      d.className = 'ss-dot' + (i === 0 ? ' active' : '');
+      d.setAttribute('aria-label', `Slide ${i+1}`);
+      d.onclick = () => { goSlide(i); resetTimer(); };
+      dots.appendChild(d);
+    });
+    goSlide(0);
+    resetTimer();
+  }
+
+  /* ── SLIDESHOW CONTROLS ─────────────────────── */
+  let curSlide = 0, timer;
+  function goSlide(n) {
+    const slides = document.querySelectorAll('.ss-slide');
+    if (!slides.length) return;
+    curSlide = (n + slides.length) % slides.length;
+    document.getElementById('ssTrack').style.transform = `translateX(-${curSlide * 100}%)`;
+    document.querySelectorAll('.ss-dot').forEach((d, i) => d.classList.toggle('active', i === curSlide));
+  }
+  window.slideMove = dir => { goSlide(curSlide + dir); resetTimer(); };
+  function resetTimer() {
+    clearInterval(timer);
+    timer = setInterval(() => goSlide(curSlide + 1), 4500);
+  }
+  const ssWrap = document.querySelector('.ss-wrap');
+  if (ssWrap) {
+    ssWrap.addEventListener('mouseenter', () => clearInterval(timer));
+    ssWrap.addEventListener('mouseleave', resetTimer);
+  }
+
+  /* ── MODALS ─────────────────────────────────── */
+  window.openModal = id => {
+    document.getElementById(id).classList.add('open');
+    if (id === 'photoModal') {
+      const saved = localStorage.getItem('clustr-profile-photo');
+      const p = document.getElementById('avPreview');
+      if (saved) { p.className=''; p.innerHTML=`<img src="${saved}" style="width:100%;height:100%;object-fit:cover">`; }
+      else        { p.className='av-init'; p.textContent=initial; }
+      document.getElementById('savePhotoBtn').disabled = true;
+      pendingPhoto = null;
+    }
+  };
+  window.closeModal = id => document.getElementById(id).classList.remove('open');
+  document.querySelectorAll('.modal-overlay').forEach(o =>
+    o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }));
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+  });
+
+  /* ── TOAST ──────────────────────────────────── */
+  window.showToast = (msg, type='success') => {
+    const t = document.getElementById('toast');
+    t.className = `toast ${type}`;
+    t.querySelector('i').className = { success:'fas fa-circle-check', error:'fas fa-circle-exclamation', info:'fas fa-circle-info' }[type] || 'fas fa-circle-check';
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  };
+
+  /* ── LOGOUT ─────────────────────────────────── */
+  window.logout = () => {
+    if (confirm('Sign out of ClustrCore?')) {
+      localStorage.removeItem('user');
+      window.location.href = 'index.html';
+    }
+  };
+
+  /* ── INIT ───────────────────────────────────── */
+  loadDashboard();
+})();
+</script>
+</body>
+</html>

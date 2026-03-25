@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In – ClustrCore</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+
+    /* ── VARIABLES ─────────────────────────────────────── */
+    :root {
+      --bg-primary: #f4f1ec;
+      --bg-secondary: #eae6df;
+      --bg-card: #ffffff;
+
+      --text-primary: #1a1714;
+      --text-secondary: #5c5650;
+      --text-muted: #9c958d;
+
+      --accent-1: #c8623a;
+      --accent-2: #3a6bc8;
+      --accent-gradient: linear-gradient(135deg, #c8623a 0%, #e08c4a 50%, #3a6bc8 100%);
+      --accent-glow: rgba(200, 98, 58, 0.2);
+
+      --border: rgba(26, 23, 20, 0.1);
+      --border-strong: rgba(26, 23, 20, 0.22);
+      --shadow-sm: 0 2px 8px rgba(26,23,20,0.08);
+      --shadow-md: 0 8px 32px rgba(26,23,20,0.12);
+      --shadow-lg: 0 24px 64px rgba(26,23,20,0.16);
+
+      --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+      --transition-slow: 0.6s cubic-bezier(0.4,0,0.2,1);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0f0e0d;
+      --bg-secondary: #161412;
+      --bg-card: #1c1916;
+
+      --text-primary: #f0ece6;
+      --text-secondary: #a09890;
+      --text-muted: #6b6358;
+
+      --accent-1: #e07a50;
+      --accent-2: #6a9be8;
+      --accent-gradient: linear-gradient(135deg, #e07a50 0%, #e8a060 50%, #6a9be8 100%);
+      --accent-glow: rgba(224,122,80,0.18);
+
+      --border: rgba(240,236,230,0.08);
+      --border-strong: rgba(240,236,230,0.16);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.35);
+      --shadow-md: 0 8px 32px rgba(0,0,0,0.45);
+      --shadow-lg: 0 24px 64px rgba(0,0,0,0.6);
+    }
+
+    /* ── RESET ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      position: relative;
+      overflow: hidden;
+      transition: background var(--transition), color var(--transition);
+    }
+
+    /* Animated grid background */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 56px 56px;
+      opacity: 0.5;
+      pointer-events: none;
+      animation: gridDrift 25s linear infinite;
+    }
+
+    @keyframes gridDrift {
+      from { background-position: 0 0; }
+      to   { background-position: 56px 56px; }
+    }
+
+    /* Ambient glow orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(80px);
+      opacity: 0.35;
+      animation: orbFloat 10s ease-in-out infinite;
+    }
+    .orb-1 {
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(200,98,58,0.4), transparent 70%);
+      top: -120px; right: -100px;
+    }
+    .orb-2 {
+      width: 360px; height: 360px;
+      background: radial-gradient(circle, rgba(58,107,200,0.35), transparent 70%);
+      bottom: -100px; left: -80px;
+      animation-delay: -5s;
+      animation-direction: reverse;
+    }
+
+    @keyframes orbFloat {
+      0%,100% { transform: scale(1) translate(0,0); }
+      33%      { transform: scale(1.08) translate(12px,-16px); }
+      66%      { transform: scale(0.94) translate(-8px,10px); }
+    }
+
+    /* Noise texture */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9999;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* ── THEME TOGGLE (top-right) ──────────────────────── */
+    .theme-btn {
+      position: fixed;
+      top: 1.25rem; right: 1.25rem;
+      z-index: 100;
+      width: 40px; height: 40px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      transition: all var(--transition);
+      box-shadow: var(--shadow-sm);
+    }
+    .theme-btn:hover {
+      background: var(--bg-secondary);
+      border-color: var(--border-strong);
+      transform: scale(1.08) rotate(15deg);
+    }
+
+    /* ── CARD ──────────────────────────────────────────── */
+    .login-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 460px;
+      padding: 2.75rem 2.5rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      z-index: 2;
+      animation: cardIn 0.7s cubic-bezier(0.4,0,0.2,1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(32px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Gradient top border */
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 2rem; right: 2rem;
+      height: 2px;
+      background: var(--accent-gradient);
+      border-radius: 0 0 4px 4px;
+    }
+
+    /* ── LOGO ──────────────────────────────────────────── */
+    .logo {
+      text-align: center;
+      margin-bottom: 2.25rem;
+    }
+
+    .logo-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px; height: 56px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      margin-bottom: 1rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    /* Outer ring on logo mark */
+    .logo-mark::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .logo h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.3rem;
+    }
+
+    .logo p {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      font-weight: 300;
+    }
+
+    /* ── FORM GROUPS ───────────────────────────────────── */
+    .form-group { margin-bottom: 1.1rem; }
+
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .input-wrapper { position: relative; }
+
+    .input-wrapper i {
+      position: absolute;
+      left: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      pointer-events: none;
+      transition: color var(--transition);
+    }
+
+    .input-wrapper:focus-within i { color: var(--accent-1); }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem 2rem 0.75rem 2.6rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      outline: none;
+      transition: all var(--transition);
+      appearance: none;
+    }
+
+    input::placeholder { color: var(--text-muted); }
+
+    input:focus, select:focus {
+      border-color: var(--accent-1);
+      background: var(--bg-card);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    /* Password toggle */
+    .toggle-pw {
+      position: absolute;
+      right: 11px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.82rem;
+      padding: 4px;
+      transition: color var(--transition);
+    }
+    .toggle-pw:hover { color: var(--accent-1); }
+
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '\f078';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      right: 13px; top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+    }
+    .select-wrap select { padding-right: 2.5rem; }
+
+    .forgot-password {
+      text-align: right;
+      margin-top: 0.4rem;
+    }
+    .forgot-password a {
+      font-size: 0.78rem;
+      color: var(--accent-2);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color var(--transition);
+    }
+    .forgot-password a:hover { color: var(--accent-1); }
+
+    /* ── ROLE CARDS ────────────────────────────────────── */
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+    }
+
+    .role-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 0.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition);
+      background: var(--bg-secondary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .role-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent-gradient);
+      transform: scaleX(0);
+      transition: transform var(--transition);
+    }
+
+    .role-card:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-card);
+    }
+
+    .role-card.selected {
+      border-color: var(--accent-1);
+      background: var(--bg-card);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .role-card.selected::before { transform: scaleX(1); }
+
+    .role-card i {
+      display: block;
+      font-size: 1.2rem;
+      margin-bottom: 0.3rem;
+      color: var(--text-muted);
+      transition: color var(--transition);
+    }
+
+    .role-card.selected i { color: var(--accent-1); }
+
+    .role-card span {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      transition: color var(--transition);
+    }
+
+    .role-card.selected span { color: var(--text-primary); }
+
+    /* Hidden real select for form submission */
+    #role { display: none; }
+
+    /* ── ERROR MESSAGE ──────────────────────────────────── */
+    .error-msg {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #ef4444;
+      border-radius: 8px;
+      padding: 0.6rem 0.875rem;
+      font-size: 0.82rem;
+      display: none;
+      margin-bottom: 1rem;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .error-msg.show { display: flex; }
+
+    /* ── SUBMIT BUTTON ─────────────────────────────────── */
+    .btn-submit {
+      width: 100%;
+      padding: 0.875rem;
+      margin-top: 1.5rem;
+      background: var(--accent-gradient);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      box-shadow: 0 4px 16px var(--accent-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      letter-spacing: 0.01em;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px var(--accent-glow);
+    }
+
+    .btn-submit:active:not(:disabled) { transform: translateY(0); }
+
+    .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+
+    .btn-submit .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── DIVIDER ───────────────────────────────────────── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      margin: 1.5rem 0;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1; height: 1px;
+      background: var(--border);
+    }
+
+    /* ── FOOTER LINK ───────────────────────────────────── */
+    .signup-link {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+    .signup-link a {
+      color: var(--accent-1);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color var(--transition);
+    }
+    .signup-link a:hover { color: var(--accent-2); }
+
+    /* ── BACK LINK ─────────────────────────────────────── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 1.5rem;
+      transition: color var(--transition);
+    }
+    .back-link:hover { color: var(--accent-1); }
+
+    /* ── SUCCESS STATE ─────────────────────────────────── */
+    .success-overlay {
+      position: absolute; inset: 0;
+      background: var(--bg-card);
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition);
+    }
+
+    .success-overlay.show { opacity: 1; pointer-events: all; }
+
+    .success-icon {
+      width: 64px; height: 64px;
+      background: rgba(58,156,90,0.12);
+      border: 1px solid rgba(58,156,90,0.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.75rem;
+      color: #3a9c5a;
+      animation: successPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    @keyframes successPop {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    .success-overlay h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .success-overlay p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* ── RESPONSIVE ────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .login-container { padding: 2rem 1.5rem; }
+      .logo h1 { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- Theme toggle -->
+  <button class="theme-btn" id="themeToggle" aria-label="Toggle theme">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <div class="login-container">
+
+    <!-- Success overlay -->
+    <div class="success-overlay" id="successOverlay">
+      <div class="success-icon"><i class="fas fa-check"></i></div>
+      <h3>Welcome back!</h3>
+      <p>Redirecting you now…</p>
+    </div>
+
+    <!-- Back to home -->
+    <a href="index.html" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to home
+    </a>
+
+    <!-- Logo -->
+    <div class="logo">
+      <div class="logo-mark">CC</div>
+      <h1>ClustrCore</h1>
+      <p>Welcome back! Sign in to continue</p>
+    </div>
+
+    <!-- Error message -->
+    <div class="error-msg" id="errorMsg">
+      <i class="fas fa-circle-exclamation"></i>
+      <span id="errorText">Please fill all fields.</span>
+    </div>
+
+    <!-- Form -->
+    <form id="loginForm" autocomplete="off">
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope"></i>
+          <input id="email" type="email" placeholder="you@example.com" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock"></i>
+          <input id="password" type="password" placeholder="Enter your password" required>
+          <button type="button" class="toggle-pw" id="togglePw" aria-label="Show password">
+            <i class="fas fa-eye" id="pwIcon"></i>
+          </button>
+        </div>
+        <div class="forgot-password">
+          <a href="#">Forgot Password?</a>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Your Role</label>
+        <select id="role" required>
+  <option value="">Select Role</option>
+  <option value="student">Student</option>
+  <option value="team">Team</option>
+  <option value="admin">Admin</option>
+</select>
+
+        <div class="role-grid" id="roleGrid">
+          <div class="role-card" data-role="student">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Student</span>
+          </div>
+          <div class="role-card" data-role="team">
+            <i class="fas fa-users"></i>
+            <span>Team</span>
+          </div>
+          <div class="role-card" data-role="admin">
+            <i class="fas fa-shield-halved"></i>
+            <span>Admin</span>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <div class="spinner" id="spinner"></div>
+        <span id="btnText">Sign In <i class="fas fa-arrow-right"></i></span>
+      </button>
+
+    </form>
+
+    <div class="divider"><span>or</span></div>
+
+    <div class="signup-link">
+      Don't have an account? <a href="signup.html">Create one</a>
+    </div>
+
+  </div>
+
+  <script>
+  (() => {
+    /* ── THEME ────────────────────────────────────────── */
+    const html   = document.documentElement;
+    const tBtn   = document.getElementById('themeToggle');
+    const saved  = localStorage.getItem('clustr-theme') || 'light';
+    applyTheme(saved);
+
+    function applyTheme(t) {
+      html.setAttribute('data-theme', t);
+      localStorage.setItem('clustr-theme', t);
+      tBtn.querySelector('i').className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+
+    tBtn.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      tBtn.style.transform = 'scale(0.8) rotate(25deg)';
+      setTimeout(() => { tBtn.style.transform = ''; applyTheme(next); }, 140);
+    });
+
+    /* ── PASSWORD TOGGLE ──────────────────────────────── */
+     const pwInput = document.getElementById('password');
+    const pwIcon  = document.getElementById('pwIcon');
+    document.getElementById('togglePw').addEventListener('click', () => {
+      const show = pwInput.type === 'password';
+      pwInput.type = show ? 'text' : 'password';
+      pwIcon.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+    });
+
+    /* ── ROLE CARDS ───────────────────────────────────── */
+    const roleSelect = document.getElementById('role');
+    let selectedRole = '';
+
+    document.getElementById('roleGrid').addEventListener('click', e => {
+      const card = e.target.closest('.role-card');
+      if (!card) return;
+      document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedRole = card.dataset.role;
+      roleSelect.value = selectedRole;
+    });
+
+    /* ── ERROR HELPER ─────────────────────────────────── */
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      document.getElementById('errorText').textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 4000);
+    }
+
+    /* ── LOADING STATE ────────────────────────────────── */
+    const submitBtn = document.getElementById('submitBtn');
+    const spinner   = document.getElementById('spinner');
+    const btnText   = document.getElementById('btnText');
+
+    function setLoading(on) {
+      submitBtn.disabled = on;
+      spinner.style.display   = on ? 'block' : 'none';
+      btnText.style.display   = on ? 'none'  : 'flex';
+    }
+
+    /* ── FORM SUBMIT ──────────────────────────────────── */
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) { showError('Please fill in all fields.'); return; }
+      if (!selectedRole)        { showError('Please select your role.');   return; }
+
+      setLoading(true);
+
+      try {
+        const res  = await fetch('http://localhost:5000/api/auth/login', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ email, password, role: selectedRole }),
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem('user', JSON.stringify({
+            email: data.user.email,
+            name:  data.user.name || email.split('@')[0],
+            role:  data.user.role || selectedRole,
+          }));
+
+          setLoading(false);
+          document.getElementById('successOverlay').classList.add('show');
+
+          setTimeout(() => {
+            if (selectedRole === 'admin')  location.href = 'admin-dashboard.html';
+            else if (selectedRole === 'team') location.href = 'portal.html';
+            else location.href = 'student-dashboard.html';
+          }, 1500);
+
+        } else {
+          throw new Error(data.message || 'Invalid credentials. Please try again.');
+        }
+
+      } catch (err) {
+        showError(err.message || 'Server error. Try again later.');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+  })();
+  </script>
+</body>
+</html>

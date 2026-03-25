@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Create Resume</title>
+<link rel="stylesheet" href="resume.css">
+</head>
+
+<body>
+
+<div class="resume-container">
+
+<h1>Build Your Resume</h1>
+
+<div class="template-preview">
+
+<h2>Resume Templates</h2>
+
+<div class="templates">
+
+<div class="template-card">
+<img src="rimages/template1.png" alt="Template 1">
+<p>Template 1 - Classic</p>
+</div>
+
+<div class="template-card">
+<img src="rimages/template2.png" alt="Template 2">
+<p>Template 2 - Modern Sidebar</p>
+</div>
+
+<div class="template-card">
+<img src="rimages/template3.png" alt="Template 3">
+<p>Template 3 - Corporate Clean</p>
+</div>
+
+</div>
+
+</div>
+
+<form id="resumeForm">
+
+<div class="section">
+
+<h2>Select Resume Template</h2>
+
+<select name="template" required>
+<option value="template1">Template 1 - Classic</option>
+<option value="template2">Template 2 - Modern Sidebar</option>
+<option value="template3">Template 3 - Corporate Clean</option>
+</select>
+
+</div>
+
+
+<div class="section">
+
+<h2>Personal Details</h2>
+
+<input name="studentId" placeholder="Student ID" required>
+<input name="name" placeholder="Full Name" required>
+<input name="email" placeholder="Email" required>
+<input name="phone" placeholder="Phone Number">
+<input name="linkedin" placeholder="LinkedIn URL">
+<input name="github" placeholder="GitHub URL">
+
+<label>Upload Profile Picture</label>
+
+<div class="file-upload">
+
+<input type="file" id="photo" name="photo" accept="image/*">
+
+<label for="photo" class="upload-btn">
+Upload Profile Picture
+</label>
+
+<span id="file-name">No image selected</span>
+
+</div>
+
+</div>
+
+
+<div class="section">
+
+<h2>Professional Summary</h2>
+
+<textarea name="summary"></textarea>
+
+</div>
+
+
+<div class="section">
+
+<h2>Skills (comma separated)</h2>
+
+<textarea name="skills"></textarea>
+
+</div>
+
+
+<div class="section">
+
+<h2>Education</h2>
+
+<select name="education">
+
+<option value="">Select Education</option>
+<option value="B.Tech">B.Tech</option>
+<option value="BCA">BCA</option>
+<option value="MCA">MCA</option>
+<option value="M.Tech">M.Tech</option>
+<option value="B.Sc">B.Sc</option>
+<option value="M.Sc">M.Sc</option>
+<option value="Diploma">Diploma</option>
+
+</select>
+
+<input name="college" placeholder="College Name">
+<input name="year" placeholder="Passing Year">
+
+</div>
+
+
+<div class="section">
+
+<h2>Experience</h2>
+
+<textarea name="experience"></textarea>
+
+</div>
+
+
+<div class="section">
+
+<h2>Projects</h2>
+
+<input name="projectName" placeholder="Project Name">
+
+<textarea name="projectDescription"
+placeholder="Project Description"></textarea>
+
+</div>
+
+
+<div class="section">
+
+<h2>Certifications / Achievements</h2>
+
+<textarea name="certifications"></textarea>
+
+</div>
+
+
+<button type="submit">
+Save & Download PDF
+</button>
+
+</form>
+
+</div>
+
+<script src="resume.js"></script>
+
+</body>
+</html>

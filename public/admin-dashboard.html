@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin Dashboard – ClustrCore</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f1ec;--bg2:#eae6df;--card:#fff;
+  --txt:#1a1714;--txt2:#5c5650;--muted:#9c958d;
+  --a1:#c8623a;--a2:#3a6bc8;
+  --grad:linear-gradient(135deg,#c8623a 0%,#e08c4a 50%,#3a6bc8 100%);
+  --glow:rgba(200,98,58,.15);
+  --bdr:rgba(26,23,20,.1);--bdr2:rgba(26,23,20,.18);
+  --sh1:0 2px 8px rgba(26,23,20,.07);--sh2:0 8px 32px rgba(26,23,20,.12);--sh3:0 24px 64px rgba(26,23,20,.15);
+  --r:16px;--rs:10px;--T:.22s cubic-bezier(.4,0,.2,1);
+  --hh:64px;--sw:272px;
+  --ff:'DM Sans',sans-serif;--fd:'Syne',sans-serif;
+}
+[data-theme="dark"]{
+  --bg:#0f0e0d;--bg2:#161412;--card:#1c1916;
+  --txt:#f0ece6;--txt2:#a09890;--muted:#6b6358;
+  --a1:#e07a50;--a2:#6a9be8;
+  --grad:linear-gradient(135deg,#e07a50 0%,#e8a060 50%,#6a9be8 100%);
+  --glow:rgba(224,122,80,.15);
+  --bdr:rgba(240,236,230,.08);--bdr2:rgba(240,236,230,.15);
+  --sh1:0 2px 8px rgba(0,0,0,.3);--sh2:0 8px 32px rgba(0,0,0,.42);--sh3:0 24px 64px rgba(0,0,0,.56);
+}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:var(--a1);border-radius:3px}
+::-webkit-scrollbar-track{background:transparent}
+html{scrollbar-color:var(--a1) transparent;scrollbar-width:thin}
+body{font-family:var(--ff);background:var(--bg);color:var(--txt);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;transition:background var(--T),color var(--T)}
+
+/* ── HEADER ── */
+.hdr{position:fixed;inset:0 0 auto 0;z-index:300;height:var(--hh);background:var(--card);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 20px;gap:10px;transition:background var(--T),border-color var(--T)}
+.hdr::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--grad);opacity:.4}
+.hdr-logo{position:absolute;left:50%;transform:translateX(-50%);font-family:var(--fd);font-weight:800;font-size:1.3rem;letter-spacing:-.02em;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;white-space:nowrap;user-select:none}
+.hdr-sp{flex:1}
+.ibt{width:36px;height:36px;border-radius:var(--rs);background:none;border:1px solid var(--bdr);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.88rem;transition:all var(--T)}
+.ibt:hover{background:var(--bg2);color:var(--txt);border-color:var(--bdr2)}
+.achip{display:flex;align-items:center;gap:5px;background:var(--bg2);border:1px solid var(--bdr);border-radius:50px;padding:5px 12px;font-size:.71rem;font-weight:600;color:var(--txt2);font-family:var(--ff)}
+.achip i{color:var(--a1);font-size:.68rem}
+.lout-btn{display:flex;align-items:center;gap:6px;background:none;border:1px solid var(--bdr);border-radius:var(--rs);padding:7px 13px;font-family:var(--ff);font-size:.78rem;font-weight:600;color:var(--txt2);cursor:pointer;transition:all var(--T)}
+.lout-btn:hover{background:var(--bg2);color:var(--txt);border-color:var(--bdr2)}
+
+/* ── SIDEBAR ── */
+.sov{position:fixed;inset:0;z-index:400;background:rgba(10,8,5,.5);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity var(--T)}
+.sov.open{opacity:1;pointer-events:all}
+.sb{position:fixed;top:0;left:0;bottom:0;z-index:500;width:var(--sw);background:var(--card);border-right:1px solid var(--bdr);display:flex;flex-direction:column;padding:0 0 24px;transform:translateX(-100%);transition:transform var(--T);overflow-y:auto}
+.sb.open{transform:translateX(0);box-shadow:var(--sh3)}
+.sb-top{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--bdr);margin-bottom:6px}
+.sb-brand{font-family:var(--fd);font-weight:800;font-size:1.15rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sb-x{width:28px;height:28px;border-radius:7px;border:1px solid var(--bdr);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.78rem;transition:all var(--T)}
+.sb-x:hover{background:var(--bg2);color:var(--txt)}
+.sb-lbl{font-size:.63rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:14px 20px 5px}
+.ni{display:flex;align-items:center;gap:12px;padding:10px 20px;font-family:var(--ff);font-size:.86rem;font-weight:500;color:var(--txt2);cursor:pointer;border:none;background:none;width:100%;text-align:left;border-left:2px solid transparent;transition:all var(--T)}
+.ni i{width:16px;text-align:center;font-size:.86rem;color:var(--muted);transition:color var(--T)}
+.ni:hover{background:var(--bg2);color:var(--txt)}
+.ni:hover i{color:var(--a1)}
+.ni.active{background:linear-gradient(90deg,rgba(200,98,58,.09),transparent);color:var(--a1);border-left-color:var(--a1);font-weight:600}
+.ni.active i{color:var(--a1)}
+.sb-div{height:1px;background:var(--bdr);margin:8px 20px}
+
+/* ── LAYOUT ── */
+.mw{margin-top:var(--hh);flex:1;display:flex;flex-direction:column}
+.pg{display:none;flex:1;flex-direction:column}
+.pg.active{display:flex;flex-direction:column}
+.con{max-width:1100px;margin:0 auto;padding:38px 24px;width:100%}
+
+/* ── PAGE HDR ── */
+.ph{margin-bottom:26px}
+.ph h1{font-family:var(--fd);font-size:1.95rem;font-weight:800;letter-spacing:-.03em;line-height:1.1;position:relative;display:inline-block;padding-bottom:11px}
+.ph h1::after{content:'';position:absolute;bottom:0;left:0;width:36px;height:3px;background:var(--grad);border-radius:2px}
+.ph p{color:var(--muted);font-size:.83rem;margin-top:7px}
+
+/* ── SECTION HDR ── */
+.sh-row{display:flex;align-items:flex-end;justify-content:space-between;padding:30px 24px 14px;max-width:1100px;margin:0 auto;width:100%;flex-wrap:wrap;gap:10px}
+.sh-ttl{font-family:var(--fd);font-size:1.3rem;font-weight:800;letter-spacing:-.02em;position:relative;display:inline-block;padding-bottom:9px}
+.sh-ttl::after{content:'';position:absolute;bottom:0;left:0;width:26px;height:2.5px;background:var(--grad);border-radius:2px}
+.sh-sub{color:var(--muted);font-size:.76rem;margin-top:6px}
+.va-btn{display:flex;align-items:center;gap:5px;border:1px solid var(--a1);color:var(--a1);background:none;border-radius:50px;padding:6px 13px;font-family:var(--ff);font-size:.77rem;font-weight:600;cursor:pointer;transition:all var(--T);white-space:nowrap}
+.va-btn:hover{background:var(--a1);color:#fff}
+
+/* ── STAT CARDS ── */
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;max-width:1100px;margin:22px auto 0;padding:0 24px;width:100%}
+.sc{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:19px;display:flex;flex-direction:column;gap:11px;transition:box-shadow var(--T),transform var(--T);position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad);opacity:0;transition:opacity var(--T)}
+.sc:hover{box-shadow:var(--sh2);transform:translateY(-2px)}
+.sc:hover::before{opacity:1}
+.sc-top{display:flex;align-items:center;justify-content:space-between}
+.sc-ico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+.sc-ico.or{background:rgba(200,98,58,.1);color:var(--a1)}
+.sc-ico.bl{background:rgba(58,107,200,.1);color:var(--a2)}
+.sc-ico.gn{background:rgba(30,138,82,.1);color:#1e8a52}
+.sc-ico.rd{background:rgba(196,48,48,.1);color:#c43030}
+.sc-num{font-family:var(--fd);font-size:1.8rem;font-weight:800;letter-spacing:-.03em;line-height:1}
+.sc-lbl{font-size:.73rem;color:var(--muted);font-weight:500}
+.sc-spin{width:20px;height:20px;border:2px solid var(--bdr);border-top-color:var(--a1);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── CARD PANEL ── */
+.cpanel{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:0 20px;max-width:1100px;margin:0 auto;width:100%}
+
+/* ── REGISTRATION ROW (read-only) ── */
+.regr{display:flex;align-items:center;gap:11px;padding:13px 0;border-bottom:1px solid var(--bdr)}
+.regr:last-child{border-bottom:none}
+.regav{width:34px;height:34px;border-radius:50%;background:rgba(200,98,58,.08);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--a1);font-size:.82rem}
+.regnfo{flex:1;min-width:0}
+.regnm{font-weight:600;font-size:.83rem}
+.regem{font-size:.7rem;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.regmeta{font-size:.68rem;color:var(--muted);margin-top:2px}
+.rtag{padding:3px 10px;border-radius:50px;font-size:.67rem;font-weight:600;border:1px solid var(--bdr);background:var(--bg2);color:var(--txt2);white-space:nowrap;flex-shrink:0}
+.rtag.confirmed{border-color:rgba(30,138,82,.3);background:rgba(30,138,82,.08);color:#1e8a52}
+.rtag.pending{border-color:rgba(200,98,58,.3);background:rgba(200,98,58,.08);color:var(--a1)}
+.rtag.rejected{border-color:rgba(196,48,48,.3);background:rgba(196,48,48,.08);color:#c43030}
+
+/* ── FULL REG CARD ── */
+.rgc{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:17px 20px;display:flex;align-items:center;gap:14px;transition:box-shadow var(--T);margin-bottom:11px}
+.rgc:hover{box-shadow:var(--sh1)}
+.rgcav{width:42px;height:42px;border-radius:50%;background:rgba(200,98,58,.08);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--a1);font-size:.95rem}
+.rgcif{flex:1;min-width:0}
+.rgcnm{font-family:var(--fd);font-weight:700;font-size:.9rem;margin-bottom:3px}
+.rgcmr{display:flex;gap:13px;flex-wrap:wrap}
+.rgcmi{display:flex;align-items:center;gap:4px;font-size:.72rem;color:var(--muted)}
+.rgcmi i{font-size:.68rem}
+.rgcev{font-size:.72rem;color:var(--txt2);margin-top:3px;font-weight:500}
+
+/* ── EVENT CARD ── */
+.evc{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;transition:box-shadow var(--T),transform var(--T);cursor:default}
+.evc:hover{box-shadow:var(--sh2);transform:translateY(-3px)}
+.ev-img{width:100%;height:150px;object-fit:cover;display:block;background:var(--bg2)}
+.ev-img-ph{width:100%;height:150px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:2rem}
+.ev-body{padding:14px 16px}
+.ev-ttl{font-family:var(--fd);font-weight:700;font-size:.88rem;margin-bottom:6px;line-height:1.3}
+.ev-meta{font-size:.72rem;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+.ev-meta span{display:flex;align-items:center;gap:5px}
+.ev-meta i{font-size:.68rem;color:var(--muted)}
+.evst{display:inline-block;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:50px;margin-top:8px}
+.evst.open,.evst.Open{background:var(--a1);color:#fff}
+.evst.upcoming,.evst.Upcoming{background:var(--bg2);color:var(--muted);border:1px solid var(--bdr)}
+.evst.completed,.evst.Completed{background:rgba(30,138,82,.1);color:#1e8a52;border:1px solid rgba(30,138,82,.2)}
+.evst.draft,.evst.Draft{background:rgba(58,107,200,.1);color:var(--a2);border:1px solid rgba(58,107,200,.2)}
+.ev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+
+/* ── ANNOUNCEMENT CARD ── */
+.anncrd{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:18px 20px;display:flex;gap:13px;transition:box-shadow var(--T);margin-bottom:11px}
+.anncrd:hover{box-shadow:var(--sh1)}
+.annico{width:36px;height:36px;border-radius:9px;background:rgba(200,98,58,.08);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--a1);font-size:.86rem}
+.annbdy{flex:1;min-width:0}
+.annttl{font-family:var(--fd);font-weight:700;font-size:.87rem;margin-bottom:4px}
+.anntxt{font-size:.77rem;color:var(--muted);line-height:1.55}
+.annft{display:flex;align-items:center;gap:10px;margin-top:6px}
+.anndt{font-size:.67rem;color:var(--muted);font-weight:500}
+.annau{font-size:.67rem;color:var(--txt2);font-weight:600}
+
+/* ── GALLERY ── */
+.gal-vp{overflow:hidden;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 5%,#000 95%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 5%,#000 95%,transparent 100%)}
+.gal-track{display:flex;gap:13px;width:max-content;animation:gscroll 36s linear infinite;padding:4px 24px 26px}
+.gal-track:hover{animation-play-state:paused}
+@keyframes gscroll{to{transform:translateX(-50%)}}
+.gi{position:relative;width:272px;height:178px;border-radius:var(--r);overflow:hidden;flex-shrink:0}
+.gi img{width:100%;height:100%;object-fit:cover;transition:transform .4s;display:block}
+.gi:hover img{transform:scale(1.06)}
+.gcap{position:absolute;inset:0;top:auto;background:linear-gradient(transparent 30%,rgba(0,0,0,.68));color:#fff;font-size:.73rem;font-weight:500;padding:18px 12px 9px;opacity:0;transition:opacity .24s;display:flex;align-items:flex-end}
+.gi:hover .gcap{opacity:1}
+
+/* ── SEARCH ── */
+.srch{position:relative}
+.srch i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.78rem;pointer-events:none}
+.srch-inp{background:var(--card);border:1px solid var(--bdr);border-radius:50px;padding:8px 15px 8px 34px;font-family:var(--ff);font-size:.8rem;color:var(--txt);width:220px;outline:none;transition:border-color var(--T)}
+.srch-inp:focus{border-color:var(--a1)}
+
+/* ── TOOLBAR ── */
+.tb{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+
+/* ── FILTER TABS ── */
+.ftabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.ftab{padding:6px 14px;border-radius:50px;font-family:var(--ff);font-size:.77rem;font-weight:600;border:1px solid var(--bdr);background:var(--bg2);color:var(--txt2);cursor:pointer;transition:all var(--T)}
+.ftab:hover,.ftab.active{background:var(--a1);color:#fff;border-color:var(--a1)}
+
+/* ── SETTINGS ── */
+.setcard{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r);padding:20px;margin-bottom:14px}
+.setcard h3{font-family:var(--fd);font-size:.95rem;font-weight:700;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--bdr)}
+.setrow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--bdr)}
+.setrow:last-child{border-bottom:none}
+.setlbl{font-weight:600;font-size:.84rem}
+.setdsc{font-size:.71rem;color:var(--muted);margin-top:2px}
+.tgsw{position:relative;width:38px;height:21px;flex-shrink:0}
+.tgsw input{opacity:0;width:0;height:0}
+.tgsl{position:absolute;inset:0;background:var(--bdr2);border-radius:50px;cursor:pointer;transition:background var(--T)}
+.tgsl::before{content:'';position:absolute;width:15px;height:15px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:transform var(--T)}
+.tgsw input:checked+.tgsl{background:var(--a1)}
+.tgsw input:checked+.tgsl::before{transform:translateX(17px)}
+.prow{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.pav{width:60px;height:60px;border-radius:13px;flex-shrink:0;background:var(--grad);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:1.4rem;font-weight:800;color:#fff}
+.pnm{font-family:var(--fd);font-size:1rem;font-weight:700}
+.pem{font-size:.77rem;color:var(--muted);margin-top:2px}
+.ff-fld{margin-bottom:12px}
+.ff-fld label{display:block;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.ff-fld input{width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rs);padding:9px 13px;font-family:var(--ff);font-size:.84rem;color:var(--txt);outline:none;transition:border-color var(--T)}
+.ff-fld input:focus{border-color:var(--a1)}
+.btn-p{display:inline-flex;align-items:center;gap:6px;background:var(--grad);color:#fff;border:none;border-radius:var(--rs);padding:9px 17px;font-family:var(--ff);font-size:.8rem;font-weight:600;cursor:pointer;transition:opacity var(--T),transform var(--T);box-shadow:0 4px 14px var(--glow)}
+.btn-p:hover{opacity:.9;transform:translateY(-1px)}
+.btn-p:active{transform:translateY(0)}
+
+/* ── EMPTY / ERROR / LOADING ── */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:44px 20px;gap:9px;color:var(--muted);text-align:center}
+.empty i{font-size:2rem;opacity:.35}
+.empty p{font-size:.82rem;font-weight:500}
+.loading{display:flex;align-items:center;justify-content:center;padding:32px;gap:10px;color:var(--muted);font-size:.82rem}
+.spin{width:18px;height:18px;border:2px solid var(--bdr);border-top-color:var(--a1);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.err-box{background:rgba(196,48,48,.07);border:1px solid rgba(196,48,48,.2);border-radius:10px;padding:12px 16px;color:#c43030;font-size:.8rem;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:20px;right:20px;z-index:900;background:#140f08;color:#fff;padding:10px 17px;border-radius:9px;font-size:.79rem;font-weight:500;box-shadow:0 5px 26px rgba(0,0,0,.3);opacity:0;transform:translateY(11px);pointer-events:none;transition:opacity .19s,transform .19s;font-family:var(--ff)}
+#toast.show{opacity:1;transform:translateY(0)}
+
+@media(max-width:900px){.sg{grid-template-columns:1fr 1fr}}
+@media(max-width:580px){.sg{grid-template-columns:1fr}.ph h1{font-size:1.65rem}.ev-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <button class="ibt" id="menuBtn"><i class="fas fa-bars"></i></button>
+  <a class="hdr-logo" href="#" onclick="nav('home');return false;">ClustrCore</a>
+  <div class="hdr-sp"></div>
+  <div class="achip"><i class="fas fa-shield-halved"></i><span id="chip-name">Admin</span></div>
+  <button class="ibt" id="themeBtn" style="margin-left:4px"><i class="fas fa-moon" id="theme-icon"></i></button>
+  <button class="lout-btn" onclick="logout()"><i class="fas fa-arrow-right-from-bracket"></i>Log Out</button>
+</header>
+
+<div class="sov" id="sov" onclick="closeSB()"></div>
+<nav class="sb" id="sb">
+  <div class="sb-top">
+    <span class="sb-brand">ClustrCore</span>
+    <button class="sb-x" onclick="closeSB()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="sb-lbl">Overview</div>
+  <button class="ni active" onclick="nav('home')" data-p="home"><i class="fas fa-gauge-high"></i>Dashboard</button>
+  <button class="ni" onclick="nav('registrations')" data-p="registrations"><i class="fas fa-user-plus"></i>Registrations</button>
+  <button class="ni" onclick="nav('events')" data-p="events"><i class="fas fa-calendar-days"></i>Events</button>
+  <button class="ni" onclick="nav('announcements')" data-p="announcements"><i class="fas fa-bullhorn"></i>Announcements</button>
+  <button class="ni" onclick="nav('gallery')" data-p="gallery"><i class="fas fa-images"></i>Gallery</button>
+  <div class="sb-div"></div>
+  <div class="sb-lbl">Account</div>
+  <button class="ni" onclick="nav('settings')" data-p="settings"><i class="fas fa-gear"></i>Settings</button>
+  <button class="ni" onclick="logout()"><i class="fas fa-arrow-right-from-bracket"></i>Logout</button>
+</nav>
+
+<div class="mw">
+
+  <!-- ══ DASHBOARD HOME ══ -->
+  <div class="pg active" id="page-home">
+    <div class="con" style="padding-bottom:0">
+      <div class="ph">
+        <h1>Dashboard</h1>
+        <p>Welcome back, <span id="greet-name">Admin</span></p>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="sg" id="sg">
+      <div class="sc"><div class="sc-top"><div class="sc-ico or"><i class="fas fa-calendar-days"></i></div></div><div class="sc-num" id="stat-events"><div class="sc-spin"></div></div><div class="sc-lbl">Total Events</div></div>
+      <div class="sc"><div class="sc-top"><div class="sc-ico bl"><i class="fas fa-users"></i></div></div><div class="sc-num" id="stat-regs"><div class="sc-spin"></div></div><div class="sc-lbl">Registrations</div></div>
+      <div class="sc"><div class="sc-top"><div class="sc-ico gn"><i class="fas fa-calendar-check"></i></div></div><div class="sc-num" id="stat-upcoming"><div class="sc-spin"></div></div><div class="sc-lbl">Upcoming Events</div></div>
+      <div class="sc"><div class="sc-top"><div class="sc-ico rd"><i class="fas fa-bullhorn"></i></div></div><div class="sc-num" id="stat-ann"><div class="sc-spin"></div></div><div class="sc-lbl">Announcements</div></div>
+    </div>
+
+    <!-- Events preview -->
+    <div class="sh-row">
+      <div><span class="sh-ttl">Upcoming Events</span><p class="sh-sub">From the Events team</p></div>
+      <button class="va-btn" onclick="nav('events')">View All <i class="fas fa-arrow-right"></i></button>
+    </div>
+    <div style="padding:0 24px;max-width:1100px;margin:0 auto;width:100%" id="home-events-wrap">
+      <div class="loading"><div class="spin"></div>Loading events…</div>
+    </div>
+
+    <!-- Registrations preview -->
+    <div class="sh-row" style="padding-top:28px">
+      <div><span class="sh-ttl">Recent Registrations</span><p class="sh-sub" id="hreg-sub">From tech &amp; digital teams</p></div>
+      <button class="va-btn" onclick="nav('registrations')">View All <i class="fas fa-arrow-right"></i></button>
+    </div>
+    <div style="padding:0 24px;max-width:1100px;margin:0 auto;width:100%">
+      <div class="cpanel" id="home-regs"><div class="loading"><div class="spin"></div>Loading…</div></div>
+    </div>
+
+    <!-- Announcements preview -->
+    <div class="sh-row" style="padding-top:28px">
+      <div><span class="sh-ttl">Announcements</span><p class="sh-sub">Latest from the team</p></div>
+      <button class="va-btn" onclick="nav('announcements')">View All <i class="fas fa-arrow-right"></i></button>
+    </div>
+    <div style="padding:0 24px;max-width:1100px;margin:0 auto;width:100%" id="home-anns-wrap">
+      <div class="loading"><div class="spin"></div>Loading…</div>
+    </div>
+
+    <!-- Gallery -->
+    <div style="padding:28px 24px 12px;max-width:1100px;margin:0 auto;width:100%">
+      <span class="sh-ttl">Gallery Highlights</span>
+      <p class="sh-sub" style="margin-top:7px">From events · hover to pause</p>
+    </div>
+    <div class="gal-vp" id="gal-vp">
+      <div class="gal-track" id="gal-track">
+        <div class="loading" style="width:400px"><div class="spin"></div>Loading gallery…</div>
+      </div>
+    </div>
+    <div style="height:36px"></div>
+  </div>
+
+  <!-- ══ REGISTRATIONS (read-only) ══ -->
+  <div class="pg" id="page-registrations">
+    <div class="con">
+      <div class="ph"><h1>Registrations</h1><p>View-only — managed by Tech &amp; Digital teams</p></div>
+      <div class="tb">
+        <div class="ftabs" id="reg-tabs">
+          <button class="ftab active" onclick="setRegFilter('all',this)">All</button>
+          <button class="ftab" onclick="setRegFilter('pending',this)">Pending</button>
+          <button class="ftab" onclick="setRegFilter('confirmed',this)">Confirmed</button>
+          <button class="ftab" onclick="setRegFilter('rejected',this)">Rejected</button>
+        </div>
+        <div class="srch"><i class="fas fa-magnifying-glass"></i><input class="srch-inp" type="text" placeholder="Search name or email…" oninput="searchRegs(this.value)" id="reg-search"></div>
+      </div>
+      <div id="reg-list"><div class="loading"><div class="spin"></div>Loading registrations…</div></div>
+      <div id="reg-pagination" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px"></div>
+    </div>
+  </div>
+
+  <!-- ══ EVENTS ══ -->
+  <div class="pg" id="page-events">
+    <div class="con">
+      <div class="ph"><h1>Events</h1><p>All club events — managed by Events team</p></div>
+      <div class="tb">
+        <div class="ftabs">
+          <button class="ftab active" onclick="setEvFilter('',this)">All</button>
+          <button class="ftab" onclick="setEvFilter('open',this)">Open</button>
+          <button class="ftab" onclick="setEvFilter('upcoming',this)">Upcoming</button>
+          <button class="ftab" onclick="setEvFilter('completed',this)">Completed</button>
+          <button class="ftab" onclick="setEvFilter('draft',this)">Draft</button>
+        </div>
+      </div>
+      <div class="ev-grid" id="ev-grid"><div class="loading"><div class="spin"></div>Loading events…</div></div>
+    </div>
+  </div>
+
+  <!-- ══ ANNOUNCEMENTS ══ -->
+  <div class="pg" id="page-announcements">
+    <div class="con">
+      <div class="ph"><h1>Announcements</h1><p>Posted by the Events team</p></div>
+      <div id="ann-list"><div class="loading"><div class="spin"></div>Loading announcements…</div></div>
+    </div>
+  </div>
+
+  <!-- ══ GALLERY ══ -->
+  <div class="pg" id="page-gallery">
+    <div class="con" style="padding-bottom:0">
+      <div class="ph"><h1>Gallery</h1><p>Photos uploaded across all events</p></div>
+    </div>
+    <div class="gal-vp" id="full-gal-vp">
+      <div class="gal-track" id="full-gal-track">
+        <div class="loading" style="width:400px"><div class="spin"></div>Loading gallery…</div>
+      </div>
+    </div>
+    <div style="height:40px"></div>
+  </div>
+
+  <!-- ══ SETTINGS ══ -->
+  <div class="pg" id="page-settings">
+    <div class="con">
+      <div class="ph"><h1>Settings</h1><p>Manage your account and preferences</p></div>
+      <div class="setcard">
+        <h3>Admin Profile</h3>
+        <div class="prow">
+          <div class="pav" id="pav">A</div>
+          <div><div class="pnm" id="pnm">Admin</div><div class="pem" id="pem">—</div></div>
+        </div>
+        <div style="display:flex;gap:11px;flex-wrap:wrap;margin-bottom:13px">
+          <div style="flex:1;min-width:170px"><div class="ff-fld"><label>Display Name</label><input type="text" id="set-n" placeholder="Your name"></div></div>
+          <div style="flex:1;min-width:170px"><div class="ff-fld"><label>Email</label><input type="email" id="set-e" placeholder="your@email.com"></div></div>
+        </div>
+        <button class="btn-p" onclick="savePrf()"><i class="fas fa-check"></i>Save Changes</button>
+      </div>
+      <div class="setcard">
+        <h3>Preferences</h3>
+        <div class="setrow">
+          <div><div class="setlbl">Dark Mode</div><div class="setdsc">Switch to dark theme</div></div>
+          <label class="tgsw"><input type="checkbox" id="dtog" onchange="setDark(this.checked)"><span class="tgsl"></span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+const BASE = 'http://localhost:5000/api';
+
+// ── USER INIT ──
+var currentUser = {};
+(function(){
+  try {
+    var u = JSON.parse(localStorage.getItem('user') || '{}');
+    currentUser = u;
+    var name = u.name || u.email || 'Admin';
+    var ini  = name.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2) || 'A';
+    document.getElementById('chip-name').textContent = name;
+    document.getElementById('greet-name').textContent = name;
+    document.getElementById('pnm').textContent = name;
+    document.getElementById('pem').textContent = u.email || '—';
+    document.getElementById('pav').textContent = ini;
+    document.getElementById('set-n').value = name;
+    document.getElementById('set-e').value = u.email || '';
+    var t = localStorage.getItem('clustr-theme') || 'light';
+    if(t === 'dark') applyTheme(true);
+  } catch(e) {}
+})();
+
+// ── THEME ──
+var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+function applyTheme(d) {
+  isDark = d;
+  document.documentElement.setAttribute('data-theme', d ? 'dark' : 'light');
+  document.getElementById('theme-icon').className = d ? 'fas fa-sun' : 'fas fa-moon';
+  var tg = document.getElementById('dtog'); if(tg) tg.checked = d;
+  localStorage.setItem('clustr-theme', d ? 'dark' : 'light');
+}
+function setDark(v) { applyTheme(v); toast(v ? 'Dark mode on' : 'Light mode on'); }
+document.getElementById('themeBtn').addEventListener('click', function(){
+  applyTheme(!isDark); toast(isDark ? 'Dark mode on' : 'Light mode on');
+});
+
+// ── API HELPERS ──
+// Public endpoints need no auth header
+async function apiPublic(path) {
+  const res = await fetch(BASE + path);
+  if(!res.ok) throw new Error((await res.json()).message || res.statusText);
+  return res.json();
+}
+// Admin calls (if you add admin routes later, pass x-user-id)
+async function apiAdmin(path) {
+  const headers = {};
+  if(currentUser._id) headers['x-user-id'] = currentUser._id;
+  const res = await fetch(BASE + path, { headers });
+  if(!res.ok) throw new Error((await res.json()).message || res.statusText);
+  return res.json();
+}
+
+// ── STATE ──
+var allEvents       = [];
+var allRegistrations = [];
+var allAnnouncements = [];
+var allGallery      = [];
+var regFilter = 'all';
+var regSearch = '';
+var regPage   = 1;
+var evFilter  = '';
+var allEventsRaw = [];
+
+// ── LOAD DASHBOARD ──
+async function loadDashboard() {
+  await Promise.all([loadStats(), loadHomeEvents(), loadHomeRegs(), loadHomeAnns(), loadGallery()]);
+}
+
+// ── STATS ──
+// Use public events endpoint + public announcements to derive counts
+async function loadStats() {
+  try {
+    var [evData, annData] = await Promise.all([
+      apiPublic('/events/public'),
+      apiPublic('/events/public/announcements')
+    ]);
+    allEventsRaw = evData;
+    document.getElementById('stat-events').textContent = evData.length;
+    var upcoming = evData.filter(function(e){ return e.status === 'Upcoming' || e.status === 'upcoming'; }).length;
+    document.getElementById('stat-upcoming').textContent = upcoming;
+    document.getElementById('stat-ann').textContent = annData.length;
+    // Registrations count — not exposed via public route, show dash
+    document.getElementById('stat-regs').textContent = '—';
+  } catch(err) {
+    ['stat-events','stat-regs','stat-upcoming','stat-ann'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.textContent = '—';
+    });
+  }
+}
+
+// ── HOME EVENTS ──
+async function loadHomeEvents() {
+  var wrap = document.getElementById('home-events-wrap');
+  try {
+    var events = await apiPublic('/events/public');
+    allEvents = events;
+    if(!events.length) {
+      wrap.innerHTML = '<div class="empty"><i class="fas fa-calendar-days"></i><p>No events found.</p></div>';
+      return;
+    }
+    wrap.innerHTML = '<div style="display:flex;gap:14px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none">'
+      + events.slice(0,6).map(evCardHTML).join('') + '</div>';
+  } catch(err) {
+    wrap.innerHTML = errHTML(err.message);
+  }
+}
+
+function evCardHTML(e) {
+  var img = e.image && !e.image.includes('default-event')
+    ? '<img class="ev-img" src="'+e.image+'" alt="'+esc(e.title)+'">'
+    : '<div class="ev-img-ph">📅</div>';
+  return '<div class="evc" style="min-width:240px;max-width:240px;flex-shrink:0">'
+    + img
+    + '<div class="ev-body">'
+    + '<div class="ev-ttl">'+esc(e.title)+'</div>'
+    + '<div class="ev-meta">'
+    + (e.date ? '<span><i class="fas fa-calendar"></i>'+esc(e.date)+'</span>' : '')
+    + (e.time ? '<span><i class="fas fa-clock"></i>'+esc(e.time)+'</span>' : '')
+    + '</div>'
+    + '<span class="evst '+e.status.toLowerCase()+'">'+esc(e.status)+'</span>'
+    + '</div></div>';
+}
+
+// ── HOME REGS (read-only, public endpoint doesn't expose regs — show info) ──
+async function loadHomeRegs() {
+  var el = document.getElementById('home-regs');
+  // Registrations are only accessible to team members (tech/digital)
+  // Admin gets a read-only summary view via the public events summary
+  el.innerHTML = '<div style="padding:18px 0;text-align:center;color:var(--muted);font-size:.82rem">'
+    + '<i class="fas fa-info-circle" style="margin-right:6px;color:var(--a2)"></i>'
+    + 'Registration data is managed by the Tech &amp; Digital teams. '
+    + '<a onclick="nav(\'registrations\')" style="color:var(--a1);cursor:pointer;font-weight:600">View full list →</a>'
+    + '</div>';
+}
+
+// ── HOME ANNOUNCEMENTS ──
+async function loadHomeAnns() {
+  var wrap = document.getElementById('home-anns-wrap');
+  try {
+    var anns = await apiPublic('/events/public/announcements');
+    allAnnouncements = anns;
+    if(!anns.length) {
+      wrap.innerHTML = '<div class="empty"><i class="fas fa-bullhorn"></i><p>No announcements.</p></div>';
+      return;
+    }
+    wrap.innerHTML = anns.slice(0,3).map(annCardHTML).join('');
+  } catch(err) {
+    wrap.innerHTML = errHTML(err.message);
+  }
+}
+
+function annCardHTML(a) {
+  return '<div class="anncrd">'
+    + '<div class="annico"><i class="fas fa-'+(a.icon||'bullhorn')+'"></i></div>'
+    + '<div class="annbdy">'
+    + '<div class="annttl">'+esc(a.title)+'</div>'
+    + '<div class="anntxt">'+esc(a.body)+'</div>'
+    + '<div class="annft">'
+    + '<span class="anndt">'+esc(a.date)+'</span>'
+    + (a.author ? '<span class="annau">· '+esc(a.author)+'</span>' : '')
+    + '</div></div></div>';
+}
+
+// ── GALLERY ──
+async function loadGallery() {
+  var track = document.getElementById('gal-track');
+  var vp    = document.getElementById('gal-vp');
+  try {
+    var photos = await apiPublic('/events/public/gallery');
+    allGallery = photos;
+    renderGalleryTrack(track, vp, photos);
+  } catch(err) {
+    track.innerHTML = '<div class="empty" style="width:360px"><i class="fas fa-images"></i><p>'+esc(err.message)+'</p></div>';
+    if(vp){vp.style.webkitMaskImage='none';vp.style.maskImage='none';}
+  }
+}
+
+function renderGalleryTrack(track, vp, photos) {
+  if(!photos.length) {
+    track.innerHTML = '<div class="empty" style="width:360px"><i class="fas fa-images"></i><p>No gallery photos yet.</p></div>';
+    if(vp){vp.style.webkitMaskImage='none';vp.style.maskImage='none';}
+    return;
+  }
+  if(vp){
+    vp.style.webkitMaskImage = 'linear-gradient(to right,transparent 0%,#000 5%,#000 95%,transparent 100%)';
+    vp.style.maskImage       = 'linear-gradient(to right,transparent 0%,#000 5%,#000 95%,transparent 100%)';
+  }
+  var doubled = photos.concat(photos);
+  track.innerHTML = doubled.map(function(p){
+    var imgUrl = p.url || ('/api/events/' + p.eventId + '/gallery/' + p.photoId + '/image');
+    return '<div class="gi"><img src="'+BASE.replace('/api','')+imgUrl+'" alt="'+esc(p.caption||'')+'" loading="lazy">'
+      + '<div class="gcap">'+esc(p.caption||'')+'</div></div>';
+  }).join('');
+}
+
+// ── REGISTRATIONS PAGE ──
+// Note: /api/tech/registrations requires role=team & team=tech
+// Admin cannot directly call it. We show a note and attempt with admin userId.
+// If your backend has an admin route, replace the URL below.
+var regDebounce;
+async function loadRegistrations() {
+  var el = document.getElementById('reg-list');
+  el.innerHTML = '<div class="loading"><div class="spin"></div>Loading registrations…</div>';
+
+  var params = '?page='+regPage+'&limit=30';
+  if(regFilter !== 'all') params += '&status='+regFilter;
+  if(regSearch) params += '&search='+encodeURIComponent(regSearch);
+
+  try {
+    // Try tech route with admin's userId — backend may allow if you add admin check
+    var headers = {};
+    if(currentUser._id) headers['x-user-id'] = currentUser._id;
+    var res = await fetch(BASE + '/tech/registrations' + params, { headers });
+
+    if(res.status === 403) {
+      // Admin can't hit tech route — show instructional state
+      el.innerHTML = '<div class="empty">'
+        + '<i class="fas fa-lock"></i>'
+        + '<p>Registrations are managed by the <strong>Tech</strong> and <strong>Digital</strong> teams.<br>'
+        + 'Ask your backend to add an admin-accessible registration endpoint.</p>'
+        + '</div>';
+      return;
+    }
+    if(!res.ok) throw new Error((await res.json()).message || res.statusText);
+
+    var data = await res.json();
+    var items = data.students || data.registrations || [];
+    renderRegList(items);
+    renderRegPagination(data.total, data.pages);
+  } catch(err) {
+    el.innerHTML = errHTML(err.message);
+  }
+}
+
+function renderRegList(items) {
+  var el = document.getElementById('reg-list');
+  if(!items.length) {
+    el.innerHTML = '<div class="empty"><i class="fas fa-user-check"></i><p>No registrations found.</p></div>';
+    return;
+  }
+  el.innerHTML = items.map(function(r) {
+    var evNames = Array.isArray(r.events) ? r.events.join(', ') : (r.eventName || '—');
+    return '<div class="rgc">'
+      + '<div class="rgcav"><i class="fas fa-user"></i></div>'
+      + '<div class="rgcif">'
+      + '<div class="rgcnm">'+esc(r.name)+'</div>'
+      + '<div class="rgcmr">'
+      + '<span class="rgcmi"><i class="fas fa-envelope"></i>'+esc(r.email)+'</span>'
+      + (r.course ? '<span class="rgcmi"><i class="fas fa-graduation-cap"></i>'+esc(r.course)+(r.year?' · Yr '+r.year:'')+'</span>' : '')
+      + (r.phone_number ? '<span class="rgcmi"><i class="fas fa-phone"></i>'+esc(r.phone_number)+'</span>' : '')
+      + '</div>'
+      + '<div class="rgcev"><i class="fas fa-calendar" style="margin-right:4px;font-size:.65rem"></i>'+esc(evNames)+'</div>'
+      + '</div>'
+      + '<span class="rtag '+r.status+'">'+esc(r.status)+'</span>'
+      + '</div>';
+  }).join('');
+}
+
+function renderRegPagination(total, pages) {
+  var el = document.getElementById('reg-pagination');
+  if(!el || pages <= 1) { if(el) el.innerHTML=''; return; }
+  var html = '';
+  for(var i=1; i<=pages; i++) {
+    html += '<button onclick="regPage='+i+';loadRegistrations()" style="'
+      + 'padding:6px 12px;border-radius:8px;border:1px solid var(--bdr);'
+      + 'background:'+(i===regPage?'var(--a1)':'var(--card)')
+      + ';color:'+(i===regPage?'#fff':'var(--txt2)')+';font-family:var(--ff);font-size:.78rem;font-weight:600;cursor:pointer">'
+      + i + '</button>';
+  }
+  el.innerHTML = html;
+}
+
+function setRegFilter(f, btn) {
+  regFilter = f; regPage = 1;
+  document.querySelectorAll('#reg-tabs .ftab').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  loadRegistrations();
+}
+
+function searchRegs(v) {
+  regSearch = v; regPage = 1;
+  clearTimeout(regDebounce);
+  regDebounce = setTimeout(loadRegistrations, 350);
+}
+
+// ── EVENTS PAGE ──
+async function loadEvents() {
+  var el = document.getElementById('ev-grid');
+  el.innerHTML = '<div class="loading" style="grid-column:1/-1"><div class="spin"></div>Loading events…</div>';
+  try {
+    var events = await apiPublic('/events/public');
+    allEventsRaw = events;
+    renderEventGrid(events);
+  } catch(err) {
+    el.innerHTML = errHTML(err.message);
+  }
+}
+
+function renderEventGrid(events) {
+  var el = document.getElementById('ev-grid');
+  var filtered = evFilter
+    ? events.filter(function(e){ return e.status.toLowerCase() === evFilter; })
+    : events;
+  if(!filtered.length) {
+    el.innerHTML = '<div class="empty" style="grid-column:1/-1"><i class="fas fa-calendar-days"></i><p>No events found.</p></div>';
+    return;
+  }
+  el.innerHTML = filtered.map(function(e) {
+    var img = e.image && !e.image.includes('default-event')
+      ? '<img class="ev-img" src="'+e.image+'" alt="'+esc(e.title)+'">'
+      : '<div class="ev-img-ph">📅</div>';
+    return '<div class="evc">'
+      + img
+      + '<div class="ev-body">'
+      + '<div class="ev-ttl">'+esc(e.title)+'</div>'
+      + '<div class="ev-meta">'
+      + (e.date ? '<span><i class="fas fa-calendar"></i>'+esc(e.date)+'</span>' : '')
+      + (e.time ? '<span><i class="fas fa-clock"></i>'+esc(e.time)+'</span>' : '')
+      + (e.description ? '<span style="margin-top:4px;display:block;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;display:-webkit-box"><i class="fas fa-align-left"></i>'+esc(e.description)+'</span>' : '')
+      + '</div>'
+      + '<span class="evst '+e.status.toLowerCase()+'">'+esc(e.status)+'</span>'
+      + '</div></div>';
+  }).join('');
+}
+
+function setEvFilter(f, btn) {
+  evFilter = f;
+  document.querySelectorAll('#page-events .ftab').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  renderEventGrid(allEventsRaw);
+}
+
+// ── ANNOUNCEMENTS PAGE ──
+async function loadAnnouncements() {
+  var el = document.getElementById('ann-list');
+  el.innerHTML = '<div class="loading"><div class="spin"></div>Loading…</div>';
+  try {
+    var anns = await apiPublic('/events/public/announcements');
+    allAnnouncements = anns;
+    if(!anns.length) {
+      el.innerHTML = '<div class="empty"><i class="fas fa-bullhorn"></i><p>No announcements.</p></div>';
+      return;
+    }
+    el.innerHTML = anns.map(annCardHTML).join('');
+  } catch(err) {
+    el.innerHTML = errHTML(err.message);
+  }
+}
+
+// ── GALLERY PAGE ──
+async function loadFullGallery() {
+  var track = document.getElementById('full-gal-track');
+  var vp    = document.getElementById('full-gal-vp');
+  try {
+    var photos = await apiPublic('/events/public/gallery');
+    renderGalleryTrack(track, vp, photos);
+  } catch(err) {
+    track.innerHTML = '<div class="empty" style="width:360px"><i class="fas fa-images"></i><p>'+esc(err.message)+'</p></div>';
+    if(vp){vp.style.webkitMaskImage='none';vp.style.maskImage='none';}
+  }
+}
+
+// ── SETTINGS ──
+function savePrf() {
+  var n = document.getElementById('set-n').value.trim();
+  var e = document.getElementById('set-e').value.trim();
+  if(n) {
+    document.getElementById('pnm').textContent = n;
+    document.getElementById('chip-name').textContent = n;
+    document.getElementById('greet-name').textContent = n;
+    var ini = n.split(' ').map(function(w){return w[0]||'';}).join('').toUpperCase().slice(0,2);
+    document.getElementById('pav').textContent = ini;
+    try { var u = JSON.parse(localStorage.getItem('user')||'{}'); u.name=n; localStorage.setItem('user',JSON.stringify(u)); } catch(err){}
+  }
+  if(e) document.getElementById('pem').textContent = e;
+  toast('Profile updated!');
+}
+
+// ── NAV ──
+var pageLoaded = {};
+function nav(page) {
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('active');});
+  var el = document.getElementById('page-'+page); if(el) el.classList.add('active');
+  document.querySelectorAll('.ni[data-p]').forEach(function(n){n.classList.toggle('active', n.dataset.p === page);});
+  closeSB(); window.scrollTo(0,0);
+  // Lazy-load page data on first visit
+  if(!pageLoaded[page]) {
+    pageLoaded[page] = true;
+    if(page === 'registrations') loadRegistrations();
+    if(page === 'events')        loadEvents();
+    if(page === 'announcements') loadAnnouncements();
+    if(page === 'gallery')       loadFullGallery();
+  }
+}
+
+// ── SIDEBAR ──
+document.getElementById('menuBtn').addEventListener('click', function(){
+  document.getElementById('sb').classList.add('open');
+  document.getElementById('sov').classList.add('open');
+});
+function closeSB() {
+  document.getElementById('sb').classList.remove('open');
+  document.getElementById('sov').classList.remove('open');
+}
+
+// ── LOGOUT ──
+function logout() { localStorage.removeItem('user'); window.location.href = 'login.html'; }
+
+// ── UTILS ──
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function errHTML(msg) {
+  return '<div class="err-box"><i class="fas fa-triangle-exclamation"></i>'+esc(msg)+'</div>';
+}
+
+var tT;
+function toast(m) {
+  var t = document.getElementById('toast');
+  t.textContent = m; t.classList.add('show');
+  clearTimeout(tT); tT = setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+// ── INIT ──
+loadDashboard();
+pageLoaded['home'] = true;
+</script>
+</body>
+</html>

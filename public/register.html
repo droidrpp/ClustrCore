@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register | ClustrCore</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+
+    :root {
+      --bg-primary:#f4f1ec; --bg-secondary:#eae6df; --bg-card:#ffffff;
+      --text-primary:#1a1714; --text-secondary:#5c5650; --text-muted:#9c958d;
+      --accent-1:#c8623a; --accent-2:#3a6bc8; --accent-green:#3a9c5a;
+      --accent-gradient:linear-gradient(135deg,#c8623a 0%,#e08c4a 50%,#3a6bc8 100%);
+      --accent-glow:rgba(200,98,58,0.2);
+      --border:rgba(26,23,20,0.1); --border-strong:rgba(26,23,20,0.2);
+      --shadow-sm:0 2px 8px rgba(26,23,20,0.08);
+      --shadow-md:0 8px 32px rgba(26,23,20,0.12);
+      --shadow-lg:0 20px 60px rgba(26,23,20,0.18);
+      --transition:0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    [data-theme="dark"] {
+      --bg-primary:#0f0e0d; --bg-secondary:#161412; --bg-card:#1c1916;
+      --text-primary:#f0ece6; --text-secondary:#a09890; --text-muted:#6b6358;
+      --accent-1:#e07a50; --accent-2:#6a9be8;
+      --accent-gradient:linear-gradient(135deg,#e07a50 0%,#e8a060 50%,#6a9be8 100%);
+      --accent-glow:rgba(224,122,80,0.15);
+      --border:rgba(240,236,230,0.08); --border-strong:rgba(240,236,230,0.15);
+      --shadow-sm:0 2px 8px rgba(0,0,0,0.3);
+      --shadow-md:0 8px 32px rgba(0,0,0,0.4);
+      --shadow-lg:0 20px 60px rgba(0,0,0,0.55);
+    }
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100vh;transition:background var(--transition),color var(--transition);overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")}
+    .bg-blob{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;opacity:.35}
+    .bg-blob-1{width:500px;height:500px;background:radial-gradient(circle,rgba(200,98,58,.18),transparent 70%);top:-150px;left:-150px}
+    .bg-blob-2{width:400px;height:400px;background:radial-gradient(circle,rgba(58,107,200,.15),transparent 70%);bottom:-100px;right:-100px}
+    [data-theme="dark"] .bg-blob{opacity:.5}
+    ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg-secondary)}::-webkit-scrollbar-thumb{background:var(--accent-1);border-radius:3px}
+
+    /* ── HEADER ── */
+    .header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(244,241,236,.88);border-bottom:1px solid var(--border);backdrop-filter:blur(20px);transition:background var(--transition)}
+    [data-theme="dark"] .header{background:rgba(15,14,13,.9)}
+    .header-inner{max-width:1100px;margin:0 auto;padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between}
+    .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:-.02em;background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none}
+    .header-right{display:flex;align-items:center;gap:.75rem}
+    .btn-icon{background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);width:36px;height:36px;border-radius:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:all var(--transition)}
+    .btn-icon:hover{background:var(--bg-secondary);transform:scale(1.06)}
+    .back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.82rem;font-weight:500;color:var(--text-secondary);text-decoration:none;padding:.35rem .8rem;border:1px solid var(--border);border-radius:100px;background:var(--bg-card);transition:all var(--transition)}
+    .back-link:hover{border-color:var(--border-strong);color:var(--text-primary)}
+
+    /* ── PAGE LAYOUT ── */
+    .page{position:relative;z-index:1;min-height:100vh;display:flex;padding:80px 1.5rem 3rem}
+    .page-inner{max-width:1040px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1.15fr;gap:3rem;align-items:start;padding-top:2rem}
+
+    /* ── LEFT PANEL ── */
+    .left-panel{position:sticky;top:100px;animation:fadeLeft .7s cubic-bezier(0.4,0,0.2,1) both}
+    @keyframes fadeLeft{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
+    .eyebrow{display:inline-flex;align-items:center;gap:.4rem;font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-1);background:rgba(200,98,58,.1);border:1px solid rgba(200,98,58,.2);padding:.25rem .75rem;border-radius:100px;margin-bottom:1.25rem}
+
+    /* category chip */
+    .cat-chip{display:inline-flex;align-items:center;gap:.4rem;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.3rem .75rem;border-radius:100px;margin-left:.5rem}
+    .cat-chip.hackathon{background:rgba(139,92,246,.12);color:#8b5cf6;border:1px solid rgba(139,92,246,.25)}
+    .cat-chip.workshop{background:rgba(58,107,200,.12);color:var(--accent-2);border:1px solid rgba(58,107,200,.25)}
+    .cat-chip.seminar{background:rgba(58,156,90,.12);color:var(--accent-green);border:1px solid rgba(58,156,90,.25)}
+    .cat-chip.other{background:var(--bg-secondary);color:var(--text-muted);border:1px solid var(--border)}
+
+    .event-info-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:var(--shadow-md);margin-bottom:1.5rem;animation:fadeLeft .6s cubic-bezier(0.4,0,0.2,1) .1s both}
+    .event-banner-placeholder{width:100%;height:140px;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;font-size:2.5rem}
+    .event-banner{width:100%;height:140px;object-fit:cover;display:none}
+    .event-info-body{padding:1.125rem}
+    .event-status-badge{display:inline-flex;align-items:center;gap:.3rem;font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.2rem .65rem;border-radius:4px;margin-bottom:.625rem}
+    .badge-open{background:rgba(58,156,90,.12);color:#3a9c5a;border:1px solid rgba(58,156,90,.25)}
+    .badge-upcoming{background:rgba(200,98,58,.12);color:var(--accent-1);border:1px solid rgba(200,98,58,.25)}
+    .badge-completed{background:var(--bg-secondary);color:var(--text-muted);border:1px solid var(--border)}
+    .event-info-body h2{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.625rem;line-height:1.25}
+    .event-meta-list{display:flex;flex-direction:column;gap:.4rem}
+    .event-meta-item{display:flex;align-items:center;gap:.6rem;font-size:.78rem;color:var(--text-secondary)}
+    .event-meta-item i{color:var(--accent-1);font-size:.75rem;width:14px;text-align:center}
+
+    /* fee badge */
+    .fee-badge{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:700;padding:.35rem .875rem;border-radius:100px;margin-top:.75rem}
+    .fee-badge.paid{background:rgba(200,98,58,.1);color:var(--accent-1);border:1px solid rgba(200,98,58,.25)}
+    .fee-badge.free{background:rgba(58,156,90,.1);color:var(--accent-green);border:1px solid rgba(58,156,90,.25)}
+
+    .left-panel h1{font-family:'Syne',sans-serif;font-size:clamp(1.5rem,3vw,2rem);font-weight:800;letter-spacing:-.04em;line-height:1.2;margin-bottom:.625rem}
+    .left-panel h1 span{background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .left-panel>p{font-size:.85rem;color:var(--text-secondary);line-height:1.7;font-weight:300;max-width:300px}
+
+    /* ── FORM CARD ── */
+    .form-card{background:var(--bg-card);border:1px solid var(--border);border-radius:24px;padding:2rem;box-shadow:var(--shadow-md);animation:fadeRight .7s cubic-bezier(0.4,0,0.2,1) both;position:relative;overflow:hidden}
+    @keyframes fadeRight{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+    .form-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent-gradient)}
+    .form-card-header{margin-bottom:1.5rem}
+    .form-card-header h2{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.2rem}
+    .form-card-header p{font-size:.8rem;color:var(--text-muted)}
+
+    /* Progress */
+    .progress-bar{height:3px;background:var(--bg-secondary);border-radius:2px;margin-bottom:1.375rem;overflow:hidden}
+    .progress-fill{height:100%;background:var(--accent-gradient);border-radius:2px;transition:width .4s cubic-bezier(0.4,0,0.2,1)}
+
+    /* Steps indicator */
+    .steps{display:flex;align-items:center;margin-bottom:1.5rem;gap:0}
+    .step-ind{display:flex;flex-direction:column;align-items:center;gap:.25rem;flex:1;position:relative}
+    .step-ind::after{content:'';position:absolute;top:13px;left:50%;right:-50%;height:1px;background:var(--border);z-index:0;transition:background var(--transition)}
+    .step-ind:last-child::after{display:none}
+    .step-ind.done::after{background:var(--accent-1)}
+    .step-dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:var(--text-muted);z-index:1;transition:all var(--transition)}
+    .step-ind.active .step-dot{border-color:var(--accent-1);background:var(--accent-1);color:white;box-shadow:0 0 0 4px rgba(200,98,58,.15)}
+    .step-ind.done .step-dot{border-color:var(--accent-1);background:var(--accent-1);color:white}
+    .step-lbl{font-size:.58rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted);transition:color var(--transition)}
+    .step-ind.active .step-lbl,.step-ind.done .step-lbl{color:var(--accent-1)}
+
+    /* Step panels */
+    .step-panel{display:none}
+    .step-panel.active{display:block;animation:stepIn .3s cubic-bezier(0.4,0,0.2,1) both}
+    @keyframes stepIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+
+    /* ── FIELDS ── */
+    .field-group{margin-bottom:.875rem}
+    .field-group label{display:block;font-size:.7rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.3rem}
+    .req{color:var(--accent-1);margin-left:2px}
+    .input-wrap{position:relative}
+    .input-wrap i.fi{position:absolute;left:.8rem;top:50%;transform:translateY(-50%);font-size:.78rem;color:var(--text-muted);pointer-events:none;transition:color var(--transition)}
+    .input-wrap:focus-within i.fi{color:var(--accent-1)}
+    .field-group input,.field-group select,.field-group textarea{width:100%;padding:.65rem .875rem .65rem 2.1rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.86rem;color:var(--text-primary);outline:none;transition:all var(--transition);appearance:none;resize:none}
+    .field-group textarea{padding-left:.875rem}
+    .field-group input::placeholder,.field-group textarea::placeholder{color:var(--text-muted)}
+    .field-group input:focus,.field-group select:focus,.field-group textarea:focus{border-color:var(--accent-1);box-shadow:0 0 0 3px var(--accent-glow);background:var(--bg-card)}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+    .field-group.has-error input,.field-group.has-error select{border-color:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.1)}
+    .field-error{font-size:.68rem;color:#ef4444;margin-top:.25rem;display:flex;align-items:center;gap:.25rem}
+
+    /* Section divider */
+    .section-divider{display:flex;align-items:center;gap:.75rem;margin:.875rem 0}
+    .section-divider span{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);white-space:nowrap}
+    .section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+    /* Team members dynamic rows */
+    .team-member-row{display:grid;grid-template-columns:1fr 1fr auto;gap:.5rem;margin-bottom:.5rem;align-items:end}
+    .team-member-row .field-group{margin-bottom:0}
+    .remove-member-btn{width:34px;height:36px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;color:#ef4444;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.78rem;transition:all var(--transition);flex-shrink:0}
+    .remove-member-btn:hover{background:rgba(239,68,68,.15)}
+    .add-member-btn{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;font-weight:600;color:var(--accent-1);background:rgba(200,98,58,.08);border:1px solid rgba(200,98,58,.2);padding:.4rem .875rem;border-radius:100px;cursor:pointer;transition:all var(--transition);font-family:'DM Sans',sans-serif}
+    .add-member-btn:hover{background:rgba(200,98,58,.14)}
+
+    /* Radio group */
+    .radio-group{display:flex;gap:.625rem}
+    .radio-opt{flex:1}
+    .radio-opt input[type=radio]{display:none}
+    .radio-opt label{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.6rem;border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:.82rem;font-weight:500;color:var(--text-secondary);transition:all var(--transition);background:var(--bg-secondary)}
+    .radio-opt input[type=radio]:checked + label{border-color:var(--accent-1);background:rgba(200,98,58,.08);color:var(--accent-1)}
+
+    /* ── PAYMENT STEP ── */
+    .payment-box{background:var(--bg-secondary);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1rem}
+    .payment-box-header{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem}
+    .payment-box-header i{color:var(--accent-1)}
+    .payment-box-header h4{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700}
+    .upi-amount{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.25rem}
+    .upi-id-box{display:flex;align-items:center;justify-content:space-between;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:.625rem 1rem;margin-bottom:.875rem}
+    .upi-id{font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;letter-spacing:.02em}
+    .copy-btn{font-size:.7rem;font-weight:600;color:var(--accent-2);background:none;border:1px solid rgba(58,107,200,.25);padding:.2rem .55rem;border-radius:6px;cursor:pointer;transition:all var(--transition);font-family:'DM Sans',sans-serif}
+    .copy-btn:hover{background:var(--accent-2);color:white;border-color:var(--accent-2)}
+    /* QR placeholder */
+    .qr-wrap{width:160px;height:160px;background:white;border:1px solid var(--border);border-radius:14px;margin:0 auto .875rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.35rem;color:var(--text-muted)}
+    .qr-wrap i{font-size:3rem;color:var(--text-muted);opacity:.4}
+    .qr-wrap span{font-size:.68rem;text-align:center;color:var(--text-muted);line-height:1.4}
+  .qr-wrap img{max-width:100%;max-height:100%;border-radius:12px;object-fit:contain;}
+    .screenshot-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+    .screenshot-drop i{font-size:1.4rem;color:var(--text-muted);display:block;margin-bottom:.4rem}
+    .screenshot-drop p{font-size:.8rem;color:var(--text-muted)}
+    .screenshot-drop strong{color:var(--accent-1)}
+    .screenshot-preview{margin-top:.625rem;display:none}
+    .screenshot-preview img{width:100%;max-height:160px;object-fit:contain;border-radius:8px;border:1px solid var(--border)}
+    .screenshot-name{font-size:.72rem;color:var(--text-muted);margin-top:.3rem;text-align:center}
+
+    /* ── REVIEW ── */
+    .review-box{background:var(--bg-secondary);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:.875rem}
+    .review-label{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.625rem}
+    .review-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem .75rem}
+    .review-item span{display:block;color:var(--text-muted);font-size:.65rem}
+    .review-item strong{display:block;font-weight:600;color:var(--text-primary);font-size:.8rem;margin-top:1px;word-break:break-word}
+
+    /* ── NAV BUTTONS ── */
+    .form-nav{display:flex;gap:.75rem;margin-top:1.375rem;align-items:center}
+    .btn-back{display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.125rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:100px;font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:500;color:var(--text-secondary);cursor:pointer;transition:all var(--transition)}
+    .btn-back:hover{border-color:var(--border-strong);color:var(--text-primary)}
+    .btn-next{display:inline-flex;align-items:center;gap:.45rem;padding:.65rem 1.625rem;background:var(--accent-gradient);border:none;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:600;color:white;cursor:pointer;transition:all var(--transition);box-shadow:0 4px 16px var(--accent-glow);margin-left:auto}
+    .btn-next:hover{transform:translateY(-2px);box-shadow:0 6px 24px var(--accent-glow)}
+    .btn-next:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+    /* ── SUCCESS ── */
+    .success-state{text-align:center;padding:1.5rem 0;display:none}
+    .success-state.show{display:block;animation:stepIn .5s ease both}
+    .success-icon{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#3a9c5a,#5ab878);display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:white;margin:0 auto 1.125rem;box-shadow:0 8px 24px rgba(58,156,90,.3);animation:popIn .5s cubic-bezier(.34,1.56,.64,1) .2s both}
+    @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+    .success-state h3{font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.4rem}
+    .success-state>p{font-size:.86rem;color:var(--text-secondary);line-height:1.6;max-width:300px;margin:0 auto 1.375rem}
+    .success-name{background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Free event notice */
+    .free-notice{background:rgba(58,156,90,.06);border:1px solid rgba(58,156,90,.2);border-radius:12px;padding:1rem;text-align:center;margin-bottom:1rem}
+    .free-notice i{color:var(--accent-green);margin-right:.4rem}
+    .free-notice p{font-size:.85rem;color:var(--text-secondary)}
+    .free-notice strong{color:var(--accent-green)}
+
+    @media(max-width:768px){
+      .page-inner{grid-template-columns:1fr;gap:2rem;padding-top:1rem}
+      .left-panel{position:static}
+      .field-row{grid-template-columns:1fr}
+      .team-member-row{grid-template-columns:1fr;gap:.4rem}
+      .page{padding:72px 1rem 2rem}
+    }
+  </style>
+</head>
+<body>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+
+<header class="header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">ClustrCore</a>
+    <div class="header-right">
+      <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back</a>
+      <button class="btn-icon" id="themeToggle"><i class="fas fa-moon"></i></button>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+  <div class="page-inner">
+
+    <!-- LEFT: Event Info -->
+    <div class="left-panel">
+      <span class="eyebrow" id="eyebrowLabel"><i class="fas fa-bolt"></i> Event Registration</span>
+
+      <div class="event-info-card">
+        <div class="event-banner-placeholder" id="eventBannerPlaceholder">📅</div>
+        <img class="event-banner" id="eventBanner" alt="Event banner">
+        <div class="event-info-body">
+          <div style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin-bottom:.625rem">
+            <div class="event-status-badge badge-upcoming" id="eventStatusBadge">
+              <i class="fas fa-circle" style="font-size:.45rem"></i> Loading…
+            </div>
+            <span class="cat-chip other" id="catChip" style="display:none"></span>
+          </div>
+          <h2 id="eventTitle">Loading event…</h2>
+          <div class="event-meta-list">
+            <div class="event-meta-item" id="eventDateMeta" style="display:none"><i class="fas fa-calendar"></i><span id="eventDateText"></span></div>
+            <div class="event-meta-item" id="eventTimeMeta" style="display:none"><i class="fas fa-clock"></i><span id="eventTimeText"></span></div>
+            <div class="event-meta-item" id="eventVenueMeta" style="display:none"><i class="fas fa-location-dot"></i><span id="eventVenueText"></span></div>
+          </div>
+          <div id="feeBadgeWrap" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- Mentors/Speakers Section -->
+      <div id="mentorsSection" style="display:none">
+        <div class="section-divider"><span><i class="fas fa-user-tie"></i> Mentors & Speakers</span></div>
+        <div id="mentorsList"></div>
+      </div>
+
+      <!-- Companies Section -->
+      <div id="companiesSection" style="display:none">
+        <div class="section-divider"><span><i class="fas fa-building"></i> Partner Companies</span></div>
+        <div id="companiesList"></div>
+      </div>
+
+      <h1>Secure your <span>spot today</span></h1>
+      <p id="leftDesc">Fill in your details and we'll confirm your registration. Certificates are issued automatically after the event.</p>
+    </div>
+
+    <!-- RIGHT: Form -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <h2>Registration Form</h2>
+        <p id="formSubtitle">Complete all steps to register</p>
+      </div>
+
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:25%"></div></div>
+
+      <!-- Step indicators — rendered by JS based on category -->
+      <div class="steps" id="stepsIndicator"></div>
+
+      <form id="registerForm" novalidate>
+
+        <!-- ══ STEP 1: Personal Info (all event types) ══ -->
+        <div class="step-panel active" id="step-1">
+          <div class="field-group" id="fg-name">
+            <label>Full Name <span class="req">*</span></label>
+            <div class="input-wrap"><input type="text" id="f-name" placeholder="e.g. Riddhi Sharma" autocomplete="name"><i class="fas fa-user fi"></i></div>
+          </div>
+          <div class="field-group" id="fg-email">
+            <label>Email Address <span class="req">*</span></label>
+            <div class="input-wrap"><input type="email" id="f-email" placeholder="you@college.edu" autocomplete="email"><i class="fas fa-envelope fi"></i></div>
+          </div>
+          <div class="field-row">
+            <div class="field-group" id="fg-phone">
+              <label>Phone Number</label>
+              <div class="input-wrap"><input type="tel" id="f-phone" placeholder="10-digit number"><i class="fas fa-phone fi"></i></div>
+            </div>
+            <div class="field-group" id="fg-course">
+              <label>Course <span class="req">*</span></label>
+              <div class="input-wrap"><input type="text" id="f-course" placeholder="e.g. B.Tech CSE"><i class="fas fa-graduation-cap fi"></i></div>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field-group" id="fg-year">
+              <label>Year <span class="req">*</span></label>
+              <div class="input-wrap">
+                <select id="f-year">
+                  <option value="">Select year</option>
+                  <option value="1">1st Year</option>
+                  <option value="2">2nd Year</option>
+                  <option value="3">3rd Year</option>
+                  <option value="4">4th Year</option>
+                </select>
+                <i class="fas fa-layer-group fi"></i>
+              </div>
+            </div>
+            <div class="field-group">
+              <label>Branch</label>
+              <div class="input-wrap"><input type="text" id="f-branch" placeholder="e.g. CSE, ECE"><i class="fas fa-code-branch fi"></i></div>
+            </div>
+          </div>
+          <div class="form-nav">
+            <button type="button" class="btn-next" onclick="nextStep(1)">Next <i class="fas fa-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- ══ STEP 2: Category-specific fields ══ -->
+        <div class="step-panel" id="step-2">
+          <!-- Hackathon fields -->
+          <div id="fields-hackathon" style="display:none">
+            <div class="section-divider"><span><i class="fas fa-users"></i> Team Details</span></div>
+            <div class="field-row">
+              <div class="field-group" id="fg-teamName">
+                <label>Team Name <span class="req">*</span></label>
+                <div class="input-wrap"><input type="text" id="f-teamName" placeholder="e.g. Team Nexus"><i class="fas fa-users fi"></i></div>
+              </div>
+              <div class="field-group" id="fg-teamSize">
+                <label>Team Size <span class="req">*</span></label>
+                <div class="input-wrap">
+                  <select id="f-teamSize" onchange="updateTeamMembers()">
+                    <option value="">Members</option>
+                    <option value="1">Solo (1)</option>
+                    <option value="2">2 members</option>
+                    <option value="3">3 members</option>
+                    <option value="4">4 members</option>
+                  </select>
+                  <i class="fas fa-hashtag fi"></i>
+                </div>
+              </div>
+            </div>
+            <div id="teamMembersWrap" style="display:none">
+              <div class="section-divider"><span><i class="fas fa-user-plus"></i> Other Team Members</span></div>
+              <div id="teamMembersList"></div>
+            </div>
+            <div class="section-divider"><span><i class="fas fa-lightbulb"></i> Project</span></div>
+            <div class="field-group" id="fg-projectIdea">
+              <label>Project Idea / Problem Statement <span class="req">*</span></label>
+              <textarea id="f-projectIdea" rows="3" placeholder="Briefly describe what you plan to build or the problem you want to solve…" style="padding-left:.875rem"></textarea>
+            </div>
+          </div>
+
+          <!-- Workshop fields -->
+          <div id="fields-workshop" style="display:none">
+            <div class="section-divider"><span><i class="fas fa-laptop"></i> Workshop Details</span></div>
+            <div class="field-group">
+              <label>Will you bring a laptop? <span class="req">*</span></label>
+              <div class="radio-group">
+                <div class="radio-opt"><input type="radio" name="laptop" id="laptop-yes" value="true"><label for="laptop-yes"><i class="fas fa-check"></i> Yes</label></div>
+                <div class="radio-opt"><input type="radio" name="laptop" id="laptop-no"  value="false"><label for="laptop-no"><i class="fas fa-times"></i> No</label></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seminar: nothing extra, just message -->
+          <div id="fields-seminar" style="display:none">
+            <div class="section-divider"><span><i class="fas fa-comment"></i> Additional Info</span></div>
+          </div>
+
+          <!-- General message (all types) -->
+          <div class="field-group">
+            <label>Message / Special Requirements</label>
+            <textarea id="f-message" rows="3" placeholder="Dietary needs, accessibility requirements, questions…" style="padding-left:.875rem"></textarea>
+          </div>
+
+          <div class="form-nav">
+            <button type="button" class="btn-back" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
+            <button type="button" class="btn-next" onclick="nextStep(2)">Next <i class="fas fa-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- ══ STEP 3: Payment (shown only if event has fee) ══ -->
+        <div class="step-panel" id="step-3">
+          <!-- Paid event -->
+          <div id="paymentPaidSection">
+            <div class="payment-box">
+              <div class="payment-box-header"><i class="fas fa-indian-rupee-sign"></i><h4>Pay Registration Fee</h4></div>
+              <div class="upi-amount" id="payAmountDisplay">₹0</div>
+              <p style="font-size:.78rem;color:var(--text-muted);margin-bottom:.875rem">Pay via UPI to the ID below or scan the QR code</p>
+              <div class="upi-id-box">
+                <span class="upi-id">clustrcore@upi</span>
+                <button type="button" class="copy-btn" onclick="copyUPI()"><i class="fas fa-copy"></i> Copy</button>
+              </div>
+              <div class="qr-wrap">
+                <i class="fas fa-qrcode"></i>
+                <span>QR Code<br>Place your UPI QR image here</span>
+              </div>
+            </div>
+            <div class="field-group" id="fg-utr">
+              <label>Transaction ID / UTR Number</label>
+              <div class="input-wrap"><input type="text" id="f-utr" placeholder="e.g. T2401011234567890"><i class="fas fa-receipt fi"></i></div>
+            </div>
+            <div class="field-group">
+              <label>Payment Screenshot <span class="req">*</span></label>
+              <div class="screenshot-drop" id="screenshotDrop">
+                <input type="file" id="screenshotInput" accept="image/*" onchange="handleScreenshot(this)">
+                <i class="fas fa-image"></i>
+                <p>Drop screenshot here or <strong>click to browse</strong></p>
+              </div>
+              <div class="screenshot-preview" id="screenshotPreview">
+                <img id="screenshotImg" src="" alt="Payment screenshot">
+                <div class="screenshot-name" id="screenshotName"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Free event -->
+          <div id="paymentFreeSection" style="display:none">
+            <div class="free-notice">
+              <p><i class="fas fa-gift"></i>This is a <strong>free event</strong> — no payment required! Just confirm your details and you're in.</p>
+            </div>
+          </div>
+
+          <div class="form-nav">
+            <button type="button" class="btn-back" onclick="prevStep(3)"><i class="fas fa-arrow-left"></i> Back</button>
+            <button type="button" class="btn-next" onclick="nextStep(3)">Review <i class="fas fa-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- ══ STEP 4: Review & Submit ══ -->
+        <div class="step-panel" id="step-4">
+          <div class="review-box" id="reviewPersonal">
+            <div class="review-label"><i class="fas fa-user"></i> Personal & Academic</div>
+            <div class="review-grid" id="reviewPersonalGrid"></div>
+          </div>
+          <div class="review-box" id="reviewExtra" style="display:none">
+            <div class="review-label" id="reviewExtraLabel"><i class="fas fa-info-circle"></i> Event Details</div>
+            <div class="review-grid" id="reviewExtraGrid"></div>
+          </div>
+          <div class="review-box" id="reviewPayment" style="display:none">
+            <div class="review-label"><i class="fas fa-indian-rupee-sign"></i> Payment</div>
+            <div class="review-grid" id="reviewPaymentGrid"></div>
+          </div>
+          <div class="form-nav">
+            <button type="button" class="btn-back" onclick="prevStep(4)"><i class="fas fa-arrow-left"></i> Back</button>
+            <button type="submit" class="btn-next" id="submitBtn"><i class="fas fa-check"></i> Confirm Registration</button>
+          </div>
+        </div>
+
+      </form>
+
+      <!-- SUCCESS -->
+      <div class="success-state" id="successState">
+        <div class="success-icon"><i class="fas fa-check"></i></div>
+        <h3>You're in, <span class="success-name" id="successName">there</span>! 🎉</h3>
+        <p id="successMsg">Your spot is confirmed. We'll send you updates before the event.</p>
+        <a href="index.html" class="btn-next" style="text-decoration:none;margin:0 auto"><i class="fas fa-home"></i> Back to Home</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(() => {
+  const API = 'http://localhost:5000';
+
+  /* ── THEME ── */
+  const htmlEl = document.documentElement;
+  const tBtn   = document.getElementById('themeToggle');
+  applyTheme(localStorage.getItem('clustr-theme') || 'light');
+  function applyTheme(t) {
+    htmlEl.setAttribute('data-theme', t);
+    localStorage.setItem('clustr-theme', t);
+    tBtn.querySelector('i').className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+  }
+  tBtn.addEventListener('click', () => {
+    const next = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    tBtn.style.transform = 'scale(0.8) rotate(20deg)';
+    setTimeout(() => { tBtn.style.transform = ''; applyTheme(next); }, 140);
+  });
+
+  /* ── URL PARAMS ── */
+  const params    = new URLSearchParams(window.location.search);
+  const eventId   = params.get('id') || '';
+  const eventName = decodeURIComponent(params.get('event') || '');
+
+  /* ── EVENT STATE ── */
+  let eventCategory  = (params.get('category') || 'other').toLowerCase();
+  let eventFee       = Number(params.get('fee') || 0);   // 0 = free
+  let screenshotFile = null;
+
+  /* Steps config per category:
+     hackathon → 4 steps: Personal | Team & Project | Payment | Review
+     workshop  → 4 steps: Personal | Workshop Info  | Payment | Review
+     seminar   → 3 steps: Personal | Payment        | Review
+     other     → 3 steps: Personal | Payment        | Review           */
+  function getStepCount()   { return panelSequence().length; }
+  function hasExtraStep()   { return ['hackathon','workshop'].includes(eventCategory); }
+
+  /* ── BUILD STEP INDICATORS ── */
+  function buildSteps() {
+    const labels = hasExtraStep()
+      ? { 1:'Personal', 2: eventCategory === 'hackathon' ? 'Team' : 'Workshop', 3:'Payment', 4:'Review' }
+      : { 1:'Personal', 2:'Payment', 3:'Review' };
+    const n      = getStepCount();
+    const wrap   = document.getElementById('stepsIndicator');
+    wrap.innerHTML = '';
+    for (let i = 1; i <= n; i++) {
+      const el = document.createElement('div');
+      el.className = 'step-ind' + (i === 1 ? ' active' : '');
+      el.id = `step-ind-${i}`;
+      el.innerHTML = `<div class="step-dot">${i}</div><span class="step-lbl">${labels[i]}</span>`;
+      wrap.appendChild(el);
+    }
+  }
+
+  /* ── STEP NAVIGATION ── */
+  let currentStep = 1;   /* always a panel ID (1–4) */
+
+  function updateProgress() {
+    const seq = panelSequence();
+    const idx = seq.indexOf(currentStep);   // 0-based position in sequence
+    const pct = ((idx + 1) / seq.length) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+
+    /* Update visual step indicators (1-indexed in UI) */
+    const n = seq.length;
+    for (let ui = 1; ui <= n; ui++) {
+      const ind = document.getElementById(`step-ind-${ui}`);
+      if (!ind) continue;
+      const panelAtUi = seq[ui - 1];
+      ind.classList.remove('active','done');
+      if (panelAtUi === currentStep) ind.classList.add('active');
+      if (seq.indexOf(panelAtUi) < idx) ind.classList.add('done');
+      ind.querySelector('.step-dot').innerHTML =
+        seq.indexOf(panelAtUi) < idx
+          ? '<i class="fas fa-check" style="font-size:.55rem"></i>'
+          : ui;
+    }
+  }
+
+  /* Always work in panel IDs (1–4).
+     Seminar/other skip panel 2: 1 → 3 → 4
+     Hackathon/workshop use all: 1 → 2 → 3 → 4            */
+  function panelSequence() {
+    return hasExtraStep() ? [1, 2, 3, 4] : [1, 3, 4];
+  }
+
+  function showPanel(panelId) {
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    const el = document.getElementById(`step-${panelId}`);
+    if (!el) { console.error('Missing panel step-' + panelId); return; }
+    el.classList.add('active');
+
+    /* Show correct category fields inside panel 2 */
+    if (panelId === 2) {
+      document.getElementById('fields-hackathon').style.display = eventCategory === 'hackathon' ? 'block' : 'none';
+      document.getElementById('fields-workshop').style.display  = eventCategory === 'workshop'  ? 'block' : 'none';
+      document.getElementById('fields-seminar').style.display   = eventCategory === 'seminar'   ? 'block' : 'none';
+    }
+
+    /* Show paid / free payment section */
+    if (panelId === 3) {
+      document.getElementById('paymentPaidSection').style.display = eventFee > 0 ? 'block' : 'none';
+      document.getElementById('paymentFreeSection').style.display = eventFee > 0 ? 'none'  : 'block';
+    }
+
+    if (panelId === 4) buildReview();
+
+    currentStep = panelId;
+    updateProgress();
+  }
+
+  /* nextStep / prevStep receive the CURRENT panel ID from onclick */
+  window.nextStep = (currentPanelId) => {
+    if (!validatePanel(currentPanelId)) return;
+    const seq = panelSequence();
+    const idx = seq.indexOf(currentPanelId);
+    if (idx < seq.length - 1) showPanel(seq[idx + 1]);
+  };
+
+  window.prevStep = (currentPanelId) => {
+    const seq = panelSequence();
+    const idx = seq.indexOf(currentPanelId);
+    if (idx > 0) showPanel(seq[idx - 1]);
+  };
+
+  /* ── VALIDATION ── */
+  const v = id => document.getElementById(id)?.value?.trim() || '';
+
+  function setErr(groupId, msg) {
+    const g = document.getElementById(groupId); if (!g) return;
+    g.classList.add('has-error');
+    let err = g.querySelector('.field-error');
+    if (!err) { err = document.createElement('p'); err.className='field-error'; g.appendChild(err); }
+    err.innerHTML = `<i class="fas fa-circle-exclamation"></i> ${msg}`;
+  }
+  function clrErr(groupId) {
+    const g = document.getElementById(groupId); if (!g) return;
+    g.classList.remove('has-error');
+    g.querySelector('.field-error')?.remove();
+  }
+
+  function validatePanel(panelId) {
+    let ok = true;
+
+    if (panelId === 1) {
+      if (!v('f-name') || !/^[A-Za-z\s]+$/.test(v('f-name'))) { setErr('fg-name', !v('f-name') ? 'Name is required' : 'Letters only'); ok=false; } else clrErr('fg-name');
+      if (!v('f-email') || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('f-email'))) { setErr('fg-email','Valid email required'); ok=false; } else clrErr('fg-email');
+      if (!v('f-course')) { setErr('fg-course','Course is required'); ok=false; } else clrErr('fg-course');
+      if (!v('f-year'))   { setErr('fg-year',  'Year is required');   ok=false; } else clrErr('fg-year');
+    }
+
+    if (panelId === 2) {
+      if (eventCategory === 'hackathon') {
+        if (!v('f-teamName'))    { setErr('fg-teamName',   'Team name required');   ok=false; } else clrErr('fg-teamName');
+        if (!v('f-teamSize'))    { setErr('fg-teamSize',   'Team size required');   ok=false; } else clrErr('fg-teamSize');
+        if (!v('f-projectIdea')) { setErr('fg-projectIdea','Project idea required');ok=false; } else clrErr('fg-projectIdea');
+      }
+      if (eventCategory === 'workshop') {
+        if (!document.querySelector('input[name="laptop"]:checked')) {
+          alert('Please select whether you will bring a laptop.');
+          ok = false;
+        }
+      }
+    }
+
+    /* Payment panel — only validate screenshot for paid events */
+    if (panelId === 3 && eventFee > 0) {
+      if (!screenshotFile) { alert('Please upload your payment screenshot.'); ok=false; }
+    }
+
+    return ok;
+  }
+
+  /* ── TEAM MEMBERS DYNAMIC ── */
+  window.updateTeamMembers = () => {
+    const size = parseInt(v('f-teamSize')) || 0;
+    const wrap = document.getElementById('teamMembersWrap');
+    const list = document.getElementById('teamMembersList');
+    const extra = size - 1; // registrant is member 1
+    if (extra <= 0) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'block';
+    list.innerHTML = '';
+    for (let i = 1; i <= extra; i++) {
+      const div = document.createElement('div');
+      div.className = 'field-row';
+      div.style.marginBottom = '.5rem';
+      div.innerHTML = `
+        <div class="field-group" style="margin-bottom:0">
+          <label>Member ${i+1} Name</label>
+          <div class="input-wrap"><input type="text" id="member-name-${i}" placeholder="Full name"><i class="fas fa-user fi"></i></div>
+        </div>
+        <div class="field-group" style="margin-bottom:0">
+          <label>Member ${i+1} Email</label>
+          <div class="input-wrap"><input type="email" id="member-email-${i}" placeholder="email@college.edu"><i class="fas fa-envelope fi"></i></div>
+        </div>`;
+      list.appendChild(div);
+    }
+  };
+
+  /* ── SCREENSHOT HANDLER ── */
+  window.handleScreenshot = (input) => {
+    const file = input.files[0]; if (!file) return;
+    screenshotFile = file;
+    const url  = URL.createObjectURL(file);
+    document.getElementById('screenshotPreview').style.display = 'block';
+    document.getElementById('screenshotImg').src  = url;
+    document.getElementById('screenshotName').textContent = file.name;
+  };
+
+  /* screenshot drag-drop */
+  const drop = document.getElementById('screenshotDrop');
+  drop.addEventListener('dragover',  e => { e.preventDefault(); drop.classList.add('dragover'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('dragover'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith('image/')) {
+      document.getElementById('screenshotInput').files = e.dataTransfer.files;
+      handleScreenshot({ files: [f] });
+    }
+  });
+
+  /* ── UPI COPY ── */
+  window.copyUPI = () => {
+    navigator.clipboard.writeText('clustrcore@upi').then(() => {
+      const btn = document.querySelector('.copy-btn');
+      const old = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+      setTimeout(() => { btn.innerHTML = old; }, 2000);
+    });
+  };
+
+  /* ── BUILD REVIEW ── */
+  function buildReview() {
+    const personal = [
+      ['Name',   v('f-name')],
+      ['Email',  v('f-email')],
+      ['Phone',  v('f-phone')  || '—'],
+      ['Course', v('f-course')],
+      ['Year',   v('f-year') ? `Year ${v('f-year')}` : '—'],
+      ['Branch', v('f-branch') || '—'],
+      ['Event',  eventName      || '—'],
+    ];
+    document.getElementById('reviewPersonalGrid').innerHTML =
+      personal.map(([k,val]) => `<div class="review-item"><span>${k}</span><strong>${val}</strong></div>`).join('');
+
+    /* Extra fields */
+    const extraItems = [];
+    if (eventCategory === 'hackathon') {
+      extraItems.push(['Team',    v('f-teamName') || '—']);
+      extraItems.push(['Size',    v('f-teamSize') ? `${v('f-teamSize')} member(s)` : '—']);
+      extraItems.push(['Project', v('f-projectIdea')?.slice(0,60)+(v('f-projectIdea')?.length>60?'…':'') || '—']);
+    }
+    if (eventCategory === 'workshop') {
+      const laptop = document.querySelector('input[name="laptop"]:checked')?.value;
+      extraItems.push(['Laptop', laptop === 'true' ? 'Yes, bringing laptop' : laptop === 'false' ? 'No laptop' : '—']);
+    }
+    const extraBox = document.getElementById('reviewExtra');
+    if (extraItems.length) {
+      extraBox.style.display = 'block';
+      document.getElementById('reviewExtraLabel').innerHTML =
+        `<i class="fas fa-info-circle"></i> ${eventCategory === 'hackathon' ? 'Hackathon Details' : 'Workshop Details'}`;
+      document.getElementById('reviewExtraGrid').innerHTML =
+        extraItems.map(([k,val]) => `<div class="review-item"><span>${k}</span><strong>${val}</strong></div>`).join('');
+    } else {
+      extraBox.style.display = 'none';
+    }
+
+    /* Payment */
+    const payBox = document.getElementById('reviewPayment');
+    if (eventFee > 0) {
+      payBox.style.display = 'block';
+      document.getElementById('reviewPaymentGrid').innerHTML = `
+        <div class="review-item"><span>Amount</span><strong>₹${eventFee}</strong></div>
+        <div class="review-item"><span>UTR / Ref</span><strong>${v('f-utr') || '—'}</strong></div>
+        <div class="review-item"><span>Screenshot</span><strong>${screenshotFile ? '✓ Uploaded' : 'Not uploaded'}</strong></div>`;
+    } else {
+      payBox.style.display = 'none';
+    }
+  }
+
+  /* ── SUBMIT ── */
+  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!eventId) { alert('No event specified. Please go back and select an event.'); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner" style="animation:spin .8s linear infinite;display:inline-block"></i> Registering…';
+
+    /* Build team members array */
+    const size = parseInt(v('f-teamSize')) || 0;
+    const members = [];
+    for (let i = 1; i <= size - 1; i++) {
+      members.push({
+        name:  document.getElementById(`member-name-${i}`)?.value?.trim() || '',
+        email: document.getElementById(`member-email-${i}`)?.value?.trim() || '',
+      });
+    }
+
+    const fd = new FormData();
+    fd.append('eventId',    eventId);
+    fd.append('eventName',  eventName);
+    fd.append('name',       v('f-name'));
+    fd.append('email',      v('f-email'));
+    fd.append('phone',      v('f-phone'));
+    fd.append('course',     v('f-course'));
+    fd.append('year',       v('f-year'));
+    fd.append('branch',     v('f-branch'));
+    fd.append('message',    v('f-message'));
+
+    if (eventCategory === 'hackathon') {
+      fd.append('teamName',    v('f-teamName'));
+      fd.append('teamSize',    v('f-teamSize'));
+      fd.append('projectIdea', v('f-projectIdea'));
+      fd.append('teamMembers', JSON.stringify(members));
+    }
+    if (eventCategory === 'workshop') {
+      const laptop = document.querySelector('input[name="laptop"]:checked')?.value || '';
+      fd.append('laptopRequired', laptop);
+    }
+    if (eventFee > 0) {
+      fd.append('paymentUtrRef', v('f-utr'));
+      if (screenshotFile) fd.append('paymentScreenshot', screenshotFile);
+    }
+
+    try {
+      const res  = await fetch(`${API}/api/registrations`, { method:'POST', body: fd });
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (data.message?.toLowerCase().includes('email')) {
+          setErr('fg-email', 'This email is already registered for this event');
+          showPanel(1);
+        }
+        throw new Error(data.message || 'Registration failed');
+      }
+
+      /* Show success */
+      document.getElementById('registerForm').style.display     = 'none';
+      document.getElementById('stepsIndicator').style.display   = 'none';
+      document.querySelector('.progress-bar').style.display     = 'none';
+      document.querySelector('.form-card-header').style.display = 'none';
+      document.getElementById('successName').textContent        = v('f-name').split(' ')[0];
+      document.getElementById('successMsg').textContent         = eventFee > 0
+        ? `Your registration for ${eventName} is received. We'll verify your payment and confirm your spot.`
+        : `Your spot for ${eventName} is confirmed. We'll keep you posted with updates!`;
+      document.getElementById('successState').classList.add('show');
+
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-check"></i> Confirm Registration';
+      if (!err.message?.toLowerCase().includes('email')) {
+        alert(err.message || 'Something went wrong. Please try again.');
+      }
+    }
+  });
+
+  /* ── LOAD EVENT DETAILS ── */
+  async function loadEventDetails() {
+    document.getElementById('eventTitle').textContent = eventName || 'Event';
+    document.getElementById('formSubtitle').textContent = eventName ? `Registering for: ${eventName}` : 'Complete all steps to register';
+    updateStatusBadge('upcoming');
+    showCatChip(eventCategory);
+    setFeeDisplay();
+
+    if (!eventId) return;
+    try {
+      const res  = await fetch(`${API}/api/events/public`);
+      if (!res.ok) throw new Error();
+      const events = await res.json();
+      const event  = events.find(e => String(e._id) === String(eventId));
+      if (!event) return;
+
+      eventCategory = (event.status === 'open' ? event.category : eventCategory) || eventCategory;
+      document.getElementById('eventTitle').textContent = event.title;
+      document.title = `Register – ${event.title} | ClustrCore`;
+      updateStatusBadge(event.status);
+      showCatChip(event.category || eventCategory);
+      setFeeDisplay();
+
+      if (event.image) {
+        const img = document.getElementById('eventBanner');
+        img.src = event.image;
+        img.onload = () => { img.style.display='block'; document.getElementById('eventBannerPlaceholder').style.display='none'; };
+      }
+      if (event.date)  { showMeta('eventDateMeta',  'eventDateText',  event.date);  }
+      if (event.time)  { showMeta('eventTimeMeta',  'eventTimeText',  event.time);  }
+      if (event.venue) { showMeta('eventVenueMeta', 'eventVenueText', event.venue); }
+
+      /* Update fee from event data */
+      if (event.registrationFee !== undefined && event.registrationFee !== null) {
+        eventFee = Number(event.registrationFee) || 0;
+        setFeeDisplay();
+      }
+
+      if (event.qrImage) {
+        const qrWrap = document.querySelector('.qr-wrap');
+        if (qrWrap) {
+          qrWrap.innerHTML = `<img src="${event.qrImage}" alt="QR code">`;
+        }
+      }
+
+      /* Display mentors */
+      if (event.mentors && event.mentors.length > 0) {
+        const mentorsList = document.getElementById('mentorsList');
+        mentorsList.innerHTML = event.mentors.map(m => `
+          <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;padding:.5rem;border:1px solid var(--border);border-radius:8px;background:var(--bg-secondary)">
+            ${m.photo ? `<img src="${m.photo}" style="width:40px;height:40px;border-radius:50%;object-fit:cover">` : '<i class="fas fa-user-tie" style="font-size:1.5rem;color:var(--accent-1)"></i>'}
+            <div>
+              <div style="font-weight:600;color:var(--text-primary)">${m.name}</div>
+              <div style="font-size:.8rem;color:var(--text-muted)">${m.title || m.role}</div>
+              ${m.bio ? `<div style="font-size:.75rem;color:var(--text-secondary);margin-top:.25rem">${m.bio.slice(0,100)}${m.bio.length>100?'...':''}</div>` : ''}
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('mentorsSection').style.display = 'block';
+      }
+
+      /* Display companies - avoid duplicates by clearing first */
+      if (event.companies && event.companies.length > 0) {
+        const companiesList = document.getElementById('companiesList');
+        /* Remove any existing duplicates */
+        companiesList.innerHTML = '';
+        
+        const uniqueCompanies = [];
+        const seenNames = new Set();
+        event.companies.forEach(c => {
+          if (!seenNames.has(c.name)) {
+            uniqueCompanies.push(c);
+            seenNames.add(c.name);
+          }
+        });
+        
+        companiesList.innerHTML = uniqueCompanies.map(c => `
+          <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;padding:.5rem;border:1px solid var(--border);border-radius:8px;background:var(--bg-secondary)">
+            ${c.logo ? `<img src="${c.logo}" style="width:32px;height:32px;object-fit:contain">` : '<i class="fas fa-building" style="font-size:1.2rem;color:var(--accent-2)"></i>'}
+            <div>
+              <div style="font-weight:600;color:var(--text-primary)">${c.name}</div>
+              <div style="font-size:.8rem;color:var(--text-muted)">${c.role}</div>
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('companiesSection').style.display = 'block';
+      }
+    } catch {}
+  }
+
+  function showMeta(metaId, textId, val) {
+    document.getElementById(metaId).style.display = 'flex';
+    document.getElementById(textId).textContent   = val;
+  }
+
+  function updateStatusBadge(status) {
+    const badge = document.getElementById('eventStatusBadge');
+    const map = { open:['badge-open','Open'], upcoming:['badge-upcoming','Upcoming'], completed:['badge-completed','Completed'], draft:['badge-upcoming','Coming Soon'] };
+    const [cls, label] = map[status?.toLowerCase()] || map.upcoming;
+    badge.className = `event-status-badge ${cls}`;
+    badge.innerHTML = `<i class="fas fa-circle" style="font-size:.45rem"></i> ${label}`;
+  }
+
+  function showCatChip(cat) {
+    if (!cat) return;
+    const chip = document.getElementById('catChip');
+    const icons = { hackathon:'fa-code', workshop:'fa-laptop-code', seminar:'fa-chalkboard-teacher', other:'fa-calendar' };
+    const labels = { hackathon:'Hackathon', workshop:'Workshop', seminar:'Seminar', competition:'Competition', webinar:'Webinar', other:'Event' };
+    chip.className = `cat-chip ${cat}`;
+    chip.innerHTML = `<i class="fas ${icons[cat]||'fa-calendar'}"></i> ${labels[cat]||cat}`;
+    chip.style.display = 'inline-flex';
+
+    /* Update left panel text per category */
+    const descs = {
+      hackathon: 'Form your team, submit your project idea and secure your hackathon spot. Top teams win prizes!',
+      workshop:  'Interactive hands-on workshop. Bring your laptop if possible for the best experience.',
+      seminar:   'Join our knowledge session. Certificate of participation issued after attendance.',
+    };
+    document.getElementById('leftDesc').textContent = descs[cat] || descs.seminar;
+
+    /* Update eyebrow */
+    const eyeIcons = { hackathon:'fa-code', workshop:'fa-laptop', seminar:'fa-microphone' };
+    document.getElementById('eyebrowLabel').innerHTML = `<i class="fas ${eyeIcons[cat]||'fa-bolt'}"></i> ${labels[cat]||'Event'} Registration`;
+  }
+
+  function setFeeDisplay() {
+    const wrap = document.getElementById('feeBadgeWrap');
+    if (eventFee > 0) {
+      wrap.style.display = 'block';
+      wrap.innerHTML = `<span class="fee-badge paid"><i class="fas fa-indian-rupee-sign"></i> ₹${eventFee} Registration Fee</span>`;
+      document.getElementById('payAmountDisplay').textContent = `₹${eventFee}`;
+    } else {
+      wrap.style.display = 'block';
+      wrap.innerHTML = `<span class="fee-badge free"><i class="fas fa-gift"></i> Free Event</span>`;
+    }
+  }
+
+  /* ── INIT ── */
+  buildSteps();
+  updateProgress();
+  loadEventDetails();
+})();
+</script>
+</body>
+</html>

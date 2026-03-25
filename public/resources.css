@@ -1,0 +1,93 @@
+* {
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #4f46e5, #a5b4fc, #fbcfe8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.page {
+  width: 100%;
+  padding: 40px;
+}
+
+.resource-window {
+  background: white;
+  max-width: 1100px;
+  width: 100%;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+}
+
+.resource-header h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.resource-header p {
+  color: #6b7280;
+  margin-top: 6px;
+}
+
+.search-bar {
+  margin: 25px 0;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  font-size: 15px;
+}
+
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.resource-card {
+  border-radius: 14px;
+  padding: 22px;
+  background: #f9fafb;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.resource-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+
+.icon {
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+
+.resource-card h3 {
+  margin: 0 0 8px;
+}
+
+.resource-card p {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 14px;
+}
+
+.btn {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  background: #6366f1;
+  padding: 8px 14px;
+  border-radius: 8px;
+  display: inline-block;
+}

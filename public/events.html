@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Timeline | ClustrCore</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+
+    :root {
+      --bg-primary: #f4f1ec;
+      --bg-secondary: #eae6df;
+      --bg-card: #ffffff;
+      --text-primary: #1a1714;
+      --text-secondary: #5c5650;
+      --text-muted: #9c958d;
+      --accent-1: #c8623a;
+      --accent-2: #3a6bc8;
+      --accent-gradient: linear-gradient(135deg, #c8623a 0%, #e08c4a 50%, #3a6bc8 100%);
+      --accent-glow: rgba(200, 98, 58, 0.2);
+      --border: rgba(26, 23, 20, 0.1);
+      --border-strong: rgba(26, 23, 20, 0.2);
+      --shadow-sm: 0 2px 8px rgba(26,23,20,0.08);
+      --shadow-md: 0 8px 32px rgba(26,23,20,0.12);
+      --shadow-lg: 0 20px 60px rgba(26,23,20,0.18);
+      --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+      --transition-slow: 0.6s cubic-bezier(0.4,0,0.2,1);
+      --line-color: rgba(26,23,20,0.15);
+      --past: #9c958d;
+      --future: #c8623a;
+      --today-color: #3a6bc8;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0f0e0d;
+      --bg-secondary: #161412;
+      --bg-card: #1c1916;
+      --text-primary: #f0ece6;
+      --text-secondary: #a09890;
+      --text-muted: #6b6358;
+      --accent-1: #e07a50;
+      --accent-2: #6a9be8;
+      --accent-gradient: linear-gradient(135deg, #e07a50 0%, #e8a060 50%, #6a9be8 100%);
+      --accent-glow: rgba(224,122,80,0.15);
+      --border: rgba(240,236,230,0.08);
+      --border-strong: rgba(240,236,230,0.15);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+      --shadow-md: 0 8px 32px rgba(0,0,0,0.4);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.55);
+      --line-color: rgba(240,236,230,0.12);
+      --past: #6b6358;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      transition: background var(--transition), color var(--transition);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9999;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+    ::-webkit-scrollbar-thumb { background: var(--accent-1); border-radius: 3px; }
+
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(244,241,236,0.92);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: background var(--transition);
+    }
+    [data-theme="dark"] .header { background: rgba(15,14,13,0.92); }
+
+    .header-inner {
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 2rem; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.3rem;
+      letter-spacing: -0.02em;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-decoration: none;
+    }
+
+    .header-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+    .btn-icon {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      width: 38px; height: 38px;
+      border-radius: 10px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem;
+      transition: all var(--transition);
+    }
+    .btn-icon:hover { background: var(--bg-secondary); border-color: var(--border-strong); transform: scale(1.06); }
+
+    .page {
+      max-width: 1200px; margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+    }
+
+    .page-intro {
+      margin-bottom: 3.5rem;
+      animation: fadeUp 0.7s cubic-bezier(0.4,0,0.2,1) both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .page-intro h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800; letter-spacing: -0.04em;
+      margin-bottom: 0.5rem;
+    }
+    .page-intro h1 span {
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-intro p { color: var(--text-secondary); font-size: 1rem; font-weight: 300; max-width: 500px; }
+
+    .filter-bar {
+      display: flex; align-items: center; gap: 0.5rem;
+      margin-bottom: 3rem; flex-wrap: wrap;
+    }
+
+    .filter-tab {
+      padding: 0.45rem 1rem;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem; font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .filter-tab:hover { border-color: var(--border-strong); color: var(--text-primary); }
+    .filter-tab.active {
+      background: var(--accent-gradient);
+      color: white; border-color: transparent;
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+
+    .filter-count { margin-left: auto; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+
+    .year-group { margin-bottom: 0.5rem; }
+
+    .year-label {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      padding: 0.3rem 0.875rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+    }
+
+    .timeline { position: relative; padding-left: 2rem; }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, transparent 0%, var(--line-color) 5%, var(--line-color) 95%, transparent 100%);
+    }
+
+    .today-marker {
+      position: relative;
+      display: flex; align-items: center;
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+    }
+
+    .today-marker::before {
+      content: '';
+      position: absolute;
+      left: -2rem; top: 50%;
+      transform: translateY(-50%);
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--today-color);
+      box-shadow: 0 0 0 4px rgba(58,107,200,0.2), 0 0 0 8px rgba(58,107,200,0.08);
+      animation: todayPulse 2s ease-in-out infinite;
+      z-index: 2;
+    }
+
+    @keyframes todayPulse {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(58,107,200,0.2), 0 0 0 8px rgba(58,107,200,0.08); }
+      50%       { box-shadow: 0 0 0 6px rgba(58,107,200,0.3), 0 0 0 12px rgba(58,107,200,0.05); }
+    }
+
+    .today-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--today-color);
+      background: rgba(58,107,200,0.1);
+      padding: 0.25rem 0.75rem;
+      border-radius: 100px;
+      border: 1px solid rgba(58,107,200,0.2);
+    }
+
+    .today-line { flex: 1; height: 1px; background: linear-gradient(to right, rgba(58,107,200,0.4), transparent); }
+
+    .timeline-item {
+      position: relative;
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.75rem;
+      animation: itemIn 0.5s cubic-bezier(0.4,0,0.2,1) both;
+    }
+
+    @keyframes itemIn {
+      from { opacity: 0; transform: translateX(-16px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -2rem; top: 1.4rem;
+      transform: translateX(-50%);
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--bg-primary);
+      z-index: 2;
+      transition: transform var(--transition);
+    }
+
+    .timeline-item.past::before   { background: var(--past); }
+    .timeline-item.future::before { background: var(--future); box-shadow: 0 0 8px var(--accent-glow); }
+    .timeline-item:hover::before  { transform: translateX(-50%) scale(1.4); }
+
+    .tl-date {
+      flex-shrink: 0; width: 90px;
+      padding-top: 1.2rem; text-align: right;
+    }
+
+    .tl-date .month {
+      display: block;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .tl-date .day {
+      display: block;
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem; font-weight: 800;
+      line-height: 1; letter-spacing: -0.04em;
+      color: var(--text-primary);
+    }
+
+    .tl-date .year-small { display: block; font-size: 0.7rem; color: var(--text-muted); }
+
+    .tl-card {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all var(--transition);
+      position: relative;
+      cursor: pointer;
+    }
+
+    .tl-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--border-strong); }
+
+    .tl-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--accent-gradient);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .tl-card:hover::before { opacity: 1; }
+
+    .tl-card-inner { display: flex; gap: 0; align-items: stretch; }
+
+    .tl-card-img { width: 120px; flex-shrink: 0; overflow: hidden; }
+
+    .tl-card-img img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform var(--transition-slow);
+      filter: brightness(0.9);
+    }
+
+    .tl-card:hover .tl-card-img img { transform: scale(1.08); filter: brightness(1); }
+
+    .tl-card-img .img-placeholder {
+      width: 100%; height: 100%; min-height: 100px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      background: var(--bg-secondary);
+      color: var(--text-muted);
+    }
+
+    .tl-card-body { flex: 1; padding: 1.1rem 1.25rem; }
+
+    .tl-card-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.5rem; align-items: center; }
+
+    .tag {
+      font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      background: var(--bg-secondary);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .tag.tech      { background: rgba(58,107,200,0.1);  color: #3a6bc8; border-color: rgba(58,107,200,0.2); }
+    .tag.sports    { background: rgba(58,156,90,0.1);   color: #3a9c5a; border-color: rgba(58,156,90,0.2); }
+    .tag.annual    { background: rgba(200,98,58,0.1);   color: #c8623a; border-color: rgba(200,98,58,0.2); }
+    .tag.social    { background: rgba(139,92,246,0.1);  color: #8b5cf6; border-color: rgba(139,92,246,0.2); }
+    .tag.seminar   { background: rgba(58,107,200,0.1);  color: #3a6bc8; border-color: rgba(58,107,200,0.2); }
+    .tag.workshop  { background: rgba(58,156,90,0.1);   color: #3a9c5a; border-color: rgba(58,156,90,0.2); }
+    .tag.hackathon { background: rgba(139,92,246,0.1);  color: #8b5cf6; border-color: rgba(139,92,246,0.2); }
+    .tag.webinar   { background: rgba(91,184,245,0.1);  color: #5bb8f5; border-color: rgba(91,184,245,0.2); }
+    .tag.competition { background: rgba(245,158,11,0.1); color: #f59e0b; border-color: rgba(245,158,11,0.2); }
+    .tag.completed { background: rgba(156,149,141,0.1); color: #9c958d; border-color: rgba(156,149,141,0.2); }
+    .tag.open      { background: rgba(58,156,90,0.1);   color: #3a9c5a; border-color: rgba(58,156,90,0.2); }
+    .tag.closed    { background: rgba(239,68,68,0.08);  color: #ef4444; border-color: rgba(239,68,68,0.2); }
+    .tag.draft     { background: rgba(156,149,141,0.1); color: #9c958d; border-color: rgba(156,149,141,0.2); }
+    .tag.upcoming  { background: rgba(200,98,58,0.12);  color: var(--accent-1); border-color: var(--accent-1); }
+
+    .tl-card-body h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem; font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      margin-bottom: 0.35rem; line-height: 1.3;
+    }
+
+    .tl-card-body p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; font-weight: 300; }
+
+    .tl-card-meta { display: flex; align-items: center; gap: 1rem; margin-top: 0.75rem; flex-wrap: wrap; }
+
+    .meta-item { display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: var(--text-muted); }
+    .meta-item i { color: var(--accent-1); font-size: 0.7rem; }
+
+    .future-badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--accent-1);
+      background: rgba(200,98,58,0.1);
+      border: 1px solid rgba(200,98,58,0.25);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+    }
+    .future-badge::before {
+      content: '';
+      width: 5px; height: 5px;
+      background: var(--accent-1);
+      border-radius: 50%;
+      animation: badgePulse 1.5s ease-in-out infinite;
+    }
+    @keyframes badgePulse {
+      0%,100% { opacity:1; transform: scale(1); }
+      50%     { opacity:0.4; transform: scale(1.5); }
+    }
+
+    .skeleton-wrap { display: flex; flex-direction: column; gap: 1.5rem; padding-left: 2rem; }
+    .skeleton-item { display: flex; gap: 1.5rem; align-items: center; }
+    .skeleton-date { width: 90px; height: 60px; border-radius: 8px; background: var(--bg-secondary); animation: shimmer 1.5s infinite; }
+    .skeleton-card { flex: 1; height: 100px; border-radius: 16px; background: var(--bg-secondary); animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+    .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); display: none; }
+    .empty-state.show { display: block; }
+    .empty-state i { font-size: 3rem; margin-bottom: 1rem; display: block; }
+    .empty-state p { font-size: 0.95rem; }
+
+    @media (max-width: 640px) {
+      .page { padding: 2rem 1rem 4rem; }
+      .timeline { padding-left: 1.5rem; }
+      .tl-date { width: 60px; }
+      .tl-date .day { font-size: 1.4rem; }
+      .tl-card-img { width: 80px; }
+      .header-inner { padding: 0 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">ClustrCore</a>
+      <div class="header-actions">
+        <button class="btn-icon" id="themeToggle" aria-label="Toggle theme">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="page">
+    <div class="page-intro">
+      <h1>Events <span>Timeline</span></h1>
+      <p>A living record of past milestones and upcoming adventures — all in one place.</p>
+    </div>
+
+    <div class="filter-bar" id="filterBar">
+      <button class="filter-tab active" data-filter="all">All</button>
+      <button class="filter-tab" data-filter="past">Past</button>
+      <button class="filter-tab" data-filter="future">Upcoming</button>
+      <button class="filter-tab" data-filter="open">Open</button>
+      <button class="filter-tab" data-filter="completed">Completed</button>
+      <span class="filter-count" id="filterCount"></span>
+    </div>
+
+    <div id="timelineRoot">
+      <div class="skeleton-wrap" id="loadingSkeleton">
+        <div class="skeleton-item"><div class="skeleton-date"></div><div class="skeleton-card"></div></div>
+        <div class="skeleton-item"><div class="skeleton-date"></div><div class="skeleton-card"></div></div>
+        <div class="skeleton-item"><div class="skeleton-date"></div><div class="skeleton-card"></div></div>
+      </div>
+    </div>
+
+    <div class="empty-state" id="emptyState">
+      <i class="fas fa-calendar-xmark"></i>
+      <p>No events found.</p>
+    </div>
+  </div>
+
+  <script>
+  (() => {
+
+    /* ── THEME ── */
+    const html  = document.documentElement;
+    const tBtn  = document.getElementById('themeToggle');
+    applyTheme(localStorage.getItem('clustr-theme') || 'light');
+
+    function applyTheme(t) {
+      html.setAttribute('data-theme', t);
+      localStorage.setItem('clustr-theme', t);
+      tBtn.querySelector('i').className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+
+    tBtn.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      tBtn.style.transform = 'scale(0.8) rotate(25deg)';
+      setTimeout(() => { tBtn.style.transform = ''; applyTheme(next); }, 140);
+    });
+
+    /* ── STATE ── */
+    let events = [];
+    let filter = 'all';
+    const TODAY = new Date(); TODAY.setHours(0,0,0,0);
+
+    /* ── HELPERS ── */
+    function isPast(dateStr) {
+      const d = new Date(dateStr); d.setHours(0,0,0,0);
+      return d < TODAY;
+    }
+
+    function fmt(dateStr) {
+      const d = new Date(dateStr);
+      return {
+        month: d.toLocaleString('en', { month: 'short' }).toUpperCase(),
+        day:   d.getDate(),
+        year:  d.getFullYear(),
+      };
+    }
+
+    function parseDate(e) {
+      // e.date can be "9 March 2026" (formatted) or ISO string
+      const d = new Date(e.date);
+      return isNaN(d) ? new Date().toISOString().split('T')[0] : d.toISOString().split('T')[0];
+    }
+
+    function categoryEmoji(cat) {
+      const map = {
+        tech:'💻', seminar:'🎤', workshop:'🛠️', sports:'⚽',
+        annual:'🏆', social:'🎉', hackathon:'💡', cultural:'🎭',
+        competition:'🏆', webinar:'🖥️', other:'📅',
+      };
+      return map[(cat || '').toLowerCase()] || '📅';
+    }
+
+    /* ── FETCH ── */
+    async function loadEvents() {
+      try {
+        const res  = await fetch('/api/events/public');
+        const data = await res.json();
+
+        events = data.map(e => ({
+          id:     e._id,
+          title:  e.title,
+          desc:   e.description || '',
+          date:   parseDate(e),
+          eventDate: e.eventDate,
+          registrationClose: e.registrationClose,
+          time:   e.time  || '',
+          venue:  e.venue || '',
+          /* ✅ FIX 1: category is ONLY used for the category chip.
+             Never fall back to status here — that's what caused
+             "Open" to appear twice (as both category chip and status chip). */
+          category: (e.category || '').toLowerCase(),
+          /* status is kept separately for the status chip */
+          status:   (e.status || '').toLowerCase(),
+          image:    e.image || '',
+          emoji:    categoryEmoji(e.category),
+        }));
+
+      } catch (err) {
+        console.error('ClustrCore: failed to load events', err);
+        events = [];
+      }
+
+      document.getElementById('loadingSkeleton').remove();
+      render();
+    }
+
+    /* ── GET DISPLAY STATUS ── */
+    function getDisplayStatus(event) {
+      // Check if event date is in the past
+      if (event.eventDate) {
+        const eventDate = new Date(event.eventDate);
+        eventDate.setHours(0, 0, 0, 0);
+        if (eventDate < TODAY) return 'Past';
+      }
+
+      // Check if registration close date has passed but event is still in future
+      if (event.registrationClose) {
+        const regCloseDate = new Date(event.registrationClose);
+        regCloseDate.setHours(0, 0, 0, 0);
+        if (regCloseDate < TODAY) return 'Registration Closed';
+      }
+
+      // Return original status
+      return event.status || 'open';
+    }
+
+    /* ── FILTER ── */
+    function getFiltered() {
+      return events
+        .filter(e => {
+          if (filter === 'past')      return isPast(e.date);
+          if (filter === 'future')    return !isPast(e.date);
+          if (filter === 'open')      return e.status === 'open';
+          if (filter === 'completed') return e.status === 'completed';
+          return true;
+        })
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+    }
+
+    /* ── RENDER ── */
+    function render() {
+      const root     = document.getElementById('timelineRoot');
+      const empty    = document.getElementById('emptyState');
+      const countEl  = document.getElementById('filterCount');
+      const filtered = getFiltered();
+
+      countEl.textContent = `${filtered.length} event${filtered.length !== 1 ? 's' : ''}`;
+
+      if (!filtered.length) {
+        root.innerHTML = '';
+        empty.classList.add('show');
+        return;
+      }
+      empty.classList.remove('show');
+
+      // Group by year
+      const byYear = {};
+      filtered.forEach(e => {
+        const y = new Date(e.date).getFullYear();
+        (byYear[y] = byYear[y] || []).push(e);
+      });
+
+      let todayInjected = false;
+      let markup = '';
+
+      Object.keys(byYear).sort().forEach(year => {
+        markup += `<div class="year-group">
+          <div class="year-label"><i class="fas fa-layer-group"></i> ${year}</div>
+          <div class="timeline">`;
+
+        byYear[year].forEach((e, idx) => {
+          const past = isPast(e.date);
+          const d    = fmt(e.date);
+          const displayStatus = getDisplayStatus(e);
+
+          if (!todayInjected && !past) {
+            todayInjected = true;
+            markup += `<div class="today-marker">
+              <span class="today-label"><i class="fas fa-circle-dot"></i> Today</span>
+              <span class="today-line"></span>
+            </div>`;
+          }
+
+          const delay = idx * 60;
+
+          /* ✅ FIX 2: Only render the status chip if it differs from the
+             category chip (case-insensitive). This stops "open" appearing
+             twice when category is absent and status fills in. */
+          const showStatusChip = displayStatus && displayStatus !== e.category;
+
+          markup += `
+          <div class="timeline-item ${past ? 'past' : 'future'}" style="animation-delay:${delay}ms">
+            <div class="tl-date">
+              <span class="month">${d.month}</span>
+              <span class="day">${d.day}</span>
+              <span class="year-small">${d.year}</span>
+            </div>
+            <div class="tl-card">
+              <div class="tl-card-inner">
+                <div class="tl-card-img">
+                  ${e.image
+                    ? `<img src="${e.image}" alt="${e.title}" loading="lazy">`
+                    : `<div class="img-placeholder">${e.emoji}</div>`
+                  }
+                </div>
+                <div class="tl-card-body">
+                  <div class="tl-card-tags">
+                    ${e.category ? `<span class="tag ${e.category}">${e.category}</span>` : ''}
+                    ${showStatusChip  ? `<span class="tag ${displayStatus.toLowerCase().replace(/\s+/g, '')}">${displayStatus}</span>`   : ''}
+                    ${!past           ? `<span class="future-badge">Upcoming</span>`         : ''}
+                  </div>
+                  <h3>${e.title}</h3>
+                  ${e.desc ? `<p>${e.desc}</p>` : ''}
+                  <div class="tl-card-meta">
+                    ${e.time  ? `<span class="meta-item"><i class="fas fa-clock"></i>${e.time}</span>`         : ''}
+                    ${e.venue ? `<span class="meta-item"><i class="fas fa-location-dot"></i>${e.venue}</span>` : ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>`;
+        });
+
+        markup += `</div></div>`;
+      });
+
+      root.innerHTML = markup;
+    }
+
+    /* ── FILTER TABS ── */
+    document.getElementById('filterBar').addEventListener('click', e => {
+      const tab = e.target.closest('.filter-tab');
+      if (!tab) return;
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      filter = tab.dataset.filter;
+      render();
+    });
+
+    /* ── INIT ── */
+    loadEvents();
+
+  })();
+  </script>
+</body>
+</html>
