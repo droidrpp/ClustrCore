@@ -248,6 +248,7 @@ body{font-family:var(--ff);background:var(--bg);color:var(--txt);min-height:100v
   <button class="ni" onclick="nav('gallery')" data-p="gallery"><i class="fas fa-images"></i>Gallery</button>
   <div class="sb-div"></div>
   <div class="sb-lbl">Account</div>
+  <button class="ni" onclick="nav('profile')" data-p="profile"><i class="fas fa-user"></i>Profile</button>
   <button class="ni" onclick="nav('settings')" data-p="settings"><i class="fas fa-gear"></i>Settings</button>
   <button class="ni" onclick="logout()"><i class="fas fa-arrow-right-from-bracket"></i>Logout</button>
 </nav>
@@ -365,6 +366,27 @@ body{font-family:var(--ff);background:var(--bg);color:var(--txt);min-height:100v
       </div>
     </div>
     <div style="height:40px"></div>
+  </div>
+
+  <!-- ══ PROFILE ══ -->
+  <div class="pg" id="page-profile">
+    <div class="con">
+      <div class="ph"><h1>My Profile</h1><p>Update your profile photo and information</p></div>
+      <div class="setcard">
+        <h3>Profile Settings</h3>
+        <div style="display:flex;gap:20px;align-items:flex-start;margin-top:20px">
+          <div id="profileAv" style="width:80px;height:80px;border-radius:16px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:1.5rem;overflow:hidden"></div>
+          <div style="flex:1">
+            <label style="display:block;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem">Profile Photo</label>
+            <input type="file" id="profilePhotoInput" accept="image/*" style="margin-bottom:.5rem">
+            <small style="color:var(--muted);font-size:.75rem">Upload a new profile photo (max 5MB, JPG/PNG/WEBP)</small>
+            <label style="display:block;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;margin-top:1rem">LinkedIn Profile</label>
+            <input id="profileLinkedin" placeholder="https://linkedin.com/in/yourprofile" style="margin-bottom:.5rem">
+            <button class="va-btn" onclick="updateProfile()" style="margin-top:.5rem"><i class="fas fa-save"></i> Update Profile</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ══ SETTINGS ══ -->
@@ -791,6 +813,7 @@ function nav(page) {
     if(page === 'events')        loadEvents();
     if(page === 'announcements') loadAnnouncements();
     if(page === 'gallery')       loadFullGallery();
+    if(page === 'profile')       loadProfile();
   }
 }
 
@@ -821,6 +844,27 @@ function toast(m) {
   t.textContent = m; t.classList.add('show');
   clearTimeout(tT); tT = setTimeout(function(){ t.classList.remove('show'); }, 2500);
 }
+
+// ── PROFILE ──
+async function loadProfile(){
+  try{
+    const res=await fetch('http://localhost:5000/api/team/profile/'+JSON.parse(localStorage.getItem('user')||'{}').id,{headers:{'Authorization':'Bearer '+localStorage.getItem('user')}});
+    const {user:profile}=await res.json();
+    const av=document.getElementById('profileAv');
+    av.innerHTML=profile.photo?`<img src="data:${profile.photoMime};base64,${profile.photo}" style="width:100%;height:100%;object-fit:cover">`:JSON.parse(localStorage.getItem('user')||'{}').name.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2);
+    document.getElementById('profileLinkedin').value=profile.linkedin||'';
+  }catch{toast('Could not load profile');}
+}
+function updateProfile(){
+  const formData=new FormData();
+  const photo=document.getElementById('profilePhotoInput').files[0];
+  if(photo)formData.append('photo',photo);
+  formData.append('linkedin',document.getElementById('profileLinkedin').value);
+  fetch('http://localhost:5000/api/team/profile/'+JSON.parse(localStorage.getItem('user')||'{}').id,{method:'PUT',body:formData,headers:{'Authorization':'Bearer '+localStorage.getItem('user')}}).then(res=>{
+    if(res.ok){toast('Profile updated!');loadProfile();}else res.json().then(err=>toast(err.message||'Failed'));
+  }).catch(err=>toast('Failed'));
+}
+document.getElementById('profilePhotoInput').addEventListener('change',e=>{const f=e.target.files[0];if(f){const r=new FileReader();r.onload=()=>document.getElementById('profileAv').innerHTML=`<img src="${r.result}" style="width:100%;height:100%;object-fit:cover">`;r.readAsDataURL(f);}});
 
 // ── INIT ──
 loadDashboard();

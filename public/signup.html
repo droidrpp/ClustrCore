@@ -6,289 +6,277 @@
   <title>Sign Up – ClustrCore</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap');
 
-    /* ── VARIABLES ─────────────────────────────────────── */
+    /* ── TOKENS (matches landing page exactly) ── */
     :root {
-      --bg-primary: #f4f1ec;
-      --bg-secondary: #eae6df;
-      --bg-card: #ffffff;
-      --text-primary: #1a1714;
-      --text-secondary: #5c5650;
-      --text-muted: #9c958d;
-      --accent-1: #c8623a;
-      --accent-2: #3a6bc8;
-      --accent-gradient: linear-gradient(135deg, #c8623a 0%, #e08c4a 50%, #3a6bc8 100%);
-      --accent-glow: rgba(200, 98, 58, 0.2);
-      --border: rgba(26, 23, 20, 0.1);
-      --border-strong: rgba(26, 23, 20, 0.22);
-      --shadow-sm: 0 2px 8px rgba(26,23,20,0.08);
-      --shadow-md: 0 8px 32px rgba(26,23,20,0.12);
-      --shadow-lg: 0 24px 64px rgba(26,23,20,0.16);
-      --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
-      --radius-sm: 10px;
-    }
+      --orange:#c8623a; --orange-l:#e08c4a; --orange-d:#a34c28;
+      --blue:#3a6bc8; --blue-l:#6a9be8;
+      --grad:linear-gradient(135deg, var(--orange) 0%, var(--orange-l) 50%, var(--blue) 100%);
+      --grad-text:linear-gradient(90deg, var(--orange) 0%, var(--orange-l) 40%, var(--blue) 100%);
 
+      --bg:#faf8f5; --bg2:#f2ede6; --bg3:#ebe4d9;
+      --ink:#1a1410; --ink2:#4a3f35; --ink3:#8c7b6d;
+      --card:#ffffff; --card2:rgba(255,255,255,0.75);
+      --line:rgba(26,20,16,0.08); --line2:rgba(26,20,16,0.15);
+      --sh1:0 1px 4px rgba(26,20,16,0.06),0 4px 16px rgba(26,20,16,0.06);
+      --sh2:0 8px 32px rgba(26,20,16,0.10),0 2px 8px rgba(26,20,16,0.06);
+      --sh3:0 24px 64px rgba(26,20,16,0.14),0 4px 16px rgba(26,20,16,0.08);
+      --glow:rgba(200,98,58,0.18);
+      --ease:cubic-bezier(0.4,0,0.2,1); --t:0.3s;
+    }
     [data-theme="dark"] {
-      --bg-primary: #0f0e0d;
-      --bg-secondary: #161412;
-      --bg-card: #1c1916;
-      --text-primary: #f0ece6;
-      --text-secondary: #a09890;
-      --text-muted: #6b6358;
-      --accent-1: #e07a50;
-      --accent-2: #6a9be8;
-      --accent-gradient: linear-gradient(135deg, #e07a50 0%, #e8a060 50%, #6a9be8 100%);
-      --accent-glow: rgba(224,122,80,0.18);
-      --border: rgba(240,236,230,0.08);
-      --border-strong: rgba(240,236,230,0.16);
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.35);
-      --shadow-md: 0 8px 32px rgba(0,0,0,0.45);
-      --shadow-lg: 0 24px 64px rgba(0,0,0,0.6);
+      --bg:#110e0b; --bg2:#1a1512; --bg3:#231e18;
+      --ink:#f5f0ea; --ink2:#b5a898; --ink3:#6b5e52;
+      --card:#1e1a15; --card2:rgba(30,26,21,0.85);
+      --line:rgba(245,240,234,0.07); --line2:rgba(245,240,234,0.14);
+      --sh1:0 1px 4px rgba(0,0,0,0.3),0 4px 16px rgba(0,0,0,0.25);
+      --sh2:0 8px 32px rgba(0,0,0,0.4),0 2px 8px rgba(0,0,0,0.3);
+      --sh3:0 24px 64px rgba(0,0,0,0.55),0 4px 16px rgba(0,0,0,0.4);
     }
 
-    /* ── RESET ─────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
 
     body {
       font-family: 'DM Sans', sans-serif;
-      background: var(--bg-primary);
+      background: var(--bg);
+      color: var(--ink);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2rem 1rem;
+      padding: 3rem 1.25rem;
       position: relative;
       overflow-x: hidden;
-      transition: background var(--transition), color var(--transition);
-      color: var(--text-primary);
+      transition: background var(--t), color var(--t);
     }
 
-    /* Animated grid */
+    /* ── Cinematic noise texture (matches landing) ── */
     body::before {
       content: '';
       position: fixed; inset: 0;
-      background-image:
-        linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 56px 56px;
-      opacity: 0.5;
-      pointer-events: none;
-      animation: gridDrift 25s linear infinite;
-    }
-    @keyframes gridDrift {
-      from { background-position: 0 0; }
-      to   { background-position: 56px 56px; }
+      pointer-events: none; z-index: 0;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    /* Noise */
+    /* ── Cinematic radial gradient bg (matches landing hero) ── */
     body::after {
       content: '';
       position: fixed; inset: 0;
-      pointer-events: none; z-index: 9999;
-      opacity: 0.025;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 80% 20%, rgba(200,98,58,0.1) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 70% at 10% 80%, rgba(58,107,200,0.08) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(224,140,74,0.06) 0%, transparent 50%);
     }
 
-    /* Ambient orbs */
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      pointer-events: none;
-      filter: blur(80px);
-      opacity: 0.3;
-      animation: orbFloat 10s ease-in-out infinite;
-    }
-    .orb-1 {
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(200,98,58,0.4), transparent 70%);
-      top: -100px; right: -80px;
-    }
-    .orb-2 {
-      width: 340px; height: 340px;
-      background: radial-gradient(circle, rgba(58,107,200,0.35), transparent 70%);
-      bottom: -80px; left: -60px;
-      animation-delay: -5s;
-      animation-direction: reverse;
-    }
-    @keyframes orbFloat {
-      0%,100% { transform: scale(1) translate(0,0); }
-      33%     { transform: scale(1.08) translate(10px,-14px); }
-      66%     { transform: scale(0.94) translate(-8px,10px); }
-    }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg2); }
+    ::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 3px; }
 
-    /* ── THEME BUTTON ───────────────────────────────────── */
-    .theme-btn {
+    /* ── THEME TOGGLE — matches landing style ── */
+    .theme-toggle {
       position: fixed;
       top: 1.25rem; right: 1.25rem;
       z-index: 100;
-      width: 40px; height: 40px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--line2);
+      background: var(--card2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--ink2);
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.95rem;
-      color: var(--text-primary);
-      transition: all var(--transition);
-      box-shadow: var(--shadow-sm);
+      font-size: 0.85rem;
+      transition: all var(--t);
+      box-shadow: var(--sh1);
     }
-    .theme-btn:hover {
-      background: var(--bg-secondary);
-      border-color: var(--border-strong);
-      transform: scale(1.08) rotate(15deg);
-    }
+    .theme-toggle:hover { border-color: var(--orange); color: var(--orange); transform: scale(1.05); }
 
-    /* ── CARD ───────────────────────────────────────────── */
-    .signup-container {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
+    /* ── BACK LINK ── */
+    .back-link {
+      position: fixed;
+      top: 1.25rem; left: 1.25rem;
+      z-index: 100;
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      font-size: 0.82rem; font-weight: 500;
+      color: var(--ink3);
+      text-decoration: none;
+      background: var(--card2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--line2);
+      border-radius: 100px;
+      padding: 0.45rem 1rem;
+      box-shadow: var(--sh1);
+      transition: all var(--t);
+    }
+    .back-link:hover { color: var(--orange); border-color: rgba(200,98,58,0.3); }
+
+    /* ── MAIN CARD — glassmorphic like landing header ── */
+    .signup-card {
+      background: var(--card2);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid var(--line2);
+      border-radius: 28px;
       width: 100%;
-      max-width: 480px;
-      padding: 2.75rem 2.5rem;
-      box-shadow: var(--shadow-lg);
+      max-width: 490px;
+      padding: 2.875rem 2.625rem;
+      box-shadow: var(--sh3);
       position: relative;
       z-index: 2;
-      animation: cardIn 0.7s cubic-bezier(0.4,0,0.2,1) both;
+      animation: cardIn 0.7s var(--ease) both;
     }
     @keyframes cardIn {
-      from { opacity: 0; transform: translateY(32px) scale(0.97); }
+      from { opacity: 0; transform: translateY(28px) scale(0.97); }
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* Gradient top border */
-    .signup-container::before {
+    /* Gradient top edge — landing signature detail */
+    .signup-card::before {
       content: '';
       position: absolute;
-      top: 0; left: 2rem; right: 2rem;
+      top: 0; left: 0; right: 0;
       height: 2px;
-      background: var(--accent-gradient);
-      border-radius: 0 0 4px 4px;
+      background: var(--grad);
+      border-radius: 28px 28px 0 0;
     }
 
-    /* ── BACK LINK ──────────────────────────────────────── */
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      margin-bottom: 1.5rem;
-      transition: color var(--transition);
-    }
-    .back-link:hover { color: var(--accent-1); }
-
-    /* ── LOGO ───────────────────────────────────────────── */
-    .logo {
+    /* ── HEADER ── */
+    .card-header {
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 2.25rem;
     }
-    .logo-mark {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 52px; height: 52px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 15px;
-      margin-bottom: 0.875rem;
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 1rem;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      box-shadow: var(--shadow-sm);
-      position: relative;
+
+    .logo-eyebrow {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      background: var(--bg2); border: 1px solid var(--line2);
+      border-radius: 100px; padding: 0.32rem 0.9rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; font-weight: 500; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--orange);
+      margin-bottom: 1.125rem;
     }
-    .logo-mark::after {
+    .logo-eyebrow::before {
       content: '';
-      position: absolute;
-      inset: -4px;
-      border-radius: 18px;
-      border: 1px solid var(--border);
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--orange);
+      animation: pulse 2s ease-in-out infinite;
     }
-    .logo h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.5rem;
-      font-weight: 800;
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.1rem;
+      font-weight: 900;
       letter-spacing: -0.03em;
-      background: var(--accent-gradient);
+      line-height: 1.05;
+      margin-bottom: 0.5rem;
+    }
+    .card-title .gradient-text {
+      background: var(--grad-text);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 0.25rem;
     }
-    .logo p {
-      color: var(--text-muted);
-      font-size: 0.85rem;
+    .card-subtitle {
+      font-size: 0.88rem;
+      color: var(--ink3);
       font-weight: 300;
+      line-height: 1.5;
     }
 
-    /* ── FORM ───────────────────────────────────────────── */
-    .form-group { margin-bottom: 1rem; }
+    /* ── BANNER ── */
+    .msg-banner {
+      border-radius: 10px;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.82rem;
+      display: none;
+      margin-bottom: 1.125rem;
+      align-items: center;
+      gap: 0.5rem;
+      line-height: 1.4;
+    }
+    .msg-banner.show { display: flex; }
+    .msg-banner.error {
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: #ef4444;
+    }
+    .msg-banner.success {
+      background: rgba(58,156,90,0.08);
+      border: 1px solid rgba(58,156,90,0.25);
+      color: #3a9c5a;
+    }
 
-    .form-group label {
+    /* ── FORM GROUPS ── */
+    .form-group { margin-bottom: 1.05rem; }
+
+    .form-label {
       display: block;
-      font-size: 0.76rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--ink3);
       margin-bottom: 0.4rem;
     }
 
-    .input-wrapper { position: relative; }
+    .input-wrap { position: relative; }
 
-    .input-wrapper i.input-icon {
+    .input-icon {
       position: absolute;
       left: 13px; top: 50%;
       transform: translateY(-50%);
-      color: var(--text-muted);
-      font-size: 0.82rem;
+      color: var(--ink3);
+      font-size: 0.8rem;
       pointer-events: none;
-      transition: color var(--transition);
+      transition: color var(--t);
     }
-    .input-wrapper:focus-within i.input-icon { color: var(--accent-1); }
+    .input-wrap:focus-within .input-icon { color: var(--orange); }
 
-    input, select {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    select {
       width: 100%;
-      padding: 0.72rem 1rem 0.72rem 2.5rem;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      padding: 0.72rem 1rem 0.72rem 2.4rem;
+      background: var(--bg2);
+      border: 1px solid var(--line2);
+      border-radius: 10px;
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.88rem;
-      color: var(--text-primary);
+      font-size: 0.87rem;
+      color: var(--ink);
       outline: none;
-      transition: all var(--transition);
+      transition: all var(--t);
       appearance: none;
     }
-    input::placeholder { color: var(--text-muted); }
+    input::placeholder { color: var(--ink3); }
     input:focus, select:focus {
-      border-color: var(--accent-1);
-      background: var(--bg-card);
-      box-shadow: 0 0 0 3px var(--accent-glow);
+      border-color: var(--orange);
+      background: var(--card);
+      box-shadow: 0 0 0 3px rgba(200,98,58,0.1);
     }
 
-    /* Password toggle */
     .toggle-pw {
       position: absolute;
       right: 11px; top: 50%;
       transform: translateY(-50%);
       background: none; border: none;
-      color: var(--text-muted);
+      color: var(--ink3);
       cursor: pointer;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       padding: 4px;
-      transition: color var(--transition);
+      transition: color var(--t);
     }
-    .toggle-pw:hover { color: var(--accent-1); }
+    .toggle-pw:hover { color: var(--orange); }
 
-    /* Select arrow */
     .select-wrap { position: relative; }
     .select-wrap::after {
       content: '\f078';
@@ -298,21 +286,17 @@
       right: 13px; top: 50%;
       transform: translateY(-50%);
       pointer-events: none;
-      color: var(--text-muted);
-      font-size: 0.7rem;
+      color: var(--ink3);
+      font-size: 0.65rem;
     }
-    .select-wrap select { padding-right: 2.5rem; }
+    .select-wrap select { padding-right: 2.5rem; cursor: pointer; }
 
-    /* ── PASSWORD STRENGTH ──────────────────────────────── */
-    .strength-wrap {
-      margin-top: 0.5rem;
-      display: none;
-    }
+    /* ── PASSWORD STRENGTH ── */
+    .strength-wrap { margin-top: 0.5rem; display: none; }
     .strength-wrap.show { display: block; }
-
     .strength-track {
       height: 3px;
-      background: var(--bg-secondary);
+      background: var(--bg3);
       border-radius: 3px;
       overflow: hidden;
       margin-bottom: 0.3rem;
@@ -324,115 +308,180 @@
       transition: width 0.4s ease, background 0.4s ease;
     }
     .strength-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
     }
-    .s-weak   { background: #ef4444; }
-    .s-medium { background: #f59e0b; }
-    .s-strong { background: #3a9c5a; }
 
-    /* ── ROLE CARDS ─────────────────────────────────────── */
+    /* ── ROLE CARDS — editorial feel ── */
     .role-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 0.5rem;
       margin-top: 0.4rem;
     }
+
     .role-card {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0.75rem 0.5rem;
+      border: 1px solid var(--line2);
+      border-radius: 12px;
+      padding: 0.875rem 0.5rem;
       text-align: center;
       cursor: pointer;
-      transition: all var(--transition);
-      background: var(--bg-secondary);
+      transition: all var(--t);
+      background: var(--bg2);
       position: relative;
       overflow: hidden;
     }
-    .role-card::before {
+    .role-card::after {
       content: '';
       position: absolute;
       bottom: 0; left: 0; right: 0;
       height: 2px;
-      background: var(--accent-gradient);
+      background: var(--grad);
       transform: scaleX(0);
-      transition: transform var(--transition);
+      transition: transform var(--t);
     }
-    .role-card:hover { border-color: var(--border-strong); background: var(--bg-card); }
+    .role-card:hover {
+      border-color: rgba(200,98,58,0.25);
+      background: var(--card);
+      transform: translateY(-1px);
+    }
     .role-card.selected {
-      border-color: var(--accent-1);
-      background: var(--bg-card);
-      box-shadow: 0 0 0 3px var(--accent-glow);
+      border-color: var(--orange);
+      background: var(--card);
+      box-shadow: 0 0 0 3px rgba(200,98,58,0.1), var(--sh1);
     }
-    .role-card.selected::before { transform: scaleX(1); }
+    .role-card.selected::after { transform: scaleX(1); }
     .role-card i {
       display: block;
-      font-size: 1.1rem;
-      margin-bottom: 0.3rem;
-      color: var(--text-muted);
-      transition: color var(--transition);
+      font-size: 1.05rem;
+      margin-bottom: 0.35rem;
+      color: var(--ink3);
+      transition: color var(--t);
     }
-    .role-card.selected i { color: var(--accent-1); }
+    .role-card.selected i { color: var(--orange); }
     .role-card span {
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.63rem;
+      font-weight: 500;
+      letter-spacing: 0.07em;
       text-transform: uppercase;
-      color: var(--text-secondary);
+      color: var(--ink3);
+      transition: color var(--t);
     }
-    .role-card.selected span { color: var(--text-primary); }
+    .role-card.selected span { color: var(--ink); }
     #role { display: none; }
 
-    /* ── ERROR / SUCCESS MSG ────────────────────────────── */
-    .msg-banner {
-      border-radius: 8px;
-      padding: 0.6rem 0.875rem;
-      font-size: 0.82rem;
-      display: none;
-      margin-bottom: 1rem;
-      align-items: center;
-      gap: 0.5rem;
+    /* ── TEAM EXPAND ── */
+    .team-expand {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.55s var(--ease), opacity 0.4s ease;
     }
-    .msg-banner.show { display: flex; }
-    .msg-banner.error {
-      background: rgba(239,68,68,0.1);
-      border: 1px solid rgba(239,68,68,0.3);
-      color: #ef4444;
+    .team-expand.open { max-height: 700px; opacity: 1; }
+
+    /* Divider — editorial section separator */
+    .section-divider {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin: 1.125rem 0;
     }
-    .msg-banner.success {
-      background: rgba(58,156,90,0.1);
-      border: 1px solid rgba(58,156,90,0.3);
-      color: #3a9c5a;
+    .section-divider-line { flex: 1; height: 1px; background: var(--line2); }
+    .section-divider-badge {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      background: rgba(200,98,58,0.07);
+      border: 1px solid rgba(200,98,58,0.2);
+      color: var(--orange);
+      padding: 0.22rem 0.75rem; border-radius: 100px;
+      white-space: nowrap;
     }
 
-    /* ── SUBMIT BUTTON ──────────────────────────────────── */
+    /* Team selection cards */
+    .team-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 0.5rem;
+      margin-top: 0.4rem;
+    }
+    .team-opt[data-team="tech"]    i { color: var(--blue) !important; }
+    .team-opt[data-team="events"]  i { color: var(--orange) !important; }
+    .team-opt[data-team="digital"] i { color: #7c3aed !important; }
+    .team-opt.selected[data-team="tech"]    { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(58,107,200,0.12), var(--sh1); }
+    .team-opt.selected[data-team="events"]  { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(200,98,58,0.12), var(--sh1); }
+    .team-opt.selected[data-team="digital"] { border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.12), var(--sh1); }
+
+    /* ── PHOTO UPLOAD ── */
+    #photoGroup { display: none; }
+    #photoGroup.show { display: block; }
+
+    .photo-drop {
+      width: 100%;
+      height: 130px;
+      background: var(--bg2);
+      border: 1.5px dashed var(--line2);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--t);
+      position: relative;
+      overflow: hidden;
+      gap: 0.4rem;
+    }
+    .photo-drop:hover { border-color: var(--orange); background: rgba(200,98,58,0.04); }
+    .photo-drop i { font-size: 1.6rem; color: var(--ink3); transition: color var(--t); }
+    .photo-drop span { font-size: 0.8rem; color: var(--ink3); transition: color var(--t); }
+    .photo-drop:hover i, .photo-drop:hover span { color: var(--orange); }
+    .photo-drop.has-image { border-style: solid; border-color: rgba(200,98,58,0.25); }
+    .photo-drop.has-image img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+    .photo-drop.has-image i,
+    .photo-drop.has-image span { display: none; }
+    .photo-hint { font-size: 0.72rem; color: var(--ink3); margin-top: 0.3rem; }
+
+    /* ── SOCIAL LINKS ── */
+    #socialGroup { display: none; }
+
+    /* ── SUBMIT BUTTON — matches landing primary btn ── */
     .btn-submit {
       width: 100%;
-      padding: 0.875rem;
-      margin-top: 1.25rem;
-      background: var(--accent-gradient);
+      padding: 0.9rem;
+      margin-top: 1.375rem;
+      background: var(--grad);
       color: white;
       border: none;
-      border-radius: var(--radius-sm);
+      border-radius: 100px;
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all var(--transition);
-      box-shadow: 0 4px 16px var(--accent-glow);
+      transition: all var(--t);
+      box-shadow: 0 4px 20px rgba(200,98,58,0.35);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-submit::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.1);
+      opacity: 0;
+      transition: opacity var(--t);
     }
     .btn-submit:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 8px 28px var(--accent-glow);
+      box-shadow: 0 8px 32px rgba(200,98,58,0.5);
     }
+    .btn-submit:hover::before { opacity: 1; }
     .btn-submit:active:not(:disabled) { transform: translateY(0); }
-    .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+    .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; }
 
     .spinner {
       width: 16px; height: 16px;
@@ -444,42 +493,41 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── DIVIDER ────────────────────────────────────────── */
+    /* ── DIVIDER ── */
     .divider {
-      display: flex;
-      align-items: center;
-      gap: 0.875rem;
+      display: flex; align-items: center; gap: 0.875rem;
       margin: 1.5rem 0;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      color: var(--ink3);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
     }
     .divider::before, .divider::after {
-      content: ''; flex: 1; height: 1px;
-      background: var(--border);
+      content: ''; flex: 1; height: 1px; background: var(--line2);
     }
 
-    /* ── FOOTER ─────────────────────────────────────────── */
-    .signin-link {
+    /* ── FOOTER LINK ── */
+    .signin-row {
       text-align: center;
-      color: var(--text-secondary);
-      font-size: 0.875rem;
+      color: var(--ink3);
+      font-size: 0.85rem;
+      font-weight: 300;
     }
-    .signin-link a {
-      color: var(--accent-1);
+    .signin-row a {
+      color: var(--orange);
       text-decoration: none;
       font-weight: 600;
-      transition: color var(--transition);
+      transition: color var(--t);
     }
-    .signin-link a:hover { color: var(--accent-2); }
+    .signin-row a:hover { color: var(--blue); }
 
-    /* ── SUCCESS OVERLAY ────────────────────────────────── */
+    /* ── SUCCESS OVERLAY ── */
     .success-overlay {
       position: absolute; inset: 0;
-      background: var(--bg-card);
-      border-radius: 24px;
+      background: var(--card2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 28px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -488,171 +536,50 @@
       z-index: 10;
       opacity: 0;
       pointer-events: none;
-      transition: opacity var(--transition);
+      transition: opacity var(--t);
     }
     .success-overlay.show { opacity: 1; pointer-events: all; }
     .success-icon {
-      width: 60px; height: 60px;
-      background: rgba(58,156,90,0.12);
+      width: 64px; height: 64px;
+      background: rgba(58,156,90,0.1);
       border: 1px solid rgba(58,156,90,0.3);
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.6rem; color: #3a9c5a;
+      font-size: 1.7rem; color: #3a9c5a;
       animation: successPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+      box-shadow: 0 0 0 8px rgba(58,156,90,0.08);
     }
     @keyframes successPop {
       from { transform: scale(0); opacity: 0; }
       to   { transform: scale(1); opacity: 1; }
     }
     .success-overlay h3 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.15rem; font-weight: 700;
-      color: var(--text-primary);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; font-weight: 700;
+      color: var(--ink);
     }
-    .success-overlay p { font-size: 0.85rem; color: var(--text-muted); }
+    .success-overlay p { font-size: 0.85rem; color: var(--ink3); font-weight: 300; }
 
-
-    /* ── TEAM EXPAND SECTION ────────────────────────────── */
-    .team-expand {
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
-    }
-    .team-expand.open {
-      max-height: 600px;
-      opacity: 1;
-    }
-
-    .team-divider {
-      display: flex; align-items: center; gap: .75rem;
-      margin: 0.25rem 0 1.125rem;
-    }
-    .team-divider-line { flex:1; height:1px; background:var(--border); }
-    .team-divider-badge {
-      display: inline-flex; align-items: center; gap: .35rem;
-      font-size: 0.68rem; font-weight: 700;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      background: rgba(200,98,58,0.08);
-      border: 1px solid rgba(200,98,58,0.22);
-      color: var(--accent-1);
-      padding: .22rem .7rem; border-radius: 100px;
-      white-space: nowrap;
-    }
-
-    .team-grid {
-      display: grid; grid-template-columns: repeat(3,1fr); gap: .5rem;
-      margin-top: .4rem;
-    }
-
-    /* Team-specific icon colors */
-    .team-opt[data-team="tech"]    i { color: #3a6bc8 !important; }
-    .team-opt[data-team="events"]  i { color: #c8623a !important; }
-    .team-opt[data-team="digital"] i { color: #8b5cf6 !important; }
-
-    .team-opt.selected[data-team="tech"]    { border-color: #3a6bc8; box-shadow: 0 0 0 3px rgba(58,107,200,0.15); }
-    .team-opt.selected[data-team="events"]  { border-color: #c8623a; box-shadow: 0 0 0 3px rgba(200,98,58,0.15); }
-    .team-opt.selected[data-team="digital"] { border-color: #8b5cf6; box-shadow: 0 0 0 3px rgba(139,92,246,0.15); }
-
-    /* Highlight team card when selected — override generic */
-    .team-opt.selected i { opacity: 1 !important; }
-
-    /* ── PHOTO UPLOAD ───────────────────────────────────── */
-    #photoGroup { display: none; }
-    #photoGroup.show { display: block; }
-
-    .photo-upload-wrapper {
-      margin-bottom: 0.5rem;
-    }
-
-    .photo-preview {
-      width: 100%;
-      height: 140px;
-      background: var(--bg-secondary);
-      border: 2px dashed var(--border-strong);
-      border-radius: var(--radius-sm);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all var(--transition);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .photo-preview:hover {
-      border-color: var(--accent-1);
-      background: var(--bg-card);
-    }
-
-    .photo-preview i {
-      font-size: 2rem;
-      color: var(--text-muted);
-      margin-bottom: 0.5rem;
-            transition: color var(--transition);
-    }
-
-    .photo-preview span {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      transition: color var(--transition);
-    }
-
-    .photo-preview:hover i,
-    .photo-preview:hover span {
-      color: var(--accent-1);
-    }
-
-    .photo-preview.has-image {
-      border-color: transparent;
-      background: transparent;
-      overflow: hidden;
-    }
-
-    .photo-preview.has-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .photo-preview.has-image i,
-    .photo-preview.has-image span {
-      display: none;
-    }
-
-    .photo-info {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-top: 0.25rem;
-    }
-
-    #socialGroup {
-      animation: slideDown 0.3s ease;
-    }
-
-    @keyframes slideDown {
-      from { opacity: 0; max-height: 0; overflow: hidden; }
-      to { opacity: 1; max-height: 600px; }
-    }
-
-    /* ── RESPONSIVE ─────────────────────────────────────── */
-    @media (max-width: 480px) {
-      .signup-container { padding: 2rem 1.5rem; }
+    @media (max-width: 520px) {
+      .signup-card { padding: 2.25rem 1.5rem; }
+      .card-title { font-size: 1.75rem; }
     }
   </style>
 </head>
 <body>
 
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-
-  <!-- Theme toggle -->
-  <button class="theme-btn" id="themeToggle" aria-label="Toggle theme">
+  <!-- Theme toggle — landing style -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
     <i class="fas fa-moon"></i>
   </button>
 
-  <div class="signup-container">
+  <!-- Back link -->
+  <a href="index.html" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to home
+  </a>
+
+  <!-- Main card -->
+  <div class="signup-card">
 
     <!-- Success overlay -->
     <div class="success-overlay" id="successOverlay">
@@ -661,16 +588,13 @@
       <p>Redirecting you to login…</p>
     </div>
 
-    <!-- Back link -->
-    <a href="index.html" class="back-link">
-      <i class="fas fa-arrow-left"></i> Back to home
-    </a>
-
-    <!-- Logo -->
-    <div class="logo">
-      <div class="logo-mark">CC</div>
-      <h1>ClustrCore</h1>
-      <p>Create your account to get started</p>
+    <!-- Header -->
+    <div class="card-header">
+      <div class="logo-eyebrow">Join the Community</div>
+      <h1 class="card-title">
+        <span class="gradient-text">ClustrCore</span>
+      </h1>
+      <p class="card-subtitle">Create your account and start exploring</p>
     </div>
 
     <!-- Banner -->
@@ -681,42 +605,45 @@
 
     <form id="signupForm" autocomplete="off">
 
+      <!-- Name -->
       <div class="form-group">
-        <label>Full Name</label>
-        <div class="input-wrapper">
+        <label class="form-label">Full Name</label>
+        <div class="input-wrap">
           <i class="fas fa-user input-icon"></i>
           <input id="name" type="text" placeholder="Your full name" required>
         </div>
       </div>
 
+      <!-- Email -->
       <div class="form-group">
-        <label>Email Address</label>
-        <div class="input-wrapper">
+        <label class="form-label">Email Address</label>
+        <div class="input-wrap">
           <i class="fas fa-envelope input-icon"></i>
           <input id="email" type="email" placeholder="you@example.com" required>
         </div>
       </div>
 
+      <!-- Password -->
       <div class="form-group">
-        <label>Password</label>
-        <div class="input-wrapper">
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
           <i class="fas fa-lock input-icon"></i>
           <input id="password" type="password" placeholder="Create a strong password" required>
           <button type="button" class="toggle-pw" id="togglePw" aria-label="Toggle password">
             <i class="fas fa-eye" id="pwIcon"></i>
           </button>
         </div>
-        <!-- Strength meter -->
         <div class="strength-wrap" id="strengthWrap">
           <div class="strength-track">
             <div class="strength-bar" id="strengthBar"></div>
           </div>
-          <span class="strength-label" id="strengthLabel" style="color:var(--text-muted)">—</span>
+          <span class="strength-label" id="strengthLabel" style="color:var(--ink3)">—</span>
         </div>
       </div>
 
+      <!-- Role -->
       <div class="form-group">
-        <label>Your Role</label>
+        <label class="form-label">Your Role</label>
         <select id="role" name="role"></select>
         <div class="role-grid" id="roleGrid">
           <div class="role-card" data-role="student">
@@ -734,25 +661,27 @@
         </div>
       </div>
 
-      <!-- TEAM EXTRA FIELDS -->
+      <!-- TEAM / ADMIN EXTRA FIELDS -->
       <div id="teamFields" class="team-expand">
 
-        <div class="team-divider">
-          <span class="team-divider-line"></span>
-          <span class="team-divider-badge"><i class="fas fa-users"></i> Team Details</span>
-          <span class="team-divider-line"></span>
+        <div class="section-divider">
+          <span class="section-divider-line"></span>
+          <span class="section-divider-badge"><i class="fas fa-users"></i> Team Details</span>
+          <span class="section-divider-line"></span>
         </div>
 
+        <!-- Phone -->
         <div class="form-group">
-          <label>Phone Number</label>
-          <div class="input-wrapper">
+          <label class="form-label">Phone Number</label>
+          <div class="input-wrap">
             <i class="fas fa-phone input-icon"></i>
             <input id="phone" type="tel" placeholder="+91 98765 43210">
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Your Team</label>
+        <!-- Team selection -->
+        <div class="form-group" id="teamGroup">
+          <label class="form-label">Your Team</label>
           <div class="team-grid" id="teamGrid">
             <div class="role-card team-opt" data-team="tech">
               <i class="fas fa-code"></i>
@@ -769,9 +698,10 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Your Role in Team</label>
-          <div class="input-wrapper select-wrap">
+        <!-- Team role dropdown -->
+        <div class="form-group" id="roleGroup">
+          <label class="form-label">Role in Team</label>
+          <div class="input-wrap select-wrap">
             <i class="fas fa-id-badge input-icon"></i>
             <select id="teamRole">
               <option value="">— select your team first —</option>
@@ -779,38 +709,35 @@
           </div>
         </div>
 
-        <!-- PHOTO UPLOAD (Team/Admin) -->
+        <!-- Photo upload -->
         <div class="form-group" id="photoGroup">
-          <label>Your Photo</label>
-          <div class="photo-upload-wrapper">
-            <div class="photo-preview" id="photoPreview">
-              <i class="fas fa-camera"></i>
-              <span>Click to upload</span>
-            </div>
-            <input id="photoInput" type="file" accept="image/*" style="display:none;">
+          <label class="form-label">Your Photo</label>
+          <div class="photo-drop" id="photoDrop">
+            <i class="fas fa-camera"></i>
+            <span>Click to upload</span>
+            <input id="photoInput" type="file" accept="image/*"
+              style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
           </div>
-          <div class="photo-info">Max 5MB, JPG/PNG recommended</div>
+          <p class="photo-hint">Max 5MB · JPG / PNG / WEBP</p>
         </div>
 
-        <!-- SOCIAL MEDIA LINKS (Team Only) -->
-        <div id="socialGroup" style="display:none;">
-          <div class="team-divider" style="margin-top:1.125rem;margin-bottom:1.125rem;">
-            <span class="team-divider-line"></span>
-            <span class="team-divider-badge"><i class="fas fa-share-alt"></i> Social Links (Optional)</span>
-            <span class="team-divider-line"></span>
+        <!-- Social links (team only) -->
+        <div id="socialGroup">
+          <div class="section-divider" style="margin-top:1.125rem">
+            <span class="section-divider-line"></span>
+            <span class="section-divider-badge"><i class="fas fa-share-alt"></i> Social Links (Optional)</span>
+            <span class="section-divider-line"></span>
           </div>
-
           <div class="form-group">
-            <label>LinkedIn Profile</label>
-            <div class="input-wrapper">
+            <label class="form-label">LinkedIn</label>
+            <div class="input-wrap">
               <i class="fab fa-linkedin input-icon"></i>
               <input id="linkedin" type="text" placeholder="linkedin.com/in/yourprofile">
             </div>
           </div>
-
           <div class="form-group">
-            <label>GitHub Profile</label>
-            <div class="input-wrapper">
+            <label class="form-label">GitHub</label>
+            <div class="input-wrap">
               <i class="fab fa-github input-icon"></i>
               <input id="github" type="text" placeholder="github.com/yourprofile">
             </div>
@@ -819,42 +746,37 @@
 
       </div>
 
+      <!-- Submit -->
       <button type="submit" class="btn-submit" id="submitBtn">
         <div class="spinner" id="spinner"></div>
-        <span id="btnText">Create Account <i class="fas fa-arrow-right"></i></span>
+        <span id="btnText"><i class="fas fa-user-plus"></i> Create Account</span>
       </button>
 
     </form>
 
     <div class="divider"><span>or</span></div>
 
-    <div class="signin-link">
+    <div class="signin-row">
       Already have an account? <a href="login.html">Sign In</a>
     </div>
 
-  </div>
+  </div><!-- /signup-card -->
 
   <script>
   (() => {
-    /* ── THEME ──────────────────────────────────────────── */
+    /* ── THEME ── */
     const html  = document.documentElement;
     const tBtn  = document.getElementById('themeToggle');
-    const saved = localStorage.getItem('clustr-theme') || 'light';
-    applyTheme(saved);
-
+    applyTheme(localStorage.getItem('clustr-theme') || 'light');
     function applyTheme(t) {
       html.setAttribute('data-theme', t);
       localStorage.setItem('clustr-theme', t);
       tBtn.querySelector('i').className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
     }
+    tBtn.addEventListener('click', () =>
+      applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
 
-    tBtn.addEventListener('click', () => {
-      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      tBtn.style.transform = 'scale(0.8) rotate(25deg)';
-      setTimeout(() => { tBtn.style.transform = ''; applyTheme(next); }, 140);
-    });
-
-    /* ── PASSWORD TOGGLE ────────────────────────────────── */
+    /* ── PASSWORD TOGGLE ── */
     const pwInput = document.getElementById('password');
     const pwIcon  = document.getElementById('pwIcon');
     document.getElementById('togglePw').addEventListener('click', () => {
@@ -863,30 +785,24 @@
       pwIcon.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
     });
 
-    /* ── PASSWORD STRENGTH ──────────────────────────────── */
+    /* ── PASSWORD STRENGTH ── */
     const strengthWrap  = document.getElementById('strengthWrap');
     const strengthBar   = document.getElementById('strengthBar');
     const strengthLabel = document.getElementById('strengthLabel');
-
     pwInput.addEventListener('input', () => {
       const val = pwInput.value;
-      if (!val) {
-        strengthWrap.classList.remove('show');
-        return;
-      }
+      if (!val) { strengthWrap.classList.remove('show'); return; }
       strengthWrap.classList.add('show');
-
       let score = 0;
-      if (val.length >= 8)                              score++;
-      if (/[a-z]/.test(val) && /[A-Z]/.test(val))      score++;
-      if (/[0-9]/.test(val))                            score++;
-      if (/[^a-zA-Z0-9]/.test(val))                    score++;
-
+      if (val.length >= 8)                         score++;
+      if (/[a-z]/.test(val) && /[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val))                       score++;
+      if (/[^a-zA-Z0-9]/.test(val))               score++;
       const levels = [
-        { pct: '25%',  cls: 's-weak',   label: 'Weak',   color: '#ef4444' },
-        { pct: '50%',  cls: 's-weak',   label: 'Weak',   color: '#ef4444' },
-        { pct: '66%',  cls: 's-medium', label: 'Medium', color: '#f59e0b' },
-        { pct: '100%', cls: 's-strong', label: 'Strong', color: '#3a9c5a' },
+        { pct:'25%',  color:'#ef4444', label:'Weak'   },
+        { pct:'50%',  color:'#ef4444', label:'Weak'   },
+        { pct:'66%',  color:'#f59e0b', label:'Medium' },
+        { pct:'100%', color:'#3a9c5a', label:'Strong' },
       ];
       const lvl = levels[Math.min(score, 3)];
       strengthBar.style.width      = lvl.pct;
@@ -895,17 +811,13 @@
       strengthLabel.style.color    = lvl.color;
     });
 
-    /* ── ROLE CARDS ─────────────────────────────────────── */
-    const roleSelect = document.getElementById('role');
-    let selectedRole     = '';
-    let selectedTeam     = '';
-    let selectedTeamRole = '';
-
+    /* ── ROLE CARDS ── */
     const TEAM_ROLES = {
-      tech:    ['Lead Developer', 'Backend Developer', 'Frontend Developer', 'DevOps Engineer'],
-      events:  ['Event Lead', 'Coordinator', 'Logistics Head', 'Outreach Lead'],
-      digital: ['Design Lead', 'Social Media Manager', 'Content Creator'],
+      tech:    ['Lead Developer','Backend Developer','Frontend Developer','DevOps Engineer'],
+      events:  ['Event Lead','Coordinator','Logistics Head','Outreach Lead'],
+      digital: ['Design Lead','Social Media Manager','Content Creator'],
     };
+    let selectedRole = '', selectedTeam = '', selectedTeamRole = '';
 
     document.getElementById('roleGrid').addEventListener('click', e => {
       const card = e.target.closest('.role-card');
@@ -915,38 +827,39 @@
       selectedRole = card.dataset.role;
 
       const tf         = document.getElementById('teamFields');
-      const teamGroup  = document.getElementById('teamGrid')?.closest('.form-group');
-      const roleGroup  = document.getElementById('teamRole')?.closest('.form-group');
+      const teamGroup  = document.getElementById('teamGroup');
+      const roleGroup  = document.getElementById('roleGroup');
+      const photoGroup = document.getElementById('photoGroup');
+      const socialGroup= document.getElementById('socialGroup');
 
       if (selectedRole === 'team' || selectedRole === 'admin') {
         tf.classList.add('open');
-        // Admin only needs phone — hide team picker & role dropdown
+        photoGroup.classList.add('show');
         if (selectedRole === 'admin') {
-          if (teamGroup) teamGroup.style.display = 'none';
-          if (roleGroup) roleGroup.style.display = 'none';
+          teamGroup.style.display  = 'none';
+          roleGroup.style.display  = 'none';
+          socialGroup.style.display = 'none';
         } else {
-          if (teamGroup) teamGroup.style.display = '';
-          if (roleGroup) roleGroup.style.display = '';
+          teamGroup.style.display  = '';
+          roleGroup.style.display  = '';
+          socialGroup.style.display = 'block';
         }
       } else {
         tf.classList.remove('open');
+        photoGroup.classList.remove('show');
         selectedTeam = ''; selectedTeamRole = '';
       }
     });
 
-    // Team grid selection
     document.getElementById('teamGrid').addEventListener('click', e => {
       const card = e.target.closest('.team-opt');
       if (!card) return;
       document.querySelectorAll('.team-opt').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
       selectedTeam = card.dataset.team;
-
-      // Populate role dropdown based on selected team
-      const sel = document.getElementById('teamRole');
-      const roles = TEAM_ROLES[selectedTeam] || [];
+      const sel   = document.getElementById('teamRole');
       sel.innerHTML = '<option value="">— pick your role —</option>' +
-        roles.map(r => `<option value="${r}">${r}</option>`).join('');
+        (TEAM_ROLES[selectedTeam] || []).map(r => `<option value="${r}">${r}</option>`).join('');
       selectedTeamRole = '';
     });
 
@@ -954,7 +867,20 @@
       selectedTeamRole = e.target.value;
     });
 
-    /* ── BANNER ─────────────────────────────────────────── */
+    /* ── PHOTO PREVIEW ── */
+    const photoDrop  = document.getElementById('photoDrop');
+    const photoInput = document.getElementById('photoInput');
+    photoInput.addEventListener('change', () => {
+      const f = photoInput.files[0];
+      if (!f) return;
+      const url = URL.createObjectURL(f);
+      photoDrop.classList.add('has-image');
+      let img = photoDrop.querySelector('img');
+      if (!img) { img = document.createElement('img'); photoDrop.appendChild(img); }
+      img.src = url;
+    });
+
+    /* ── BANNER ── */
     function showBanner(msg, type = 'error') {
       const banner = document.getElementById('msgBanner');
       document.getElementById('msgText').textContent = msg;
@@ -962,30 +888,27 @@
       setTimeout(() => banner.classList.remove('show'), 4500);
     }
 
-    /* ── LOADING ────────────────────────────────────────── */
+    /* ── LOADING ── */
     const submitBtn = document.getElementById('submitBtn');
     const spinner   = document.getElementById('spinner');
     const btnText   = document.getElementById('btnText');
-
     function setLoading(on) {
-      submitBtn.disabled     = on;
-      spinner.style.display  = on ? 'block' : 'none';
-      btnText.style.display  = on ? 'none'  : 'flex';
+      submitBtn.disabled    = on;
+      spinner.style.display = on ? 'block' : 'none';
+      btnText.style.display = on ? 'none'  : 'flex';
     }
 
-    /* ── FORM SUBMIT ────────────────────────────────────── */
+    /* ── SUBMIT ── */
     document.getElementById('signupForm').addEventListener('submit', async e => {
       e.preventDefault();
-
       const name     = document.getElementById('name').value.trim();
       const email    = document.getElementById('email').value.trim();
       const password = pwInput.value;
 
       if (!name || !email || !password) { showBanner('Please fill in all fields.'); return; }
-      if (!selectedRole)                { showBanner('Please select your role.');   return; }
+      if (!selectedRole)                { showBanner('Please select your role.'); return; }
       if (password.length < 6)          { showBanner('Password must be at least 6 characters.'); return; }
 
-      // Role-specific validation
       const phone = document.getElementById('phone').value.trim();
       if (selectedRole === 'team' || selectedRole === 'admin') {
         if (!phone) { showBanner('Please enter your phone number.'); return; }
@@ -999,30 +922,24 @@
 
       try {
         const res = await fetch('http://localhost:5000/api/auth/signup', {
-          method:  'POST',
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({
+          body: JSON.stringify({
             name, email, password,
             role: selectedRole,
             ...((selectedRole === 'team' || selectedRole === 'admin') && { phone }),
-            ...(selectedRole === 'team' && {
-              team:     selectedTeam,
-              teamRole: selectedTeamRole,
-            }),
+            ...(selectedRole === 'team' && { team: selectedTeam, teamRole: selectedTeamRole }),
           }),
         });
 
         const data = await res.json();
-
         if (res.ok) {
           setLoading(false);
           document.getElementById('successOverlay').classList.add('show');
-          // All roles go to login after signup
           setTimeout(() => { window.location.href = 'login.html'; }, 1500);
         } else {
           throw new Error(data.message || 'Sign up failed. Please try again.');
         }
-
       } catch (err) {
         showBanner(err.message || 'Server error. Try again later.');
       } finally {

@@ -3,6 +3,20 @@ const bcrypt   = require('bcryptjs');
 const router   = express.Router();
 const User     = require('../models/User');
 const Otp      = require('../models/Otp');
+const multer   = require('multer');
+
+// ── Multer setup for photo uploads ──────────────────────────
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('Only image files are allowed'));
+    }
+    cb(null, true);
+  }
+});
 
 /* ── UTIL: generate 6-digit OTP ──────────────────────── */
 function generateOtp() {
@@ -180,6 +194,61 @@ router.get('/members/:team', async (req, res) => {
 
   } catch (err) {
     console.error('🔴 members error:', err);
+    res.status(500).json({ message: err.message || 'Server error' });
+  }
+});
+
+/* ══════════════════════════════════════════════════════════
+   PUT /api/team/profile/:userId
+   Body: { linkedin } + photo file
+   — Updates team member's profile photo and linkedin
+══════════════════════════════════════════════════════════ */
+router.put('/profile/:userId', upload.single('photo'), async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { linkedin } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Only allow team and admin users to update their profiles
+    if (user.role !== 'team' && user.role !== 'admin') {
+      return res.status(403).json({ message: 'Access denied.' });
+    }
+
+    // Update photo if provided
+    if (req.file) {
+      user.photo = req.file.buffer.toString('base64');
+      user.photoMime = req.file.mimetype;
+    }
+
+    // Update linkedin if provided
+    if (linkedin !== undefined) {
+      user.linkedin = linkedin;
+    }
+
+    await user.save();
+
+    res.json({
+      message: 'Profile updated successfully.',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        team: user.team,
+        teamRole: user.teamRole,
+        phone: user.phone,
+        photo: user.photo,
+        photoMime: user.photoMime,
+        linkedin: user.linkedin,
+      }
+    });
+
+  } catch (err) {
+    console.error('🔴 profile update error:', err);
     res.status(500).json({ message: err.message || 'Server error' });
   }
 });

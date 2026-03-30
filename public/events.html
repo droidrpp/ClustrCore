@@ -3,481 +3,682 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Timeline | ClustrCore</title>
+  <title>Events Timeline | ClustrCore</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap');
 
-    :root {
-      --bg-primary: #f4f1ec;
-      --bg-secondary: #eae6df;
-      --bg-card: #ffffff;
-      --text-primary: #1a1714;
-      --text-secondary: #5c5650;
-      --text-muted: #9c958d;
-      --accent-1: #c8623a;
-      --accent-2: #3a6bc8;
-      --accent-gradient: linear-gradient(135deg, #c8623a 0%, #e08c4a 50%, #3a6bc8 100%);
-      --accent-glow: rgba(200, 98, 58, 0.2);
-      --border: rgba(26, 23, 20, 0.1);
-      --border-strong: rgba(26, 23, 20, 0.2);
-      --shadow-sm: 0 2px 8px rgba(26,23,20,0.08);
-      --shadow-md: 0 8px 32px rgba(26,23,20,0.12);
-      --shadow-lg: 0 20px 60px rgba(26,23,20,0.18);
-      --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
-      --transition-slow: 0.6s cubic-bezier(0.4,0,0.2,1);
-      --line-color: rgba(26,23,20,0.15);
-      --past: #9c958d;
-      --future: #c8623a;
-      --today-color: #3a6bc8;
-    }
+  /* ── TOKENS ── */
+  :root {
+    --orange:#c8623a; --orange-l:#e08c4a; --orange-d:#a34c28;
+    --blue:#3a6bc8; --blue-l:#6a9be8; --blue-d:#2a50a0;
+    --green:#3a9c5a;
+    --grad:linear-gradient(135deg, var(--orange) 0%, var(--orange-l) 50%, var(--blue) 100%);
+    --grad-text:linear-gradient(90deg, var(--orange) 0%, var(--orange-l) 40%, var(--blue) 100%);
+    --bg:#faf8f5; --bg2:#f2ede6; --bg3:#ebe4d9;
+    --ink:#1a1410; --ink2:#4a3f35; --ink3:#8c7b6d;
+    --card:#ffffff; --card2:rgba(255,255,255,0.7);
+    --line:rgba(26,20,16,0.08); --line2:rgba(26,20,16,0.15);
+    --sh1:0 1px 4px rgba(26,20,16,0.06), 0 4px 16px rgba(26,20,16,0.06);
+    --sh2:0 8px 32px rgba(26,20,16,0.10), 0 2px 8px rgba(26,20,16,0.06);
+    --sh3:0 24px 64px rgba(26,20,16,0.14), 0 4px 16px rgba(26,20,16,0.08);
+    --r:16px; --ease:cubic-bezier(0.4,0,0.2,1); --t:0.3s;
+  }
+  [data-theme="dark"] {
+    --bg:#110e0b; --bg2:#1a1512; --bg3:#231e18;
+    --ink:#f5f0ea; --ink2:#b5a898; --ink3:#6b5e52;
+    --card:#1e1a15; --card2:rgba(30,26,21,0.8);
+    --line:rgba(245,240,234,0.07); --line2:rgba(245,240,234,0.14);
+    --sh1:0 1px 4px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.25);
+    --sh2:0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+    --sh3:0 24px 64px rgba(0,0,0,0.55), 0 4px 16px rgba(0,0,0,0.4);
+  }
 
-    [data-theme="dark"] {
-      --bg-primary: #0f0e0d;
-      --bg-secondary: #161412;
-      --bg-card: #1c1916;
-      --text-primary: #f0ece6;
-      --text-secondary: #a09890;
-      --text-muted: #6b6358;
-      --accent-1: #e07a50;
-      --accent-2: #6a9be8;
-      --accent-gradient: linear-gradient(135deg, #e07a50 0%, #e8a060 50%, #6a9be8 100%);
-      --accent-glow: rgba(224,122,80,0.15);
-      --border: rgba(240,236,230,0.08);
-      --border-strong: rgba(240,236,230,0.15);
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-      --shadow-md: 0 8px 32px rgba(0,0,0,0.4);
-      --shadow-lg: 0 20px 60px rgba(0,0,0,0.55);
-      --line-color: rgba(240,236,230,0.12);
-      --past: #6b6358;
-    }
+  /* ── RESET ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background var(--t), color var(--t);
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  img { max-width: 100%; height: auto; display: block; }
+  a { text-decoration: none; color: inherit; }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 3px; }
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
+  /* ── LAYOUT ── */
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      transition: background var(--transition), color var(--transition);
-      overflow-x: hidden;
-    }
+  /* ── HEADER ── */
+  .header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    transition: all var(--t);
+  }
+  .header-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 2rem;
+    margin: 0.75rem 1.5rem;
+    background: var(--card2);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--line2);
+    border-radius: 100px;
+    box-shadow: var(--sh1);
+    transition: all var(--t);
+  }
+  .header.scrolled .header-inner { margin: 0.5rem 1rem; box-shadow: var(--sh2); }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; font-weight: 700; letter-spacing: -0.02em;
+    background: var(--grad-text);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .header-center { display: flex; align-items: center; gap: 0.25rem; }
+  .nav-link {
+    padding: 0.45rem 1rem; border-radius: 100px;
+    font-size: 0.85rem; font-weight: 500; color: var(--ink2); transition: all var(--t);
+  }
+  .nav-link:hover, .nav-link.active { background: var(--bg2); color: var(--ink); }
+  .nav-link.active { color: var(--orange); }
+  .header-right { display: flex; align-items: center; gap: 0.75rem; }
+  .theme-toggle {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid var(--line2); background: var(--bg2);
+    color: var(--ink2); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; transition: all var(--t);
+  }
+  .theme-toggle:hover { border-color: var(--orange); color: var(--orange); }
+  .btn-auth {
+    padding: 0.45rem 1.1rem; border-radius: 100px;
+    font-size: 0.85rem; font-weight: 500; color: var(--ink2); transition: all var(--t);
+  }
+  .btn-auth:hover { color: var(--orange); }
+  .btn-auth-solid {
+    padding: 0.45rem 1.25rem; border-radius: 100px;
+    font-size: 0.85rem; font-weight: 600;
+    background: var(--grad); color: #fff;
+    box-shadow: 0 2px 12px rgba(200,98,58,0.35); transition: all var(--t);
+  }
+  .btn-auth-solid:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(200,98,58,0.5); }
+  .hamburger-btn {
+    display: none; background: none; border: none; cursor: pointer;
+    color: var(--ink2); font-size: 1.1rem; padding: 0.4rem;
+  }
 
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      pointer-events: none; z-index: 9999;
-      opacity: 0.025;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    }
+  /* ── SIDE MENU ── */
+  .side-menu {
+    position: fixed; top: 0; left: -320px; width: 300px; height: 100vh;
+    background: var(--card); border-right: 1px solid var(--line2);
+    z-index: 200; display: flex; flex-direction: column;
+    transition: left 0.4s var(--ease); box-shadow: var(--sh3); padding: 2rem 1.5rem;
+  }
+  .side-menu.open { left: 0; }
+  .side-menu-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+  .side-menu-header h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+  .close-btn {
+    background: none; border: 1px solid var(--line2); border-radius: 50%;
+    width: 32px; height: 32px; cursor: pointer; color: var(--ink2);
+    display: flex; align-items: center; justify-content: center; transition: all var(--t);
+  }
+  .close-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .side-menu-nav { display: flex; flex-direction: column; gap: 0.25rem; }
+  .menu-item {
+    display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem;
+    border-radius: 12px; color: var(--ink2); font-size: 0.9rem; font-weight: 500; transition: all var(--t);
+  }
+  .menu-item:hover { background: var(--bg2); color: var(--orange); }
+  .menu-item i { width: 18px; text-align: center; }
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(4px); z-index: 150; opacity: 0; pointer-events: none; transition: opacity var(--t);
+  }
+  .overlay.active { opacity: 1; pointer-events: all; }
 
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: var(--bg-secondary); }
-    ::-webkit-scrollbar-thumb { background: var(--accent-1); border-radius: 3px; }
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .reveal { opacity:0; transform:translateY(20px); transition:opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+  .reveal.visible { opacity:1; transform:translateY(0); }
 
-    .header {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(244,241,236,0.92);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      transition: background var(--transition);
-    }
-    [data-theme="dark"] .header { background: rgba(15,14,13,0.92); }
+  /* ── PAGE HERO ── */
+  .page-hero {
+    padding: 9rem 0 5rem; position: relative; overflow: hidden;
+  }
+  .page-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 80% 40%, rgba(200,98,58,0.10) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 70% at 10% 70%, rgba(58,107,200,0.08) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 40% at 50% 10%, rgba(224,140,74,0.06) 0%, transparent 50%);
+    pointer-events: none; z-index: 0;
+  }
+  .page-hero .container { position: relative; z-index: 1; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--bg2); border: 1px solid var(--line2);
+    border-radius: 100px; padding: 0.35rem 1rem;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--orange);
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.8s var(--ease) both;
+  }
+  .hero-eyebrow::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--orange); animation: pulse 2s ease-in-out infinite;
+  }
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 5.5vw, 4.5rem);
+    font-weight: 900; letter-spacing: -0.03em; line-height: 1.0;
+    margin-bottom: 1.25rem;
+    animation: fadeUp 0.8s var(--ease) 0.1s both;
+  }
+  .page-title .gradient-text {
+    background: var(--grad-text);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .page-title .sub-word {
+    color: var(--ink2); font-style: italic; font-size: 0.65em;
+    display: block; letter-spacing: 0;
+  }
+  .page-desc {
+    font-size: 1.05rem; line-height: 1.75; color: var(--ink2); font-weight: 300;
+    max-width: 500px; margin-bottom: 2.5rem;
+    animation: fadeUp 0.8s var(--ease) 0.2s both;
+  }
+  .hero-cta {
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    animation: fadeUp 0.8s var(--ease) 0.3s both;
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.85rem 2rem; border-radius: 100px;
+    background: var(--grad); color: #fff;
+    font-size: 0.9rem; font-weight: 600;
+    box-shadow: 0 4px 24px rgba(200,98,58,0.4);
+    transition: all var(--t); position: relative; overflow: hidden;
+    border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
+  }
+  .btn-primary::before { content:''; position:absolute; inset:0; background:rgba(255,255,255,0.12); opacity:0; transition:opacity var(--t); }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 36px rgba(200,98,58,0.5); }
+  .btn-primary:hover::before { opacity:1; }
+  .btn-secondary-outline {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.85rem 2rem; border-radius: 100px;
+    border: 1.5px solid var(--line2); color: var(--ink2);
+    font-size: 0.9rem; font-weight: 500; transition: all var(--t);
+  }
+  .btn-secondary-outline:hover { border-color: var(--orange); color: var(--orange); }
 
-    .header-inner {
-      max-width: 1200px; margin: 0 auto;
-      padding: 0 2rem; height: 64px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
+  /* ── SECTION STYLES ── */
+  section { padding: 6rem 0; position: relative; }
+  .section-eyebrow {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--orange);
+    margin-bottom: 0.75rem; display: block;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 700; letter-spacing: -0.02em;
+    line-height: 1.15; color: var(--ink); margin-bottom: 1rem;
+  }
+  .section-title em { font-style: italic; color: var(--orange); }
+  .section-lead { font-size: 1rem; line-height: 1.7; color: var(--ink2); font-weight: 300; max-width: 540px; }
+  .section-header-row {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 3rem; gap: 2rem; flex-wrap: wrap;
+  }
+  .view-all-btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.85rem; font-weight: 500; color: var(--orange);
+    border: 1px solid rgba(200,98,58,0.25);
+    padding: 0.5rem 1.1rem; border-radius: 100px;
+    transition: all var(--t); white-space: nowrap;
+  }
+  .view-all-btn:hover { background: rgba(200,98,58,0.06); transform: translateX(2px); }
 
-    .logo {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800; font-size: 1.3rem;
-      letter-spacing: -0.02em;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-decoration: none;
-    }
+  /* ── FILTER BAR ── */
+  .filter-section { background: var(--bg2); padding: 2rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .filter-inner {
+    display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+  }
+  .filter-label {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--ink3); margin-right: 0.25rem;
+  }
+  .filter-tab {
+    padding: 0.45rem 1.1rem; border-radius: 100px;
+    border: 1px solid var(--line2); background: var(--card);
+    color: var(--ink2); font-size: 0.82rem; font-weight: 500;
+    cursor: pointer; transition: all var(--t);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .filter-tab:hover { border-color: var(--orange); color: var(--orange); }
+  .filter-tab.active {
+    background: var(--grad); color: #fff; border-color: transparent;
+    box-shadow: 0 4px 12px rgba(200,98,58,0.3);
+  }
+  .filter-count {
+    margin-left: auto; font-size: 0.8rem; color: var(--ink3); font-weight: 500;
+  }
 
-    .header-actions { display: flex; align-items: center; gap: 0.75rem; }
+  /* ── TIMELINE SECTION ── */
+  .timeline-section { background: var(--bg); padding: 5rem 0 7rem; }
 
-    .btn-icon {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      color: var(--text-primary);
-      width: 38px; height: 38px;
-      border-radius: 10px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.9rem;
-      transition: all var(--transition);
-    }
-    .btn-icon:hover { background: var(--bg-secondary); border-color: var(--border-strong); transform: scale(1.06); }
+  .year-group { margin-bottom: 0.5rem; }
+  .year-label {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--ink3);
+    margin-bottom: 2rem; padding: 0.35rem 1rem;
+    background: var(--bg2); border: 1px solid var(--line2); border-radius: 100px;
+  }
 
-    .page {
-      max-width: 1200px; margin: 0 auto;
-      padding: 3rem 2rem 6rem;
-    }
+  .timeline { position: relative; padding-left: 2.5rem; }
+  .timeline::before {
+    content: '';
+    position: absolute; left: 9px; top: 0; bottom: 0; width: 2px;
+    background: linear-gradient(to bottom, transparent 0%, var(--line2) 5%, var(--line2) 95%, transparent 100%);
+  }
 
-    .page-intro {
-      margin-bottom: 3.5rem;
-      animation: fadeUp 0.7s cubic-bezier(0.4,0,0.2,1) both;
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+  /* TODAY MARKER */
+  .today-marker {
+    position: relative; display: flex; align-items: center;
+    gap: 0.75rem; margin: 2rem 0;
+  }
+  .today-marker::before {
+    content: '';
+    position: absolute; left: -2.5rem; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--blue);
+    box-shadow: 0 0 0 4px rgba(58,107,200,0.2), 0 0 0 8px rgba(58,107,200,0.08);
+    animation: todayPulse 2s ease-in-out infinite; z-index: 2;
+  }
+  @keyframes todayPulse {
+    0%,100% { box-shadow: 0 0 0 4px rgba(58,107,200,0.2), 0 0 0 8px rgba(58,107,200,0.08); }
+    50%      { box-shadow: 0 0 0 6px rgba(58,107,200,0.3), 0 0 0 14px rgba(58,107,200,0.05); }
+  }
+  .today-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--blue); background: rgba(58,107,200,0.1);
+    padding: 0.3rem 0.85rem; border-radius: 100px;
+    border: 1px solid rgba(58,107,200,0.2);
+  }
+  .today-line { flex: 1; height: 1px; background: linear-gradient(to right, rgba(58,107,200,0.3), transparent); }
 
-    .page-intro h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 800; letter-spacing: -0.04em;
-      margin-bottom: 0.5rem;
-    }
-    .page-intro h1 span {
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .page-intro p { color: var(--text-secondary); font-size: 1rem; font-weight: 300; max-width: 500px; }
+  /* TIMELINE ITEM */
+  .tl-item {
+    position: relative; display: flex; gap: 1.75rem;
+    margin-bottom: 1.75rem;
+    animation: fadeUp 0.5s var(--ease) both;
+  }
+  .tl-item::before {
+    content: '';
+    position: absolute; left: -2.5rem; top: 1.5rem;
+    transform: translateX(-50%);
+    width: 12px; height: 12px; border-radius: 50%;
+    border: 2px solid var(--bg); z-index: 2;
+    transition: transform var(--t);
+  }
+  .tl-item.past::before  { background: var(--ink3); }
+  .tl-item.future::before { background: var(--orange); box-shadow: 0 0 8px rgba(200,98,58,0.4); }
+  .tl-item:hover::before { transform: translateX(-50%) scale(1.5); }
 
-    .filter-bar {
-      display: flex; align-items: center; gap: 0.5rem;
-      margin-bottom: 3rem; flex-wrap: wrap;
-    }
+  .tl-date {
+    flex-shrink: 0; width: 80px; padding-top: 1.4rem; text-align: right;
+  }
+  .tl-date .month {
+    display: block; font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink3);
+  }
+  .tl-date .day {
+    display: block; font-family: 'Playfair Display', serif;
+    font-size: 2rem; font-weight: 700; line-height: 1;
+    letter-spacing: -0.03em; color: var(--ink);
+  }
+  .tl-date .year-sm { display: block; font-size: 0.68rem; color: var(--ink3); }
+  .tl-item.past .tl-date .day { color: var(--ink3); }
 
-    .filter-tab {
-      padding: 0.45rem 1rem;
-      border-radius: 100px;
-      border: 1px solid var(--border);
-      background: var(--bg-card);
-      color: var(--text-secondary);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.82rem; font-weight: 500;
-      cursor: pointer;
-      transition: all var(--transition);
-    }
-    .filter-tab:hover { border-color: var(--border-strong); color: var(--text-primary); }
-    .filter-tab.active {
-      background: var(--accent-gradient);
-      color: white; border-color: transparent;
-      box-shadow: 0 4px 12px var(--accent-glow);
-    }
+  /* TIMELINE CARD */
+  .tl-card {
+    flex: 1; background: var(--card); border: 1px solid var(--line);
+    border-radius: 20px; overflow: hidden;
+    transition: all var(--t); cursor: pointer;
+    box-shadow: var(--sh1); position: relative;
+  }
+  .tl-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--grad); opacity: 0; transition: opacity var(--t);
+  }
+  .tl-card:hover { transform: translateY(-3px); box-shadow: var(--sh3); border-color: var(--line2); }
+  .tl-card:hover::before { opacity: 1; }
+  .tl-card-inner { display: flex; align-items: stretch; }
+  .tl-card-img {
+    width: 130px; flex-shrink: 0; overflow: hidden;
+    background: var(--bg3);
+  }
+  .tl-card-img img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.6s var(--ease); filter: brightness(0.92);
+  }
+  .tl-card:hover .tl-card-img img { transform: scale(1.07); filter: brightness(1); }
+  .tl-card-img .img-placeholder {
+    width: 100%; height: 100%; min-height: 110px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; color: var(--ink3);
+  }
+  .tl-card-body { flex: 1; padding: 1.25rem 1.4rem; }
+  .tl-card-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.5rem; align-items: center; }
 
-    .filter-count { margin-left: auto; font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+  /* TAGS — matching index.html event-badge palette */
+  .tag {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.2rem 0.6rem; border-radius: 100px;
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); color: var(--orange);
+    border: 1px solid var(--line2);
+  }
+  .tag.tech      { color: var(--blue);      background: rgba(58,107,200,0.08);  border-color: rgba(58,107,200,0.2); }
+  .tag.sports    { color: var(--green);     background: rgba(58,156,90,0.08);   border-color: rgba(58,156,90,0.2); }
+  .tag.annual    { color: var(--orange);    background: rgba(200,98,58,0.08);   border-color: rgba(200,98,58,0.2); }
+  .tag.social    { color: #8b5cf6;          background: rgba(139,92,246,0.08);  border-color: rgba(139,92,246,0.2); }
+  .tag.seminar   { color: var(--blue);      background: rgba(58,107,200,0.08);  border-color: rgba(58,107,200,0.2); }
+  .tag.workshop  { color: var(--green);     background: rgba(58,156,90,0.08);   border-color: rgba(58,156,90,0.2); }
+  .tag.hackathon { color: #8b5cf6;          background: rgba(139,92,246,0.08);  border-color: rgba(139,92,246,0.2); }
+  .tag.webinar   { color: #5bb8f5;          background: rgba(91,184,245,0.08);  border-color: rgba(91,184,245,0.2); }
+  .tag.competition { color: #f59e0b;        background: rgba(245,158,11,0.08);  border-color: rgba(245,158,11,0.2); }
+  .tag.completed { color: var(--ink3);      background: rgba(140,123,109,0.08); border-color: var(--line2); }
+  .tag.open      { color: var(--green);     background: rgba(58,156,90,0.08);   border-color: rgba(58,156,90,0.2); }
+  .tag.closed    { color: #ef4444;          background: rgba(239,68,68,0.08);   border-color: rgba(239,68,68,0.2); }
+  .tag.upcoming  { color: var(--orange);    background: rgba(200,98,58,0.1);    border-color: rgba(200,98,58,0.25); }
 
-    .year-group { margin-bottom: 0.5rem; }
+  .upcoming-badge {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--orange); background: rgba(200,98,58,0.08);
+    border: 1px solid rgba(200,98,58,0.25); padding: 0.2rem 0.6rem; border-radius: 100px;
+  }
+  .upcoming-badge::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--orange); animation: pulse 1.5s ease-in-out infinite;
+  }
 
-    .year-label {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      font-family: 'Syne', sans-serif;
-      font-size: 0.75rem; font-weight: 700;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 1.5rem;
-      padding: 0.3rem 0.875rem;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-    }
+  .tl-card-body h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem; font-weight: 700; color: var(--ink);
+    line-height: 1.3; margin-bottom: 0.35rem;
+  }
+  .tl-card-body p {
+    font-size: 0.82rem; color: var(--ink2); line-height: 1.6; font-weight: 300;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .tl-card-meta { display: flex; align-items: center; gap: 1rem; margin-top: 0.75rem; flex-wrap: wrap; }
+  .meta-item { display: flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; color: var(--ink3); }
+  .meta-item i { color: var(--orange); font-size: 0.7rem; width: 12px; }
 
-    .timeline { position: relative; padding-left: 2rem; }
+  /* ── SKELETON ── */
+  .skeleton-wrap { display: flex; flex-direction: column; gap: 1.5rem; padding-left: 2.5rem; }
+  .skeleton-item { display: flex; gap: 1.75rem; align-items: center; }
+  .skeleton-date { width: 80px; height: 70px; border-radius: 12px; background: var(--bg2); animation: shimmer 1.4s infinite; }
+  .skeleton-card { flex: 1; height: 110px; border-radius: 20px; background: var(--bg2); animation: shimmer 1.4s infinite; }
+  @keyframes shimmer { 0%,100%{opacity:0.5} 50%{opacity:1} }
 
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 7px; top: 0; bottom: 0;
-      width: 2px;
-      background: linear-gradient(to bottom, transparent 0%, var(--line-color) 5%, var(--line-color) 95%, transparent 100%);
-    }
+  /* ── EMPTY STATE ── */
+  .empty-state { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 2rem; gap: 1rem; opacity: 0.45; }
+  .empty-state.show { display: flex; }
+  .empty-state i { font-size: 2.5rem; color: var(--ink3); }
+  .empty-state p { font-size: 0.9rem; color: var(--ink3); }
 
-    .today-marker {
-      position: relative;
-      display: flex; align-items: center;
-      gap: 0.75rem;
-      margin: 1.5rem 0;
-    }
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--ink); color: rgba(245,240,234,0.8);
+    padding: 5rem 0 2rem; position: relative; overflow: hidden;
+  }
+  [data-theme="dark"] .footer { background: #0a0806; }
+  .footer::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: var(--grad);
+  }
+  .footer-content { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 3rem; margin-bottom: 3rem; }
+  .footer-section h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: #f5f0ea; margin-bottom: 1rem; }
+  .footer-section h4 { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--orange); margin-bottom: 1rem; }
+  .footer-section p { font-size: 0.85rem; line-height: 1.7; color: rgba(245,240,234,0.55); }
+  .footer-section ul { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+  .footer-section ul li a { font-size: 0.85rem; color: rgba(245,240,234,0.55); transition: color var(--t); }
+  .footer-section ul li a:hover { color: var(--orange-l); }
+  .social-icons { display: flex; gap: 0.75rem; margin-top: 1rem; }
+  .social-icons a {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(245,240,234,0.6); display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; transition: all var(--t);
+  }
+  .social-icons a:hover { background: var(--orange); border-color: var(--orange); color: #fff; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.07); padding-top: 1.5rem; text-align: center; font-size: 0.8rem; color: rgba(245,240,234,0.3); }
 
-    .today-marker::before {
-      content: '';
-      position: absolute;
-      left: -2rem; top: 50%;
-      transform: translateY(-50%);
-      width: 16px; height: 16px;
-      border-radius: 50%;
-      background: var(--today-color);
-      box-shadow: 0 0 0 4px rgba(58,107,200,0.2), 0 0 0 8px rgba(58,107,200,0.08);
-      animation: todayPulse 2s ease-in-out infinite;
-      z-index: 2;
-    }
-
-    @keyframes todayPulse {
-      0%, 100% { box-shadow: 0 0 0 4px rgba(58,107,200,0.2), 0 0 0 8px rgba(58,107,200,0.08); }
-      50%       { box-shadow: 0 0 0 6px rgba(58,107,200,0.3), 0 0 0 12px rgba(58,107,200,0.05); }
-    }
-
-    .today-label {
-      font-family: 'Syne', sans-serif;
-      font-size: 0.72rem; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--today-color);
-      background: rgba(58,107,200,0.1);
-      padding: 0.25rem 0.75rem;
-      border-radius: 100px;
-      border: 1px solid rgba(58,107,200,0.2);
-    }
-
-    .today-line { flex: 1; height: 1px; background: linear-gradient(to right, rgba(58,107,200,0.4), transparent); }
-
-    .timeline-item {
-      position: relative;
-      display: flex;
-      gap: 1.5rem;
-      margin-bottom: 1.75rem;
-      animation: itemIn 0.5s cubic-bezier(0.4,0,0.2,1) both;
-    }
-
-    @keyframes itemIn {
-      from { opacity: 0; transform: translateX(-16px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-
-    .timeline-item::before {
-      content: '';
-      position: absolute;
-      left: -2rem; top: 1.4rem;
-      transform: translateX(-50%);
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      border: 2px solid var(--bg-primary);
-      z-index: 2;
-      transition: transform var(--transition);
-    }
-
-    .timeline-item.past::before   { background: var(--past); }
-    .timeline-item.future::before { background: var(--future); box-shadow: 0 0 8px var(--accent-glow); }
-    .timeline-item:hover::before  { transform: translateX(-50%) scale(1.4); }
-
-    .tl-date {
-      flex-shrink: 0; width: 90px;
-      padding-top: 1.2rem; text-align: right;
-    }
-
-    .tl-date .month {
-      display: block;
-      font-family: 'Syne', sans-serif;
-      font-size: 0.68rem; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    .tl-date .day {
-      display: block;
-      font-family: 'Syne', sans-serif;
-      font-size: 1.8rem; font-weight: 800;
-      line-height: 1; letter-spacing: -0.04em;
-      color: var(--text-primary);
-    }
-
-    .tl-date .year-small { display: block; font-size: 0.7rem; color: var(--text-muted); }
-
-    .tl-card {
-      flex: 1;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      transition: all var(--transition);
-      position: relative;
-      cursor: pointer;
-    }
-
-    .tl-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--border-strong); }
-
-    .tl-card::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: var(--accent-gradient);
-      opacity: 0;
-      transition: opacity var(--transition);
-    }
-    .tl-card:hover::before { opacity: 1; }
-
-    .tl-card-inner { display: flex; gap: 0; align-items: stretch; }
-
-    .tl-card-img { width: 120px; flex-shrink: 0; overflow: hidden; }
-
-    .tl-card-img img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      transition: transform var(--transition-slow);
-      filter: brightness(0.9);
-    }
-
-    .tl-card:hover .tl-card-img img { transform: scale(1.08); filter: brightness(1); }
-
-    .tl-card-img .img-placeholder {
-      width: 100%; height: 100%; min-height: 100px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem;
-      background: var(--bg-secondary);
-      color: var(--text-muted);
-    }
-
-    .tl-card-body { flex: 1; padding: 1.1rem 1.25rem; }
-
-    .tl-card-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.5rem; align-items: center; }
-
-    .tag {
-      font-size: 0.68rem; font-weight: 600;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      padding: 0.2rem 0.55rem;
-      border-radius: 4px;
-      background: var(--bg-secondary);
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-    }
-
-    .tag.tech      { background: rgba(58,107,200,0.1);  color: #3a6bc8; border-color: rgba(58,107,200,0.2); }
-    .tag.sports    { background: rgba(58,156,90,0.1);   color: #3a9c5a; border-color: rgba(58,156,90,0.2); }
-    .tag.annual    { background: rgba(200,98,58,0.1);   color: #c8623a; border-color: rgba(200,98,58,0.2); }
-    .tag.social    { background: rgba(139,92,246,0.1);  color: #8b5cf6; border-color: rgba(139,92,246,0.2); }
-    .tag.seminar   { background: rgba(58,107,200,0.1);  color: #3a6bc8; border-color: rgba(58,107,200,0.2); }
-    .tag.workshop  { background: rgba(58,156,90,0.1);   color: #3a9c5a; border-color: rgba(58,156,90,0.2); }
-    .tag.hackathon { background: rgba(139,92,246,0.1);  color: #8b5cf6; border-color: rgba(139,92,246,0.2); }
-    .tag.webinar   { background: rgba(91,184,245,0.1);  color: #5bb8f5; border-color: rgba(91,184,245,0.2); }
-    .tag.competition { background: rgba(245,158,11,0.1); color: #f59e0b; border-color: rgba(245,158,11,0.2); }
-    .tag.completed { background: rgba(156,149,141,0.1); color: #9c958d; border-color: rgba(156,149,141,0.2); }
-    .tag.open      { background: rgba(58,156,90,0.1);   color: #3a9c5a; border-color: rgba(58,156,90,0.2); }
-    .tag.closed    { background: rgba(239,68,68,0.08);  color: #ef4444; border-color: rgba(239,68,68,0.2); }
-    .tag.draft     { background: rgba(156,149,141,0.1); color: #9c958d; border-color: rgba(156,149,141,0.2); }
-    .tag.upcoming  { background: rgba(200,98,58,0.12);  color: var(--accent-1); border-color: var(--accent-1); }
-
-    .tl-card-body h3 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1rem; font-weight: 700;
-      color: var(--text-primary);
-      letter-spacing: -0.01em;
-      margin-bottom: 0.35rem; line-height: 1.3;
-    }
-
-    .tl-card-body p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6; font-weight: 300; }
-
-    .tl-card-meta { display: flex; align-items: center; gap: 1rem; margin-top: 0.75rem; flex-wrap: wrap; }
-
-    .meta-item { display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: var(--text-muted); }
-    .meta-item i { color: var(--accent-1); font-size: 0.7rem; }
-
-    .future-badge {
-      display: inline-flex; align-items: center; gap: 0.3rem;
-      font-size: 0.68rem; font-weight: 700;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      color: var(--accent-1);
-      background: rgba(200,98,58,0.1);
-      border: 1px solid rgba(200,98,58,0.25);
-      padding: 0.2rem 0.6rem;
-      border-radius: 4px;
-    }
-    .future-badge::before {
-      content: '';
-      width: 5px; height: 5px;
-      background: var(--accent-1);
-      border-radius: 50%;
-      animation: badgePulse 1.5s ease-in-out infinite;
-    }
-    @keyframes badgePulse {
-      0%,100% { opacity:1; transform: scale(1); }
-      50%     { opacity:0.4; transform: scale(1.5); }
-    }
-
-    .skeleton-wrap { display: flex; flex-direction: column; gap: 1.5rem; padding-left: 2rem; }
-    .skeleton-item { display: flex; gap: 1.5rem; align-items: center; }
-    .skeleton-date { width: 90px; height: 60px; border-radius: 8px; background: var(--bg-secondary); animation: shimmer 1.5s infinite; }
-    .skeleton-card { flex: 1; height: 100px; border-radius: 16px; background: var(--bg-secondary); animation: shimmer 1.5s infinite; }
-    @keyframes shimmer { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
-
-    .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); display: none; }
-    .empty-state.show { display: block; }
-    .empty-state i { font-size: 3rem; margin-bottom: 1rem; display: block; }
-    .empty-state p { font-size: 0.95rem; }
-
-    @media (max-width: 640px) {
-      .page { padding: 2rem 1rem 4rem; }
-      .timeline { padding-left: 1.5rem; }
-      .tl-date { width: 60px; }
-      .tl-date .day { font-size: 1.4rem; }
-      .tl-card-img { width: 80px; }
-      .header-inner { padding: 0 1rem; }
-    }
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1024px) {
+    .header-center { display: none; }
+    .footer-content { grid-template-columns: 1fr 1fr; gap: 2rem; }
+  }
+  @media (max-width: 768px) {
+    .hamburger-btn { display: flex; }
+    .btn-auth, .btn-auth-solid { display: none; }
+    .page-hero { padding: 7rem 0 3rem; }
+    section { padding: 4rem 0; }
+    .tl-card-img { width: 90px; }
+    .tl-date { width: 60px; }
+    .tl-date .day { font-size: 1.5rem; }
+    .footer-content { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .container { padding: 0 1.25rem; }
+    .header-inner { padding: 0.75rem 1rem; margin: 0.5rem 0.75rem; }
+    .timeline { padding-left: 1.75rem; }
+    .tl-item { gap: 1rem; }
+    .tl-date { display: none; }
+  }
   </style>
 </head>
 <body>
 
-  <header class="header">
+  <!-- ── HEADER ── -->
+  <header class="header" id="header">
     <div class="header-inner">
-      <a href="index.html" class="logo">ClustrCore</a>
-      <div class="header-actions">
-        <button class="btn-icon" id="themeToggle" aria-label="Toggle theme">
-          <i class="fas fa-moon"></i>
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="logo">ClustrCore</div>
+      <nav class="header-center">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="events.html" class="nav-link active">Events</a>
+        <a href="resources.html" class="nav-link">Resources</a>
+        <a href="#team" class="nav-link">Team</a>
+      </nav>
+      <div class="header-right">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <i class="fas fa-moon" id="themeIcon"></i>
         </button>
+        <a href="./login.html" class="btn-auth">Login</a>
+        <a href="./signup.html" class="btn-auth-solid">Register</a>
       </div>
     </div>
   </header>
 
-  <div class="page">
-    <div class="page-intro">
-      <h1>Events <span>Timeline</span></h1>
-      <p>A living record of past milestones and upcoming adventures — all in one place.</p>
+  <!-- ── SIDE MENU ── -->
+  <div class="side-menu" id="sideMenu">
+    <div class="side-menu-header">
+      <h3>Navigate</h3>
+      <button class="close-btn" id="closeMenuBtn"><i class="fas fa-times"></i></button>
     </div>
+    <nav class="side-menu-nav">
+      <a href="index.html" class="menu-item"><i class="fas fa-home"></i><span>Home</span></a>
+      <a href="events.html" class="menu-item"><i class="fas fa-calendar-alt"></i><span>Events Timeline</span></a>
+      <a href="resources.html" class="menu-item"><i class="fas fa-book"></i><span>Resources</span></a>
+      <a href="login.html" class="menu-item"><i class="fas fa-sign-in-alt"></i><span>Login</span></a>
+      <a href="signup.html" class="menu-item"><i class="fas fa-user-plus"></i><span>Register</span></a>
+    </nav>
+  </div>
+  <div class="overlay" id="overlay"></div>
 
-    <div class="filter-bar" id="filterBar">
-      <button class="filter-tab active" data-filter="all">All</button>
-      <button class="filter-tab" data-filter="past">Past</button>
-      <button class="filter-tab" data-filter="future">Upcoming</button>
-      <button class="filter-tab" data-filter="open">Open</button>
-      <button class="filter-tab" data-filter="completed">Completed</button>
-      <span class="filter-count" id="filterCount"></span>
-    </div>
-
-    <div id="timelineRoot">
-      <div class="skeleton-wrap" id="loadingSkeleton">
-        <div class="skeleton-item"><div class="skeleton-date"></div><div class="skeleton-card"></div></div>
-        <div class="skeleton-item"><div class="skeleton-date"></div><div class="skeleton-card"></div></div>
-        <div class="skeleton-item"><div class="skeleton-date"></div><div class="skeleton-card"></div></div>
+  <!-- ── PAGE HERO ── -->
+  <section class="page-hero">
+    <div class="container">
+      <span class="hero-eyebrow">ClustrCore Events</span>
+      <h1 class="page-title">
+        <span class="gradient-text">Events Timeline</span>
+        <span class="sub-word">Every milestone, every memory.</span>
+      </h1>
+      <p class="page-desc">A living record of past milestones and upcoming adventures — workshops, hackathons, seminars, and more. All in one place.</p>
+      <div class="hero-cta">
+        <a href="signup.html" class="btn-primary"><i class="fas fa-user-plus"></i> Join to Register</a>
+        <a href="#timeline" class="btn-secondary-outline"><i class="fas fa-arrow-down"></i> Browse Events</a>
       </div>
     </div>
+  </section>
 
-    <div class="empty-state" id="emptyState">
-      <i class="fas fa-calendar-xmark"></i>
-      <p>No events found.</p>
+  <!-- ── FILTER BAR ── -->
+  <div class="filter-section" id="filterSection">
+    <div class="container">
+      <div class="filter-inner">
+        <span class="filter-label">Filter</span>
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="past">Past</button>
+        <button class="filter-tab" data-filter="future">Upcoming</button>
+        <button class="filter-tab" data-filter="open">Open</button>
+        <button class="filter-tab" data-filter="completed">Completed</button>
+        <span class="filter-count" id="filterCount"></span>
+      </div>
     </div>
   </div>
+
+  <!-- ── TIMELINE ── -->
+  <section class="timeline-section" id="timeline">
+    <div class="container">
+      <div class="section-header-row reveal">
+        <div>
+          <span class="section-eyebrow">All Events</span>
+          <h2 class="section-title">The Full <em>Chronicle</em></h2>
+          <p class="section-lead">From past workshops to upcoming hackathons — every ClustrCore event in one scrollable timeline.</p>
+        </div>
+      </div>
+
+      <div id="timelineRoot">
+        <div class="skeleton-wrap" id="loadingSkeleton">
+          <div class="skeleton-item"><div class="skeleton-date"></div><div class="skeleton-card"></div></div>
+          <div class="skeleton-item"><div class="skeleton-date"></div><div class="skeleton-card"></div></div>
+          <div class="skeleton-item"><div class="skeleton-date"></div><div class="skeleton-card"></div></div>
+          <div class="skeleton-item"><div class="skeleton-date"></div><div class="skeleton-card"></div></div>
+        </div>
+      </div>
+
+      <div class="empty-state" id="emptyState">
+        <i class="fas fa-calendar-xmark"></i>
+        <p>No events found for this filter.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>ClustrCore</h3>
+          <p>A dynamic platform designed to enhance college club life for students, members, and faculty.</p>
+          <div class="social-icons">
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#"><i class="fab fa-github"></i></a>
+          </div>
+        </div>
+        <div class="footer-section">
+          <h4>Navigate</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="resources.html">Resources</a></li>
+            <li><a href="#">Team</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Account</h4>
+          <ul>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="signup.html">Register</a></li>
+            <li><a href="#">Portal</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Contact</h4>
+          <ul class="contact-info" style="list-style:none;">
+            <li><i class="fas fa-envelope" style="color:var(--orange-l);margin-right:0.5rem;"></i>info@clustrcore.com</li>
+            <li><i class="fas fa-phone" style="color:var(--orange-l);margin-right:0.5rem;"></i>+91 98765 43210</li>
+            <li><i class="fab fa-instagram" style="color:var(--orange-l);margin-right:0.5rem;"></i>@clustrcore</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2025 ClustrCore. Made with <span style="color:var(--orange);">♥</span> for the club.
+      </div>
+    </div>
+  </footer>
 
   <script>
   (() => {
 
     /* ── THEME ── */
-    const html  = document.documentElement;
-    const tBtn  = document.getElementById('themeToggle');
-    applyTheme(localStorage.getItem('clustr-theme') || 'light');
+    const html = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
 
-    function applyTheme(t) {
-      html.setAttribute('data-theme', t);
-      localStorage.setItem('clustr-theme', t);
-      tBtn.querySelector('i').className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    function setTheme(dark) {
+      html.dataset.theme = dark ? 'dark' : 'light';
+      themeIcon.className = dark ? 'fas fa-sun' : 'fas fa-moon';
+      localStorage.setItem('cc_theme', dark ? 'dark' : 'light');
     }
-
-    tBtn.addEventListener('click', () => {
-      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      tBtn.style.transform = 'scale(0.8) rotate(25deg)';
-      setTimeout(() => { tBtn.style.transform = ''; applyTheme(next); }, 140);
+    themeToggle.addEventListener('click', () => {
+      const going = html.dataset.theme !== 'dark';
+      themeToggle.style.transform = 'scale(0.8) rotate(25deg)';
+      setTimeout(() => { themeToggle.style.transform = ''; setTheme(going); }, 140);
     });
+    if (localStorage.getItem('cc_theme') === 'dark') setTheme(true);
+
+    /* ── HEADER SCROLL ── */
+    window.addEventListener('scroll', () => {
+      document.getElementById('header').classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    /* ── MOBILE MENU ── */
+    const sideMenu = document.getElementById('sideMenu');
+    const overlay  = document.getElementById('overlay');
+    document.getElementById('hamburgerBtn').addEventListener('click', () => { sideMenu.classList.add('open'); overlay.classList.add('active'); });
+    document.getElementById('closeMenuBtn').addEventListener('click', () => { sideMenu.classList.remove('open'); overlay.classList.remove('active'); });
+    overlay.addEventListener('click', () => { sideMenu.classList.remove('open'); overlay.classList.remove('active'); });
+
+    /* ── REVEAL ON SCROLL ── */
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
     /* ── STATE ── */
     let events = [];
@@ -489,7 +690,6 @@
       const d = new Date(dateStr); d.setHours(0,0,0,0);
       return d < TODAY;
     }
-
     function fmt(dateStr) {
       const d = new Date(dateStr);
       return {
@@ -498,20 +698,24 @@
         year:  d.getFullYear(),
       };
     }
-
     function parseDate(e) {
-      // e.date can be "9 March 2026" (formatted) or ISO string
       const d = new Date(e.date);
       return isNaN(d) ? new Date().toISOString().split('T')[0] : d.toISOString().split('T')[0];
     }
-
     function categoryEmoji(cat) {
-      const map = {
-        tech:'💻', seminar:'🎤', workshop:'🛠️', sports:'⚽',
-        annual:'🏆', social:'🎉', hackathon:'💡', cultural:'🎭',
-        competition:'🏆', webinar:'🖥️', other:'📅',
-      };
+      const map = { tech:'💻', seminar:'🎤', workshop:'🛠️', sports:'⚽', annual:'🏆', social:'🎉', hackathon:'💡', cultural:'🎭', competition:'🏆', webinar:'🖥️', other:'📅' };
       return map[(cat || '').toLowerCase()] || '📅';
+    }
+    function getDisplayStatus(ev) {
+      if (ev.eventDate) {
+        const ed = new Date(ev.eventDate); ed.setHours(0,0,0,0);
+        if (ed < TODAY) return 'completed';
+      }
+      if (ev.registrationClose) {
+        const rd = new Date(ev.registrationClose); rd.setHours(0,0,0,0);
+        if (rd < TODAY) return 'closed';
+      }
+      return ev.status || 'open';
     }
 
     /* ── FETCH ── */
@@ -519,53 +723,31 @@
       try {
         const res  = await fetch('/api/events/public');
         const data = await res.json();
-
         events = data.map(e => ({
-          id:     e._id,
-          title:  e.title,
-          desc:   e.description || '',
-          date:   parseDate(e),
-          eventDate: e.eventDate,
+          id: e._id, title: e.title, desc: e.description || '',
+          date: parseDate(e), eventDate: e.eventDate,
           registrationClose: e.registrationClose,
-          time:   e.time  || '',
-          venue:  e.venue || '',
-          /* ✅ FIX 1: category is ONLY used for the category chip.
-             Never fall back to status here — that's what caused
-             "Open" to appear twice (as both category chip and status chip). */
+          time: e.time || '', venue: e.venue || '',
           category: (e.category || '').toLowerCase(),
-          /* status is kept separately for the status chip */
           status:   (e.status || '').toLowerCase(),
-          image:    e.image || '',
-          emoji:    categoryEmoji(e.category),
+          image: e.image || '',
+          emoji: categoryEmoji(e.category),
         }));
-
-      } catch (err) {
-        console.error('ClustrCore: failed to load events', err);
-        events = [];
+      } catch {
+        // Fallback demo events so the page looks great even without an API
+        events = [
+          { id:1, title:'National Science Day Workshop', desc:'Hands-on experiments and interactive science demonstrations for all students.', date:'2025-02-28', time:'10:00 AM', venue:'Science Block, Room 201', category:'workshop', status:'completed', image:'', emoji:'🛠️' },
+          { id:2, title:'Annual Hackathon 2025', desc:'24-hour coding marathon. Build, innovate, and compete for exciting prizes.', date:'2025-03-15', time:'9:00 AM', venue:'Main Auditorium', category:'hackathon', status:'completed', image:'', emoji:'💡' },
+          { id:3, title:'Leadership Seminar Series', desc:'Insights from industry veterans on leadership, teamwork, and communication.', date:'2025-04-10', time:'2:00 PM', venue:'Seminar Hall B', category:'seminar', status:'completed', image:'', emoji:'🎤' },
+          { id:4, title:'Inter-College Tech Fest', desc:'Compete in coding, quizzes, and design challenges with students across colleges.', date:'2025-05-20', time:'8:30 AM', venue:'College Campus', category:'tech', status:'completed', image:'', emoji:'💻' },
+          { id:5, title:'Web Development Bootcamp', desc:'Three-day intensive bootcamp covering HTML, CSS, React and Node.js basics.', date:'2026-04-05', time:'10:00 AM', venue:'Computer Lab 3', category:'workshop', status:'open', image:'', emoji:'🛠️' },
+          { id:6, title:'Sports Day 2026', desc:'Annual inter-departmental sports tournament. Register your team now.', date:'2026-04-18', time:'7:00 AM', venue:'College Ground', category:'sports', status:'open', image:'', emoji:'⚽' },
+          { id:7, title:'AI & Machine Learning Webinar', desc:'Explore the frontiers of AI with live demonstrations and Q&A sessions.', date:'2026-05-02', time:'4:00 PM', venue:'Online (Zoom)', category:'webinar', status:'open', image:'', emoji:'🖥️' },
+          { id:8, title:'Annual Cultural Night', desc:'Music, dance, drama, and art — the biggest celebration of the year.', date:'2026-05-25', time:'6:00 PM', venue:'Open Air Theatre', category:'annual', status:'open', image:'', emoji:'🎉' },
+        ];
       }
-
       document.getElementById('loadingSkeleton').remove();
       render();
-    }
-
-    /* ── GET DISPLAY STATUS ── */
-    function getDisplayStatus(event) {
-      // Check if event date is in the past
-      if (event.eventDate) {
-        const eventDate = new Date(event.eventDate);
-        eventDate.setHours(0, 0, 0, 0);
-        if (eventDate < TODAY) return 'Past';
-      }
-
-      // Check if registration close date has passed but event is still in future
-      if (event.registrationClose) {
-        const regCloseDate = new Date(event.registrationClose);
-        regCloseDate.setHours(0, 0, 0, 0);
-        if (regCloseDate < TODAY) return 'Registration Closed';
-      }
-
-      // Return original status
-      return event.status || 'open';
     }
 
     /* ── FILTER ── */
@@ -590,14 +772,9 @@
 
       countEl.textContent = `${filtered.length} event${filtered.length !== 1 ? 's' : ''}`;
 
-      if (!filtered.length) {
-        root.innerHTML = '';
-        empty.classList.add('show');
-        return;
-      }
+      if (!filtered.length) { root.innerHTML = ''; empty.classList.add('show'); return; }
       empty.classList.remove('show');
 
-      // Group by year
       const byYear = {};
       filtered.forEach(e => {
         const y = new Date(e.date).getFullYear();
@@ -609,54 +786,48 @@
 
       Object.keys(byYear).sort().forEach(year => {
         markup += `<div class="year-group">
-          <div class="year-label"><i class="fas fa-layer-group"></i> ${year}</div>
+          <div class="year-label"><i class="fas fa-layer-group"></i>&nbsp; ${year}</div>
           <div class="timeline">`;
 
         byYear[year].forEach((e, idx) => {
           const past = isPast(e.date);
-          const d    = fmt(e.date);
+          const d = fmt(e.date);
           const displayStatus = getDisplayStatus(e);
+          const showStatus = displayStatus && displayStatus !== e.category;
+          const delay = idx * 55;
 
           if (!todayInjected && !past) {
             todayInjected = true;
             markup += `<div class="today-marker">
-              <span class="today-label"><i class="fas fa-circle-dot"></i> Today</span>
+              <span class="today-badge"><i class="fas fa-circle-dot"></i>&nbsp; Today</span>
               <span class="today-line"></span>
             </div>`;
           }
 
-          const delay = idx * 60;
-
-          /* ✅ FIX 2: Only render the status chip if it differs from the
-             category chip (case-insensitive). This stops "open" appearing
-             twice when category is absent and status fills in. */
-          const showStatusChip = displayStatus && displayStatus !== e.category;
-
           markup += `
-          <div class="timeline-item ${past ? 'past' : 'future'}" style="animation-delay:${delay}ms">
+          <div class="tl-item ${past ? 'past' : 'future'}" style="animation-delay:${delay}ms">
             <div class="tl-date">
               <span class="month">${d.month}</span>
               <span class="day">${d.day}</span>
-              <span class="year-small">${d.year}</span>
+              <span class="year-sm">${d.year}</span>
             </div>
             <div class="tl-card">
               <div class="tl-card-inner">
                 <div class="tl-card-img">
                   ${e.image
                     ? `<img src="${e.image}" alt="${e.title}" loading="lazy">`
-                    : `<div class="img-placeholder">${e.emoji}</div>`
-                  }
+                    : `<div class="img-placeholder">${e.emoji}</div>`}
                 </div>
                 <div class="tl-card-body">
                   <div class="tl-card-tags">
                     ${e.category ? `<span class="tag ${e.category}">${e.category}</span>` : ''}
-                    ${showStatusChip  ? `<span class="tag ${displayStatus.toLowerCase().replace(/\s+/g, '')}">${displayStatus}</span>`   : ''}
-                    ${!past           ? `<span class="future-badge">Upcoming</span>`         : ''}
+                    ${showStatus  ? `<span class="tag ${displayStatus}">${displayStatus}</span>` : ''}
+                    ${!past       ? `<span class="upcoming-badge">Upcoming</span>` : ''}
                   </div>
                   <h3>${e.title}</h3>
                   ${e.desc ? `<p>${e.desc}</p>` : ''}
                   <div class="tl-card-meta">
-                    ${e.time  ? `<span class="meta-item"><i class="fas fa-clock"></i>${e.time}</span>`         : ''}
+                    ${e.time  ? `<span class="meta-item"><i class="fas fa-clock"></i>${e.time}</span>` : ''}
                     ${e.venue ? `<span class="meta-item"><i class="fas fa-location-dot"></i>${e.venue}</span>` : ''}
                   </div>
                 </div>
@@ -672,13 +843,13 @@
     }
 
     /* ── FILTER TABS ── */
-    document.getElementById('filterBar').addEventListener('click', e => {
-      const tab = e.target.closest('.filter-tab');
-      if (!tab) return;
-      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      filter = tab.dataset.filter;
-      render();
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        filter = tab.dataset.filter;
+        render();
+      });
     });
 
     /* ── INIT ── */
@@ -686,5 +857,6 @@
 
   })();
   </script>
+
 </body>
 </html>

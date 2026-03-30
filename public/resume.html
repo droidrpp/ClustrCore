@@ -1,165 +1,868 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<title>Create Resume</title>
-<link rel="stylesheet" href="resume.css">
-</head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Your Resume — ClustrCore</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap');
 
+/* ── TOKENS ── */
+:root {
+    --orange:#c8623a; --orange-l:#e08c4a; --orange-d:#a34c28;
+    --blue:#3a6bc8; --blue-l:#6a9be8; --blue-d:#2a50a0;
+    --grad:linear-gradient(135deg, var(--orange) 0%, var(--orange-l) 50%, var(--blue) 100%);
+    --grad-text:linear-gradient(90deg, var(--orange) 0%, var(--orange-l) 40%, var(--blue) 100%);
+
+    --bg:#faf8f5; --bg2:#f2ede6; --bg3:#ebe4d9;
+    --ink:#1a1410; --ink2:#4a3f35; --ink3:#8c7b6d;
+    --card:#ffffff; --card2:rgba(255,255,255,0.7);
+    --line:rgba(26,20,16,0.08); --line2:rgba(26,20,16,0.15);
+    --sh1:0 1px 4px rgba(26,20,16,0.06), 0 4px 16px rgba(26,20,16,0.06);
+    --sh2:0 8px 32px rgba(26,20,16,0.10), 0 2px 8px rgba(26,20,16,0.06);
+    --sh3:0 24px 64px rgba(26,20,16,0.14), 0 4px 16px rgba(26,20,16,0.08);
+    --r:16px; --ease:cubic-bezier(0.4,0,0.2,1); --t:0.3s;
+}
+[data-theme="dark"] {
+    --bg:#110e0b; --bg2:#1a1512; --bg3:#231e18;
+    --ink:#f5f0ea; --ink2:#b5a898; --ink3:#6b5e52;
+    --card:#1e1a15; --card2:rgba(30,26,21,0.8);
+    --line:rgba(245,240,234,0.07); --line2:rgba(245,240,234,0.14);
+    --sh1:0 1px 4px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.25);
+    --sh2:0 8px 32px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+    --sh3:0 24px 64px rgba(0,0,0,0.55), 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background var(--t), color var(--t);
+}
+body::before {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+img { max-width: 100%; height: auto; display: block; }
+a { text-decoration: none; color: inherit; }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 3px; }
+
+/* ── LAYOUT ── */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+/* ── HEADER ── */
+.header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: 0;
+    transition: all var(--t);
+}
+.header-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 2rem;
+    margin: 0.75rem 1.5rem;
+    background: var(--card2);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid var(--line2);
+    border-radius: 100px;
+    box-shadow: var(--sh1);
+    transition: all var(--t);
+}
+.logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; font-weight: 700; letter-spacing: -0.02em;
+    background: var(--grad-text);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.header-right { display: flex; align-items: center; gap: 0.75rem; }
+.theme-toggle {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid var(--line2); background: var(--bg2);
+    color: var(--ink2); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; transition: all var(--t);
+}
+.theme-toggle:hover { border-color: var(--orange); color: var(--orange); }
+.btn-back {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.45rem 1.1rem; border-radius: 100px;
+    font-size: 0.85rem; font-weight: 500; color: var(--ink2);
+    border: 1px solid var(--line2); transition: all var(--t);
+}
+.btn-back:hover { border-color: var(--orange); color: var(--orange); }
+
+/* ── PAGE HERO ── */
+.page-hero {
+    padding: 7rem 0 3rem;
+    position: relative; overflow: hidden;
+}
+.page-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+        radial-gradient(ellipse 70% 60% at 80% 50%, rgba(200,98,58,0.09) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 70% at 10% 60%, rgba(58,107,200,0.08) 0%, transparent 55%);
+    pointer-events: none;
+}
+.page-hero-inner {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap;
+}
+.hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--bg2); border: 1px solid var(--line2);
+    border-radius: 100px; padding: 0.35rem 1rem;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--orange);
+    margin-bottom: 1.25rem;
+    animation: fadeUp 0.7s var(--ease) both;
+}
+.hero-eyebrow::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--orange); animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+.page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 900; letter-spacing: -0.03em; line-height: 1.05;
+    margin-bottom: 1rem;
+    animation: fadeUp 0.7s var(--ease) 0.1s both;
+}
+.page-title .gradient-text {
+    background: var(--grad-text);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.page-desc {
+    font-size: 1rem; line-height: 1.75; color: var(--ink2); font-weight: 300;
+    max-width: 460px; animation: fadeUp 0.7s var(--ease) 0.2s both;
+}
+.hero-steps {
+    display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    animation: fadeUp 0.7s var(--ease) 0.25s both;
+}
+.step-pill {
+    display: flex; align-items: center; gap: 0.5rem;
+    background: var(--card); border: 1px solid var(--line2);
+    border-radius: 100px; padding: 0.4rem 0.9rem;
+    font-size: 0.75rem; font-weight: 500; color: var(--ink2);
+    box-shadow: var(--sh1);
+}
+.step-num {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--grad);
+    color: #fff; font-size: 0.6rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.step-sep { color: var(--ink3); font-size: 0.7rem; }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── TEMPLATES ── */
+.templates-section {
+    padding: 1.5rem 0 3rem;
+}
+.section-eyebrow {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--orange);
+    margin-bottom: 0.75rem; display: block;
+}
+.section-title-sm {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 1.5rem;
+}
+.templates-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;
+}
+.template-card {
+    background: var(--card); border: 2px solid var(--line);
+    border-radius: 20px; overflow: hidden;
+    cursor: pointer; transition: all var(--t);
+    position: relative;
+}
+.template-card:hover { border-color: var(--orange-l); box-shadow: var(--sh2); transform: translateY(-3px); }
+.template-card.selected { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(200,98,58,0.12), var(--sh2); }
+.template-card.selected::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free'; font-weight: 900;
+    position: absolute; top: 0.75rem; right: 0.75rem;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--grad); color: #fff;
+    font-size: 0.65rem; display: flex; align-items: center; justify-content: center;
+}
+.template-thumb {
+    height: 140px; background: var(--bg3);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; position: relative;
+}
+.template-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.template-thumb-placeholder {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column; gap: 6px;
+    align-items: flex-start; justify-content: center;
+    padding: 1.25rem;
+}
+.thumb-line { border-radius: 3px; background: var(--line2); }
+.template-meta { padding: 0.85rem 1rem; }
+.template-name { font-size: 0.85rem; font-weight: 600; color: var(--ink); margin-bottom: 0.2rem; }
+.template-tag {
+    display: inline-block; font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--orange); background: rgba(200,98,58,0.08);
+    padding: 0.15rem 0.5rem; border-radius: 100px;
+}
+
+/* ── FORM LAYOUT ── */
+.form-layout {
+    display: grid; grid-template-columns: 260px 1fr; gap: 2rem;
+    padding-bottom: 5rem;
+    align-items: start;
+}
+/* Sticky sidebar nav */
+.form-sidebar {
+    position: sticky; top: 6rem;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 20px; padding: 1.25rem;
+    box-shadow: var(--sh1);
+    animation: fadeUp 0.7s var(--ease) 0.3s both;
+}
+.sidebar-title {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--ink3);
+    padding: 0 0.5rem; margin-bottom: 0.75rem;
+}
+.sidebar-nav { display: flex; flex-direction: column; gap: 0.15rem; }
+.nav-item {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.6rem 0.75rem; border-radius: 12px;
+    font-size: 0.82rem; font-weight: 500; color: var(--ink2);
+    cursor: pointer; transition: all var(--t);
+    border: none; background: none; text-align: left; width: 100%;
+}
+.nav-item:hover { background: var(--bg2); color: var(--orange); }
+.nav-item.active { background: rgba(200,98,58,0.08); color: var(--orange); }
+.nav-item i { width: 16px; text-align: center; font-size: 0.8rem; opacity: 0.8; }
+.nav-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--line2); margin-left: auto; flex-shrink: 0;
+    transition: background var(--t);
+}
+.nav-item.done .nav-dot { background: var(--orange); }
+.sidebar-divider { height: 1px; background: var(--line); margin: 0.75rem 0; }
+.sidebar-progress-wrap { padding: 0 0.5rem; }
+.sidebar-progress-label { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--ink3); margin-bottom: 0.4rem; }
+.progress-bar { height: 4px; background: var(--bg3); border-radius: 100px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--grad); border-radius: 100px; transition: width 0.5s var(--ease); width: 0%; }
+
+/* ── FORM MAIN ── */
+.form-main { animation: fadeUp 0.7s var(--ease) 0.35s both; }
+.form-section {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 24px; padding: 2rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--sh1);
+    transition: box-shadow var(--t), border-color var(--t);
+    scroll-margin-top: 6rem;
+}
+.form-section:focus-within { border-color: var(--line2); box-shadow: var(--sh2); }
+.section-hdr {
+    display: flex; align-items: center; gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+.section-icon {
+    width: 38px; height: 38px; border-radius: 12px;
+    background: rgba(200,98,58,0.1);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--orange); font-size: 0.9rem; flex-shrink: 0;
+}
+.section-hdr-text h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem; font-weight: 700; color: var(--ink);
+}
+.section-hdr-text p { font-size: 0.78rem; color: var(--ink3); margin-top: 0.1rem; }
+
+/* Fields */
+.field-grid { display: grid; gap: 0.9rem; }
+.field-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.field-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.field { display: flex; flex-direction: column; gap: 0.4rem; }
+.field label {
+    font-size: 0.75rem; font-weight: 600; color: var(--ink2);
+    letter-spacing: 0.02em;
+}
+.field label .req { color: var(--orange); margin-left: 2px; }
+.field input, .field select, .field textarea {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border-radius: 12px;
+    border: 1.5px solid var(--line2);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    transition: border-color var(--t), box-shadow var(--t), background var(--t);
+    outline: none;
+    appearance: none;
+}
+.field input::placeholder, .field textarea::placeholder { color: var(--ink3); }
+.field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(200,98,58,0.1);
+    background: var(--card);
+}
+.field select {
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%238c7b6d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+.field textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+
+/* Photo upload */
+.photo-upload-area {
+    border: 2px dashed var(--line2);
+    border-radius: 14px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--t);
+    position: relative;
+    background: var(--bg);
+}
+.photo-upload-area:hover { border-color: var(--orange); background: rgba(200,98,58,0.03); }
+.photo-upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.upload-icon { font-size: 1.5rem; color: var(--ink3); margin-bottom: 0.5rem; }
+.upload-label { font-size: 0.82rem; font-weight: 500; color: var(--ink2); }
+.upload-sub { font-size: 0.72rem; color: var(--ink3); margin-top: 0.2rem; }
+#file-name {
+    margin-top: 0.75rem; font-size: 0.75rem; color: var(--orange);
+    font-weight: 500; display: none;
+}
+#file-name.has-file { display: block; }
+
+/* Photo preview */
+.photo-preview-wrap {
+    display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap;
+}
+.photo-preview {
+    width: 80px; height: 80px; border-radius: 50%;
+    border: 2px solid var(--line2);
+    background: var(--bg3);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; flex-shrink: 0; font-size: 1.5rem; color: var(--ink3);
+}
+.photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.photo-preview-right { flex: 1; }
+
+/* Skills tags */
+.skills-preview {
+    display: flex; flex-wrap: wrap; gap: 0.4rem;
+    margin-top: 0.6rem; min-height: 28px;
+}
+.skill-tag {
+    padding: 0.25rem 0.7rem; border-radius: 100px;
+    background: rgba(200,98,58,0.08); border: 1px solid rgba(200,98,58,0.18);
+    font-size: 0.72rem; font-weight: 600; color: var(--orange);
+    letter-spacing: 0.02em;
+}
+
+/* ── SUBMIT AREA ── */
+.submit-section {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 24px; padding: 2rem;
+    box-shadow: var(--sh1);
+    display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;
+}
+.submit-info h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem;
+}
+.submit-info p { font-size: 0.82rem; color: var(--ink2); }
+.btn-primary {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    padding: 0.9rem 2.2rem; border-radius: 100px;
+    background: var(--grad); color: #fff;
+    font-size: 0.9rem; font-weight: 600;
+    box-shadow: 0 4px 24px rgba(200,98,58,0.4);
+    transition: all var(--t);
+    border: none; cursor: pointer;
+    position: relative; overflow: hidden;
+    font-family: 'DM Sans', sans-serif;
+}
+.btn-primary::before { content:''; position:absolute; inset:0; background:rgba(255,255,255,0.12); opacity:0; transition:opacity var(--t); }
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 36px rgba(200,98,58,0.5); }
+.btn-primary:hover::before { opacity:1; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+    .form-layout { grid-template-columns: 1fr; }
+    .form-sidebar { position: static; }
+    .templates-grid { grid-template-columns: 1fr 1fr; }
+    .field-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+    .templates-grid { grid-template-columns: 1fr; }
+    .field-grid.cols-2, .field-grid.cols-3 { grid-template-columns: 1fr; }
+    .container { padding: 0 1rem; }
+    .hero-steps { display: none; }
+    .submit-section { flex-direction: column; }
+}
+</style>
+</head>
 <body>
 
-<div class="resume-container">
+<!-- HEADER -->
+<header class="header" id="header">
+    <div class="header-inner">
+        <div class="logo">ClustrCore</div>
+        <div class="header-right">
+            <a href="index.html" class="btn-back"><i class="fa-solid fa-arrow-left" style="font-size:0.75rem;"></i> Back</a>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <i class="fa-solid fa-moon" id="themeIcon"></i>
+            </button>
+        </div>
+    </div>
+</header>
 
-<h1>Build Your Resume</h1>
+<!-- PAGE HERO -->
+<section class="page-hero">
+    <div class="container">
+        <div class="page-hero-inner">
+            <div>
+                <div class="hero-eyebrow">Resume Builder</div>
+                <h1 class="page-title">
+                    Build Your<br>
+                    <span class="gradient-text">Resume.</span>
+                </h1>
+                <p class="page-desc">Choose a template, fill in your details, and download a polished PDF resume — in minutes.</p>
+            </div>
+            <div class="hero-steps">
+                <div class="step-pill"><span class="step-num">1</span> Pick Template</div>
+                <span class="step-sep">→</span>
+                <div class="step-pill"><span class="step-num">2</span> Fill Details</div>
+                <span class="step-sep">→</span>
+                <div class="step-pill"><span class="step-num">3</span> Download PDF</div>
+            </div>
+        </div>
+    </div>
+</section>
 
-<div class="template-preview">
+<!-- TEMPLATES -->
+<section class="templates-section">
+    <div class="container">
+        <span class="section-eyebrow">Step 1</span>
+        <h2 class="section-title-sm">Choose a Template</h2>
+        <div class="templates-grid">
+            <!-- Template 1 -->
+            <div class="template-card selected" data-template="template1" onclick="selectTemplate(this, 'template1')">
+                <div class="template-thumb">
+                    <div class="template-thumb-placeholder">
+                        <div class="thumb-line" style="width:55%;height:10px;background:var(--orange);opacity:0.7;"></div>
+                        <div class="thumb-line" style="width:38%;height:6px;margin-top:2px;"></div>
+                        <div style="height:8px;"></div>
+                        <div class="thumb-line" style="width:90%;height:5px;"></div>
+                        <div class="thumb-line" style="width:80%;height:5px;margin-top:4px;"></div>
+                        <div class="thumb-line" style="width:85%;height:5px;margin-top:4px;"></div>
+                        <div style="height:8px;"></div>
+                        <div class="thumb-line" style="width:45%;height:7px;background:var(--blue);opacity:0.5;"></div>
+                        <div class="thumb-line" style="width:90%;height:4px;margin-top:4px;"></div>
+                        <div class="thumb-line" style="width:70%;height:4px;margin-top:3px;"></div>
+                    </div>
+                </div>
+                <div class="template-meta">
+                    <div class="template-name">Classic</div>
+                    <span class="template-tag">Clean · ATS-friendly</span>
+                </div>
+            </div>
 
-<h2>Resume Templates</h2>
+            <!-- Template 2 -->
+            <div class="template-card" data-template="template2" onclick="selectTemplate(this, 'template2')">
+                <div class="template-thumb">
+                    <div class="template-thumb-placeholder" style="flex-direction:row;gap:10px;">
+                        <div style="width:38%;display:flex;flex-direction:column;gap:5px;background:rgba(200,98,58,0.07);border-radius:6px;padding:8px 6px;">
+                            <div class="thumb-line" style="width:70%;height:22px;border-radius:50%;background:var(--bg3);"></div>
+                            <div class="thumb-line" style="width:90%;height:5px;margin-top:4px;"></div>
+                            <div class="thumb-line" style="width:80%;height:4px;margin-top:3px;"></div>
+                            <div class="thumb-line" style="width:85%;height:4px;margin-top:3px;"></div>
+                        </div>
+                        <div style="flex:1;display:flex;flex-direction:column;gap:4px;padding:4px 0;">
+                            <div class="thumb-line" style="width:70%;height:9px;background:var(--orange);opacity:0.6;"></div>
+                            <div class="thumb-line" style="width:95%;height:4px;margin-top:4px;"></div>
+                            <div class="thumb-line" style="width:88%;height:4px;margin-top:3px;"></div>
+                            <div class="thumb-line" style="width:80%;height:4px;margin-top:3px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="template-meta">
+                    <div class="template-name">Modern Sidebar</div>
+                    <span class="template-tag">Bold · Two-column</span>
+                </div>
+            </div>
 
-<div class="templates">
+            <!-- Template 3 -->
+            <div class="template-card" data-template="template3" onclick="selectTemplate(this, 'template3')">
+                <div class="template-thumb">
+                    <div class="template-thumb-placeholder">
+                        <div style="width:100%;height:28px;border-radius:6px;background:linear-gradient(135deg,var(--orange) 0%,var(--blue) 100%);opacity:0.6;margin-bottom:8px;display:flex;align-items:center;padding:0 8px;">
+                            <div style="width:40%;height:8px;border-radius:3px;background:rgba(255,255,255,0.5);"></div>
+                        </div>
+                        <div class="thumb-line" style="width:90%;height:4px;"></div>
+                        <div class="thumb-line" style="width:75%;height:4px;margin-top:3px;"></div>
+                        <div style="height:6px;"></div>
+                        <div class="thumb-line" style="width:40%;height:6px;background:var(--blue);opacity:0.4;"></div>
+                        <div class="thumb-line" style="width:90%;height:4px;margin-top:4px;"></div>
+                        <div class="thumb-line" style="width:82%;height:4px;margin-top:3px;"></div>
+                    </div>
+                </div>
+                <div class="template-meta">
+                    <div class="template-name">Corporate Clean</div>
+                    <span class="template-tag">Professional · Formal</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
-<div class="template-card">
-<img src="rimages/template1.png" alt="Template 1">
-<p>Template 1 - Classic</p>
+<!-- MAIN FORM -->
+<div class="container">
+    <div class="form-layout">
+
+        <!-- Sidebar Nav -->
+        <aside class="form-sidebar">
+            <div class="sidebar-title">Sections</div>
+            <nav class="sidebar-nav">
+                <button class="nav-item active" onclick="scrollTo('sec-personal')">
+                    <i class="fa-solid fa-user"></i> Personal Details
+                    <span class="nav-dot done"></span>
+                </button>
+                <button class="nav-item" onclick="scrollTo('sec-summary')">
+                    <i class="fa-solid fa-align-left"></i> Summary
+                    <span class="nav-dot"></span>
+                </button>
+                <button class="nav-item" onclick="scrollTo('sec-skills')">
+                    <i class="fa-solid fa-code"></i> Skills
+                    <span class="nav-dot"></span>
+                </button>
+                <button class="nav-item" onclick="scrollTo('sec-education')">
+                    <i class="fa-solid fa-graduation-cap"></i> Education
+                    <span class="nav-dot"></span>
+                </button>
+                <button class="nav-item" onclick="scrollTo('sec-experience')">
+                    <i class="fa-solid fa-briefcase"></i> Experience
+                    <span class="nav-dot"></span>
+                </button>
+                <button class="nav-item" onclick="scrollTo('sec-projects')">
+                    <i class="fa-solid fa-diagram-project"></i> Projects
+                    <span class="nav-dot"></span>
+                </button>
+                <button class="nav-item" onclick="scrollTo('sec-certifications')">
+                    <i class="fa-solid fa-certificate"></i> Certifications
+                    <span class="nav-dot"></span>
+                </button>
+            </nav>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-progress-wrap">
+                <div class="sidebar-progress-label">
+                    <span>Completion</span>
+                    <span id="progress-pct">0%</span>
+                </div>
+                <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+            </div>
+        </aside>
+
+        <!-- Form Content -->
+        <main class="form-main">
+            <form id="resumeForm">
+
+                <!-- Personal Details -->
+                <div class="form-section" id="sec-personal">
+                    <div class="section-hdr">
+                        <div class="section-icon"><i class="fa-solid fa-user"></i></div>
+                        <div class="section-hdr-text">
+                            <h3>Personal Details</h3>
+                            <p>Your contact and identity information</p>
+                        </div>
+                    </div>
+
+                    <div class="photo-preview-wrap" style="margin-bottom:1.25rem;">
+                        <div class="photo-preview" id="photoPreview">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="photo-preview-right">
+                            <div class="photo-upload-area">
+                                <input type="file" id="photo" name="photo" accept="image/*">
+                                <div class="upload-icon"><i class="fa-solid fa-camera"></i></div>
+                                <div class="upload-label">Upload Profile Picture</div>
+                                <div class="upload-sub">JPG, PNG or WEBP · Max 5MB</div>
+                            </div>
+                            <div id="file-name"></div>
+                        </div>
+                    </div>
+
+                    <div class="field-grid cols-2">
+                        <div class="field">
+                            <label>Student ID <span class="req">*</span></label>
+                            <input name="studentId" placeholder="e.g. CC2024001" required>
+                        </div>
+                        <div class="field">
+                            <label>Full Name <span class="req">*</span></label>
+                            <input name="name" placeholder="Your full name" required>
+                        </div>
+                        <div class="field">
+                            <label>Email Address <span class="req">*</span></label>
+                            <input name="email" type="email" placeholder="you@example.com" required>
+                        </div>
+                        <div class="field">
+                            <label>Phone Number</label>
+                            <input name="phone" placeholder="+91 98765 43210">
+                        </div>
+                        <div class="field">
+                            <label>LinkedIn URL</label>
+                            <input name="linkedin" placeholder="linkedin.com/in/yourname">
+                        </div>
+                        <div class="field">
+                            <label>GitHub URL</label>
+                            <input name="github" placeholder="github.com/yourhandle">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professional Summary -->
+                <div class="form-section" id="sec-summary">
+                    <div class="section-hdr">
+                        <div class="section-icon"><i class="fa-solid fa-align-left"></i></div>
+                        <div class="section-hdr-text">
+                            <h3>Professional Summary</h3>
+                            <p>A short paragraph about you and your goals</p>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Summary</label>
+                        <textarea name="summary" placeholder="e.g. Passionate computer science student with experience in web development and machine learning..." style="min-height:120px;"></textarea>
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="form-section" id="sec-skills">
+                    <div class="section-hdr">
+                        <div class="section-icon"><i class="fa-solid fa-code"></i></div>
+                        <div class="section-hdr-text">
+                            <h3>Skills</h3>
+                            <p>Separate each skill with a comma</p>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Skills <span style="color:var(--ink3);font-weight:400;">(comma separated)</span></label>
+                        <input name="skills" id="skillsInput" placeholder="e.g. Python, React, Node.js, Figma, SQL">
+                    </div>
+                    <div class="skills-preview" id="skillsPreview"></div>
+                </div>
+
+                <!-- Education -->
+                <div class="form-section" id="sec-education">
+                    <div class="section-hdr">
+                        <div class="section-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <div class="section-hdr-text">
+                            <h3>Education</h3>
+                            <p>Your highest qualification</p>
+                        </div>
+                    </div>
+                    <div class="field-grid cols-3">
+                        <div class="field">
+                            <label>Degree</label>
+                            <select name="education">
+                                <option value="">Select Degree</option>
+                                <option value="B.Tech">B.Tech</option>
+                                <option value="BCA">BCA</option>
+                                <option value="MCA">MCA</option>
+                                <option value="M.Tech">M.Tech</option>
+                                <option value="B.Sc">B.Sc</option>
+                                <option value="M.Sc">M.Sc</option>
+                                <option value="Diploma">Diploma</option>
+                            </select>
+                        </div>
+                        <div class="field" style="grid-column: span 2;">
+                            <label>College / University</label>
+                            <input name="college" placeholder="Name of your institution">
+                        </div>
+                        <div class="field">
+                            <label>Passing Year</label>
+                            <input name="year" placeholder="e.g. 2025">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Experience -->
+                <div class="form-section" id="sec-experience">
+                    <div class="section-hdr">
+                        <div class="section-icon"><i class="fa-solid fa-briefcase"></i></div>
+                        <div class="section-hdr-text">
+                            <h3>Experience</h3>
+                            <p>Internships, jobs, or freelance work</p>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Experience Details</label>
+                        <textarea name="experience" placeholder="e.g. Frontend Intern @ TechCorp (June–Aug 2024) — Built responsive dashboards using React and Tailwind CSS..." style="min-height:120px;"></textarea>
+                    </div>
+                </div>
+
+                <!-- Projects -->
+                <div class="form-section" id="sec-projects">
+                    <div class="section-hdr">
+                        <div class="section-icon"><i class="fa-solid fa-diagram-project"></i></div>
+                        <div class="section-hdr-text">
+                            <h3>Projects</h3>
+                            <p>Showcase your best work</p>
+                        </div>
+                    </div>
+                    <div class="field-grid">
+                        <div class="field">
+                            <label>Project Name</label>
+                            <input name="projectName" placeholder="e.g. ClustrCore Portal">
+                        </div>
+                        <div class="field">
+                            <label>Project Description</label>
+                            <textarea name="projectDescription" placeholder="Briefly describe what the project does, tech stack, and your role..." style="min-height:100px;"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Certifications -->
+                <div class="form-section" id="sec-certifications">
+                    <div class="section-hdr">
+                        <div class="section-icon"><i class="fa-solid fa-certificate"></i></div>
+                        <div class="section-hdr-text">
+                            <h3>Certifications &amp; Achievements</h3>
+                            <p>Courses, awards, hackathon wins</p>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Certifications / Achievements</label>
+                        <textarea name="certifications" placeholder="e.g. AWS Cloud Practitioner (2024), 1st Place — HackFest 2024, Google UX Design Certificate..." style="min-height:100px;"></textarea>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="submit-section">
+                    <div class="submit-info">
+                        <h4>Ready to download?</h4>
+                        <p>Your resume will be generated as a PDF using the selected template.</p>
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <i class="fa-solid fa-file-arrow-down"></i>
+                        Save &amp; Download PDF
+                    </button>
+                </div>
+
+            </form>
+        </main>
+
+    </div>
 </div>
 
-<div class="template-card">
-<img src="rimages/template2.png" alt="Template 2">
-<p>Template 2 - Modern Sidebar</p>
-</div>
+<!-- SCRIPT -->
+<script>
+// Theme toggle
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const html = document.documentElement;
+function setTheme(dark) {
+    html.dataset.theme = dark ? 'dark' : 'light';
+    themeIcon.className = dark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+    localStorage.setItem('cc_theme', dark ? 'dark' : 'light');
+}
+themeToggle.addEventListener('click', () => setTheme(html.dataset.theme !== 'dark'));
+if (localStorage.getItem('cc_theme') === 'dark') setTheme(true);
 
-<div class="template-card">
-<img src="rimages/template3.png" alt="Template 3">
-<p>Template 3 - Corporate Clean</p>
-</div>
+// Header scroll
+window.addEventListener('scroll', () => {
+    document.getElementById('header').classList.toggle('scrolled', window.scrollY > 40);
+});
 
-</div>
+// Template select
+function selectTemplate(card, val) {
+    document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+}
 
-</div>
+// Scroll to section
+function scrollTo(id) {
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+}
 
-<form id="resumeForm">
+// Photo upload preview
+document.getElementById('photo').addEventListener('change', function () {
+    if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const preview = document.getElementById('photoPreview');
+            preview.innerHTML = `<img src="${e.target.result}" alt="Profile">`;
+        };
+        reader.readAsDataURL(this.files[0]);
+        const fn = document.getElementById('file-name');
+        fn.textContent = '✓ ' + this.files[0].name;
+        fn.classList.add('has-file');
+    }
+});
 
-<div class="section">
+// Skills live tags
+document.getElementById('skillsInput').addEventListener('input', function () {
+    const preview = document.getElementById('skillsPreview');
+    const skills = this.value.split(',').map(s => s.trim()).filter(Boolean);
+    preview.innerHTML = skills.map(s => `<span class="skill-tag">${s}</span>`).join('');
+});
 
-<h2>Select Resume Template</h2>
+// Progress tracker
+const fields = document.querySelectorAll('#resumeForm input, #resumeForm textarea, #resumeForm select');
+function updateProgress() {
+    const filled = Array.from(fields).filter(f => f.value.trim() !== '').length;
+    const pct = Math.round((filled / fields.length) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-pct').textContent = pct + '%';
+}
+fields.forEach(f => f.addEventListener('input', updateProgress));
+fields.forEach(f => f.addEventListener('change', updateProgress));
 
-<select name="template" required>
-<option value="template1">Template 1 - Classic</option>
-<option value="template2">Template 2 - Modern Sidebar</option>
-<option value="template3">Template 3 - Corporate Clean</option>
-</select>
+// Sidebar active on scroll
+const sections = document.querySelectorAll('.form-section');
+const navItems = document.querySelectorAll('.nav-item');
+window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(sec => {
+        if (window.scrollY >= sec.offsetTop - 120) current = sec.id;
+    });
+    navItems.forEach((n, i) => {
+        const targets = ['sec-personal','sec-summary','sec-skills','sec-education','sec-experience','sec-projects','sec-certifications'];
+        n.classList.toggle('active', targets[i] === current);
+    });
+});
 
-</div>
-
-
-<div class="section">
-
-<h2>Personal Details</h2>
-
-<input name="studentId" placeholder="Student ID" required>
-<input name="name" placeholder="Full Name" required>
-<input name="email" placeholder="Email" required>
-<input name="phone" placeholder="Phone Number">
-<input name="linkedin" placeholder="LinkedIn URL">
-<input name="github" placeholder="GitHub URL">
-
-<label>Upload Profile Picture</label>
-
-<div class="file-upload">
-
-<input type="file" id="photo" name="photo" accept="image/*">
-
-<label for="photo" class="upload-btn">
-Upload Profile Picture
-</label>
-
-<span id="file-name">No image selected</span>
-
-</div>
-
-</div>
-
-
-<div class="section">
-
-<h2>Professional Summary</h2>
-
-<textarea name="summary"></textarea>
-
-</div>
-
-
-<div class="section">
-
-<h2>Skills (comma separated)</h2>
-
-<textarea name="skills"></textarea>
-
-</div>
-
-
-<div class="section">
-
-<h2>Education</h2>
-
-<select name="education">
-
-<option value="">Select Education</option>
-<option value="B.Tech">B.Tech</option>
-<option value="BCA">BCA</option>
-<option value="MCA">MCA</option>
-<option value="M.Tech">M.Tech</option>
-<option value="B.Sc">B.Sc</option>
-<option value="M.Sc">M.Sc</option>
-<option value="Diploma">Diploma</option>
-
-</select>
-
-<input name="college" placeholder="College Name">
-<input name="year" placeholder="Passing Year">
-
-</div>
-
-
-<div class="section">
-
-<h2>Experience</h2>
-
-<textarea name="experience"></textarea>
-
-</div>
-
-
-<div class="section">
-
-<h2>Projects</h2>
-
-<input name="projectName" placeholder="Project Name">
-
-<textarea name="projectDescription"
-placeholder="Project Description"></textarea>
-
-</div>
-
-
-<div class="section">
-
-<h2>Certifications / Achievements</h2>
-
-<textarea name="certifications"></textarea>
-
-</div>
-
-
-<button type="submit">
-Save & Download PDF
-</button>
-
-</form>
-
-</div>
-
-<script src="resume.js"></script>
-
+// Form submit (placeholder)
+document.getElementById('resumeForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const btn = this.querySelector('.btn-primary');
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating…';
+    btn.disabled = true;
+    setTimeout(() => {
+        btn.innerHTML = '<i class="fa-solid fa-file-arrow-down"></i> Save & Download PDF';
+        btn.disabled = false;
+    }, 2000);
+});
+</script>
 </body>
 </html>

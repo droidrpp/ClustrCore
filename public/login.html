@@ -6,435 +6,380 @@
   <title>Sign In – ClustrCore</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap');
 
-    /* ── VARIABLES ─────────────────────────────────────── */
+    /* ── TOKENS (matches landing page exactly) ── */
     :root {
-      --bg-primary: #f4f1ec;
-      --bg-secondary: #eae6df;
-      --bg-card: #ffffff;
+      --orange:#c8623a; --orange-l:#e08c4a; --orange-d:#a34c28;
+      --blue:#3a6bc8; --blue-l:#6a9be8;
+      --grad:linear-gradient(135deg, var(--orange) 0%, var(--orange-l) 50%, var(--blue) 100%);
+      --grad-text:linear-gradient(90deg, var(--orange) 0%, var(--orange-l) 40%, var(--blue) 100%);
 
-      --text-primary: #1a1714;
-      --text-secondary: #5c5650;
-      --text-muted: #9c958d;
-
-      --accent-1: #c8623a;
-      --accent-2: #3a6bc8;
-      --accent-gradient: linear-gradient(135deg, #c8623a 0%, #e08c4a 50%, #3a6bc8 100%);
-      --accent-glow: rgba(200, 98, 58, 0.2);
-
-      --border: rgba(26, 23, 20, 0.1);
-      --border-strong: rgba(26, 23, 20, 0.22);
-      --shadow-sm: 0 2px 8px rgba(26,23,20,0.08);
-      --shadow-md: 0 8px 32px rgba(26,23,20,0.12);
-      --shadow-lg: 0 24px 64px rgba(26,23,20,0.16);
-
-      --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
-      --transition-slow: 0.6s cubic-bezier(0.4,0,0.2,1);
-      --radius: 16px;
-      --radius-sm: 10px;
+      --bg:#faf8f5; --bg2:#f2ede6; --bg3:#ebe4d9;
+      --ink:#1a1410; --ink2:#4a3f35; --ink3:#8c7b6d;
+      --card:#ffffff; --card2:rgba(255,255,255,0.75);
+      --line:rgba(26,20,16,0.08); --line2:rgba(26,20,16,0.15);
+      --sh1:0 1px 4px rgba(26,20,16,0.06),0 4px 16px rgba(26,20,16,0.06);
+      --sh2:0 8px 32px rgba(26,20,16,0.10),0 2px 8px rgba(26,20,16,0.06);
+      --sh3:0 24px 64px rgba(26,20,16,0.14),0 4px 16px rgba(26,20,16,0.08);
+      --glow:rgba(200,98,58,0.18);
+      --ease:cubic-bezier(0.4,0,0.2,1); --t:0.3s;
     }
-
     [data-theme="dark"] {
-      --bg-primary: #0f0e0d;
-      --bg-secondary: #161412;
-      --bg-card: #1c1916;
-
-      --text-primary: #f0ece6;
-      --text-secondary: #a09890;
-      --text-muted: #6b6358;
-
-      --accent-1: #e07a50;
-      --accent-2: #6a9be8;
-      --accent-gradient: linear-gradient(135deg, #e07a50 0%, #e8a060 50%, #6a9be8 100%);
-      --accent-glow: rgba(224,122,80,0.18);
-
-      --border: rgba(240,236,230,0.08);
-      --border-strong: rgba(240,236,230,0.16);
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.35);
-      --shadow-md: 0 8px 32px rgba(0,0,0,0.45);
-      --shadow-lg: 0 24px 64px rgba(0,0,0,0.6);
+      --bg:#110e0b; --bg2:#1a1512; --bg3:#231e18;
+      --ink:#f5f0ea; --ink2:#b5a898; --ink3:#6b5e52;
+      --card:#1e1a15; --card2:rgba(30,26,21,0.85);
+      --line:rgba(245,240,234,0.07); --line2:rgba(245,240,234,0.14);
+      --sh1:0 1px 4px rgba(0,0,0,0.3),0 4px 16px rgba(0,0,0,0.25);
+      --sh2:0 8px 32px rgba(0,0,0,0.4),0 2px 8px rgba(0,0,0,0.3);
+      --sh3:0 24px 64px rgba(0,0,0,0.55),0 4px 16px rgba(0,0,0,0.4);
     }
 
-    /* ── RESET ─────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
 
     body {
       font-family: 'DM Sans', sans-serif;
-      background: var(--bg-primary);
+      background: var(--bg);
+      color: var(--ink);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2rem 1rem;
+      padding: 3rem 1.25rem;
       position: relative;
       overflow: hidden;
-      transition: background var(--transition), color var(--transition);
+      transition: background var(--t), color var(--t);
     }
 
-    /* Animated grid background */
+    /* ── Cinematic noise texture ── */
     body::before {
       content: '';
       position: fixed; inset: 0;
-      background-image:
-        linear-gradient(var(--border) 1px, transparent 1px),
-        linear-gradient(90deg, var(--border) 1px, transparent 1px);
-      background-size: 56px 56px;
-      opacity: 0.5;
-      pointer-events: none;
-      animation: gridDrift 25s linear infinite;
+      pointer-events: none; z-index: 0;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    @keyframes gridDrift {
-      from { background-position: 0 0; }
-      to   { background-position: 56px 56px; }
-    }
-
-    /* Ambient glow orbs */
-    .orb {
-      position: fixed;
-      border-radius: 50%;
-      pointer-events: none;
-      filter: blur(80px);
-      opacity: 0.35;
-      animation: orbFloat 10s ease-in-out infinite;
-    }
-    .orb-1 {
-      width: 420px; height: 420px;
-      background: radial-gradient(circle, rgba(200,98,58,0.4), transparent 70%);
-      top: -120px; right: -100px;
-    }
-    .orb-2 {
-      width: 360px; height: 360px;
-      background: radial-gradient(circle, rgba(58,107,200,0.35), transparent 70%);
-      bottom: -100px; left: -80px;
-      animation-delay: -5s;
-      animation-direction: reverse;
-    }
-
-    @keyframes orbFloat {
-      0%,100% { transform: scale(1) translate(0,0); }
-      33%      { transform: scale(1.08) translate(12px,-16px); }
-      66%      { transform: scale(0.94) translate(-8px,10px); }
-    }
-
-    /* Noise texture */
+    /* ── Cinematic radial ambient bg ── */
     body::after {
       content: '';
       position: fixed; inset: 0;
-      pointer-events: none; z-index: 9999;
-      opacity: 0.025;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 65% 55% at 85% 15%, rgba(200,98,58,0.11) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 65% at 10% 85%, rgba(58,107,200,0.09) 0%, transparent 55%),
+        radial-gradient(ellipse 45% 45% at 45% 50%, rgba(224,140,74,0.06) 0%, transparent 50%);
     }
 
-    /* ── THEME TOGGLE (top-right) ──────────────────────── */
-    .theme-btn {
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg2); }
+    ::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 3px; }
+
+    /* ── THEME TOGGLE ── */
+    .theme-toggle {
       position: fixed;
       top: 1.25rem; right: 1.25rem;
       z-index: 100;
-      width: 40px; height: 40px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--line2);
+      background: var(--card2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--ink2);
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.95rem;
-      color: var(--text-primary);
-      transition: all var(--transition);
-      box-shadow: var(--shadow-sm);
+      font-size: 0.85rem;
+      transition: all var(--t);
+      box-shadow: var(--sh1);
     }
-    .theme-btn:hover {
-      background: var(--bg-secondary);
-      border-color: var(--border-strong);
-      transform: scale(1.08) rotate(15deg);
-    }
+    .theme-toggle:hover { border-color: var(--orange); color: var(--orange); transform: scale(1.05); }
 
-    /* ── CARD ──────────────────────────────────────────── */
-    .login-container {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
+    /* ── BACK LINK ── */
+    .back-link {
+      position: fixed;
+      top: 1.25rem; left: 1.25rem;
+      z-index: 100;
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      font-size: 0.82rem; font-weight: 500;
+      color: var(--ink3);
+      text-decoration: none;
+      background: var(--card2);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--line2);
+      border-radius: 100px;
+      padding: 0.45rem 1rem;
+      box-shadow: var(--sh1);
+      transition: all var(--t);
+    }
+    .back-link:hover { color: var(--orange); border-color: rgba(200,98,58,0.3); }
+
+    /* ── MAIN CARD ── */
+    .login-card {
+      background: var(--card2);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border: 1px solid var(--line2);
+      border-radius: 28px;
       width: 100%;
       max-width: 460px;
-      padding: 2.75rem 2.5rem;
-      box-shadow: var(--shadow-lg);
+      padding: 2.875rem 2.625rem;
+      box-shadow: var(--sh3);
       position: relative;
       z-index: 2;
-      animation: cardIn 0.7s cubic-bezier(0.4,0,0.2,1) both;
+      animation: cardIn 0.7s var(--ease) both;
     }
-
     @keyframes cardIn {
-      from { opacity: 0; transform: translateY(32px) scale(0.97); }
+      from { opacity: 0; transform: translateY(28px) scale(0.97); }
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* Gradient top border */
-    .login-container::before {
+    /* Gradient top edge */
+    .login-card::before {
       content: '';
       position: absolute;
-      top: 0; left: 2rem; right: 2rem;
+      top: 0; left: 0; right: 0;
       height: 2px;
-      background: var(--accent-gradient);
-      border-radius: 0 0 4px 4px;
+      background: var(--grad);
+      border-radius: 28px 28px 0 0;
     }
 
-    /* ── LOGO ──────────────────────────────────────────── */
-    .logo {
+    /* ── HEADER ── */
+    .card-header {
       text-align: center;
       margin-bottom: 2.25rem;
     }
 
-    .logo-mark {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 56px; height: 56px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      margin-bottom: 1rem;
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 1.1rem;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      box-shadow: var(--shadow-sm);
-      position: relative;
+    .logo-eyebrow {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      background: var(--bg2); border: 1px solid var(--line2);
+      border-radius: 100px; padding: 0.32rem 0.9rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; font-weight: 500; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--orange);
+      margin-bottom: 1.125rem;
     }
-
-    /* Outer ring on logo mark */
-    .logo-mark::after {
+    .logo-eyebrow::before {
       content: '';
-      position: absolute;
-      inset: -4px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--orange);
+      animation: pulse 2s ease-in-out infinite;
     }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
 
-    .logo h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.6rem;
-      font-weight: 800;
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.1rem;
+      font-weight: 900;
       letter-spacing: -0.03em;
-      background: var(--accent-gradient);
+      line-height: 1.05;
+      margin-bottom: 0.5rem;
+    }
+    .card-title .gradient-text {
+      background: var(--grad-text);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 0.3rem;
     }
-
-    .logo p {
-      color: var(--text-muted);
-      font-size: 0.875rem;
+    .card-subtitle {
+      font-size: 0.88rem;
+      color: var(--ink3);
       font-weight: 300;
+      line-height: 1.5;
     }
 
-    /* ── FORM GROUPS ───────────────────────────────────── */
-    .form-group { margin-bottom: 1.1rem; }
+    /* ── ERROR BANNER ── */
+    .error-msg {
+      border-radius: 10px;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.82rem;
+      display: none;
+      margin-bottom: 1.125rem;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: #ef4444;
+    }
+    .error-msg.show { display: flex; }
 
-    .form-group label {
+    /* ── FORM ── */
+    .form-group { margin-bottom: 1.05rem; }
+
+    .form-label {
       display: block;
-      font-size: 0.78rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: var(--ink3);
       margin-bottom: 0.4rem;
     }
 
-    .input-wrapper { position: relative; }
+    .input-wrap { position: relative; }
 
-    .input-wrapper i {
+    .input-icon {
       position: absolute;
-      left: 14px; top: 50%;
+      left: 13px; top: 50%;
       transform: translateY(-50%);
-      color: var(--text-muted);
-      font-size: 0.85rem;
+      color: var(--ink3);
+      font-size: 0.8rem;
       pointer-events: none;
-      transition: color var(--transition);
+      transition: color var(--t);
     }
+    .input-wrap:focus-within .input-icon { color: var(--orange); }
 
-    .input-wrapper:focus-within i { color: var(--accent-1); }
-
-    input, select {
+    input[type="email"],
+    input[type="password"],
+    input[type="text"],
+    select {
       width: 100%;
-      padding: 0.75rem 2rem 0.75rem 2.6rem;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      padding: 0.72rem 1rem 0.72rem 2.4rem;
+      background: var(--bg2);
+      border: 1px solid var(--line2);
+      border-radius: 10px;
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.9rem;
-      color: var(--text-primary);
+      font-size: 0.87rem;
+      color: var(--ink);
       outline: none;
-      transition: all var(--transition);
+      transition: all var(--t);
       appearance: none;
     }
-
-    input::placeholder { color: var(--text-muted); }
-
+    input::placeholder { color: var(--ink3); }
     input:focus, select:focus {
-      border-color: var(--accent-1);
-      background: var(--bg-card);
-      box-shadow: 0 0 0 3px var(--accent-glow);
+      border-color: var(--orange);
+      background: var(--card);
+      box-shadow: 0 0 0 3px rgba(200,98,58,0.1);
     }
 
-    /* Password toggle */
     .toggle-pw {
       position: absolute;
       right: 11px; top: 50%;
       transform: translateY(-50%);
       background: none; border: none;
-      color: var(--text-muted);
+      color: var(--ink3);
       cursor: pointer;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       padding: 4px;
-      transition: color var(--transition);
+      transition: color var(--t);
     }
-    .toggle-pw:hover { color: var(--accent-1); }
+    .toggle-pw:hover { color: var(--orange); }
 
-    .select-wrap { position: relative; }
-    .select-wrap::after {
-      content: '\f078';
-      font-family: 'Font Awesome 6 Free';
-      font-weight: 900;
-      position: absolute;
-      right: 13px; top: 50%;
-      transform: translateY(-50%);
-      pointer-events: none;
-      color: var(--text-muted);
-      font-size: 0.7rem;
-    }
-    .select-wrap select { padding-right: 2.5rem; }
-
-    .forgot-password {
+    .forgot-row {
       text-align: right;
       margin-top: 0.4rem;
     }
-    .forgot-password a {
-      font-size: 0.78rem;
-      color: var(--accent-2);
-      text-decoration: none;
+    .forgot-row a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
       font-weight: 500;
-      transition: color var(--transition);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--blue);
+      text-decoration: none;
+      transition: color var(--t);
     }
-    .forgot-password a:hover { color: var(--accent-1); }
+    .forgot-row a:hover { color: var(--orange); }
 
-    /* ── ROLE CARDS ────────────────────────────────────── */
+    /* ── ROLE CARDS ── */
     .role-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 0.5rem;
       margin-top: 0.4rem;
     }
-
     .role-card {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0.75rem 0.5rem;
+      border: 1px solid var(--line2);
+      border-radius: 12px;
+      padding: 0.875rem 0.5rem;
       text-align: center;
       cursor: pointer;
-      transition: all var(--transition);
-      background: var(--bg-secondary);
+      transition: all var(--t);
+      background: var(--bg2);
       position: relative;
       overflow: hidden;
     }
-
-    .role-card::before {
+    .role-card::after {
       content: '';
       position: absolute;
       bottom: 0; left: 0; right: 0;
       height: 2px;
-      background: var(--accent-gradient);
+      background: var(--grad);
       transform: scaleX(0);
-      transition: transform var(--transition);
+      transition: transform var(--t);
     }
-
     .role-card:hover {
-      border-color: var(--border-strong);
-      background: var(--bg-card);
+      border-color: rgba(200,98,58,0.25);
+      background: var(--card);
+      transform: translateY(-1px);
     }
-
     .role-card.selected {
-      border-color: var(--accent-1);
-      background: var(--bg-card);
-      box-shadow: 0 0 0 3px var(--accent-glow);
+      border-color: var(--orange);
+      background: var(--card);
+      box-shadow: 0 0 0 3px rgba(200,98,58,0.1), var(--sh1);
     }
-
-    .role-card.selected::before { transform: scaleX(1); }
-
+    .role-card.selected::after { transform: scaleX(1); }
     .role-card i {
       display: block;
-      font-size: 1.2rem;
-      margin-bottom: 0.3rem;
-      color: var(--text-muted);
-      transition: color var(--transition);
+      font-size: 1.05rem;
+      margin-bottom: 0.35rem;
+      color: var(--ink3);
+      transition: color var(--t);
     }
-
-    .role-card.selected i { color: var(--accent-1); }
-
+    .role-card.selected i { color: var(--orange); }
     .role-card span {
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.04em;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.63rem;
+      font-weight: 500;
+      letter-spacing: 0.07em;
       text-transform: uppercase;
-      color: var(--text-secondary);
-      transition: color var(--transition);
+      color: var(--ink3);
+      transition: color var(--t);
     }
-
-    .role-card.selected span { color: var(--text-primary); }
-
-    /* Hidden real select for form submission */
+    .role-card.selected span { color: var(--ink); }
     #role { display: none; }
 
-    /* ── ERROR MESSAGE ──────────────────────────────────── */
-    .error-msg {
-      background: rgba(239,68,68,0.1);
-      border: 1px solid rgba(239,68,68,0.3);
-      color: #ef4444;
-      border-radius: 8px;
-      padding: 0.6rem 0.875rem;
-      font-size: 0.82rem;
-      display: none;
-      margin-bottom: 1rem;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .error-msg.show { display: flex; }
-
-    /* ── SUBMIT BUTTON ─────────────────────────────────── */
+    /* ── SUBMIT BUTTON ── */
     .btn-submit {
       width: 100%;
-      padding: 0.875rem;
+      padding: 0.9rem;
       margin-top: 1.5rem;
-      background: var(--accent-gradient);
+      background: var(--grad);
       color: white;
       border: none;
-      border-radius: var(--radius-sm);
+      border-radius: 100px;
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all var(--transition);
-      box-shadow: 0 4px 16px var(--accent-glow);
+      transition: all var(--t);
+      box-shadow: 0 4px 20px rgba(200,98,58,0.35);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
-      letter-spacing: 0.01em;
+      position: relative;
+      overflow: hidden;
     }
-
+    .btn-submit::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.1);
+      opacity: 0;
+      transition: opacity var(--t);
+    }
     .btn-submit:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 8px 28px var(--accent-glow);
+      box-shadow: 0 8px 32px rgba(200,98,58,0.5);
     }
-
+    .btn-submit:hover::before { opacity: 1; }
     .btn-submit:active:not(:disabled) { transform: translateY(0); }
+    .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; }
 
-    .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
-
-    .btn-submit .spinner {
+    .spinner {
       width: 16px; height: 16px;
       border: 2px solid rgba(255,255,255,0.35);
       border-top-color: white;
@@ -442,118 +387,94 @@
       animation: spin 0.6s linear infinite;
       display: none;
     }
-
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── DIVIDER ───────────────────────────────────────── */
+    /* ── DIVIDER ── */
     .divider {
-      display: flex;
-      align-items: center;
-      gap: 0.875rem;
+      display: flex; align-items: center; gap: 0.875rem;
       margin: 1.5rem 0;
-      color: var(--text-muted);
-      font-size: 0.78rem;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      color: var(--ink3);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
     }
     .divider::before, .divider::after {
-      content: '';
-      flex: 1; height: 1px;
-      background: var(--border);
+      content: ''; flex: 1; height: 1px; background: var(--line2);
     }
 
-    /* ── FOOTER LINK ───────────────────────────────────── */
-    .signup-link {
+    /* ── FOOTER LINK ── */
+    .signup-row {
       text-align: center;
-      color: var(--text-secondary);
-      font-size: 0.875rem;
+      color: var(--ink3);
+      font-size: 0.85rem;
+      font-weight: 300;
     }
-    .signup-link a {
-      color: var(--accent-1);
+    .signup-row a {
+      color: var(--orange);
       text-decoration: none;
       font-weight: 600;
-      transition: color var(--transition);
+      transition: color var(--t);
     }
-    .signup-link a:hover { color: var(--accent-2); }
+    .signup-row a:hover { color: var(--blue); }
 
-    /* ── BACK LINK ─────────────────────────────────────── */
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      margin-bottom: 1.5rem;
-      transition: color var(--transition);
-    }
-    .back-link:hover { color: var(--accent-1); }
-
-    /* ── SUCCESS STATE ─────────────────────────────────── */
+    /* ── SUCCESS OVERLAY ── */
     .success-overlay {
       position: absolute; inset: 0;
-      background: var(--bg-card);
-      border-radius: 24px;
+      background: var(--card2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 28px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 1rem;
+      gap: 0.875rem;
       z-index: 10;
       opacity: 0;
       pointer-events: none;
-      transition: opacity var(--transition);
+      transition: opacity var(--t);
     }
-
     .success-overlay.show { opacity: 1; pointer-events: all; }
-
     .success-icon {
       width: 64px; height: 64px;
-      background: rgba(58,156,90,0.12);
+      background: rgba(58,156,90,0.1);
       border: 1px solid rgba(58,156,90,0.3);
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.75rem;
-      color: #3a9c5a;
+      font-size: 1.7rem; color: #3a9c5a;
       animation: successPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+      box-shadow: 0 0 0 8px rgba(58,156,90,0.08);
     }
-
     @keyframes successPop {
       from { transform: scale(0); opacity: 0; }
       to   { transform: scale(1); opacity: 1; }
     }
-
     .success-overlay h3 {
-      font-family: 'Syne', sans-serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--text-primary);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; font-weight: 700;
+      color: var(--ink);
     }
+    .success-overlay p { font-size: 0.85rem; color: var(--ink3); font-weight: 300; }
 
-    .success-overlay p {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-    }
-
-    /* ── RESPONSIVE ────────────────────────────────────── */
     @media (max-width: 480px) {
-      .login-container { padding: 2rem 1.5rem; }
-      .logo h1 { font-size: 1.4rem; }
+      .login-card { padding: 2.25rem 1.5rem; }
+      .card-title { font-size: 1.75rem; }
     }
   </style>
 </head>
 <body>
 
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-
   <!-- Theme toggle -->
-  <button class="theme-btn" id="themeToggle" aria-label="Toggle theme">
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
     <i class="fas fa-moon"></i>
   </button>
 
-  <div class="login-container">
+  <!-- Back link -->
+  <a href="index.html" class="back-link">
+    <i class="fas fa-arrow-left"></i> Back to home
+  </a>
+
+  <div class="login-card">
 
     <!-- Success overlay -->
     <div class="success-overlay" id="successOverlay">
@@ -562,58 +483,56 @@
       <p>Redirecting you now…</p>
     </div>
 
-    <!-- Back to home -->
-    <a href="index.html" class="back-link">
-      <i class="fas fa-arrow-left"></i> Back to home
-    </a>
-
-    <!-- Logo -->
-    <div class="logo">
-      <div class="logo-mark">CC</div>
-      <h1>ClustrCore</h1>
-      <p>Welcome back! Sign in to continue</p>
+    <!-- Header -->
+    <div class="card-header">
+      <div class="logo-eyebrow">Welcome Back</div>
+      <h1 class="card-title">
+        <span class="gradient-text">Sign In</span>
+      </h1>
+      <p class="card-subtitle">Continue to your ClustrCore account</p>
     </div>
 
-    <!-- Error message -->
+    <!-- Error -->
     <div class="error-msg" id="errorMsg">
       <i class="fas fa-circle-exclamation"></i>
       <span id="errorText">Please fill all fields.</span>
     </div>
 
-    <!-- Form -->
     <form id="loginForm" autocomplete="off">
 
+      <!-- Email -->
       <div class="form-group">
-        <label>Email Address</label>
-        <div class="input-wrapper">
-          <i class="fas fa-envelope"></i>
+        <label class="form-label">Email Address</label>
+        <div class="input-wrap">
+          <i class="fas fa-envelope input-icon"></i>
           <input id="email" type="email" placeholder="you@example.com" required>
         </div>
       </div>
 
+      <!-- Password -->
       <div class="form-group">
-        <label>Password</label>
-        <div class="input-wrapper">
-          <i class="fas fa-lock"></i>
+        <label class="form-label">Password</label>
+        <div class="input-wrap">
+          <i class="fas fa-lock input-icon"></i>
           <input id="password" type="password" placeholder="Enter your password" required>
           <button type="button" class="toggle-pw" id="togglePw" aria-label="Show password">
             <i class="fas fa-eye" id="pwIcon"></i>
           </button>
         </div>
-        <div class="forgot-password">
+        <div class="forgot-row">
           <a href="#">Forgot Password?</a>
         </div>
       </div>
 
+      <!-- Role -->
       <div class="form-group">
-        <label>Your Role</label>
+        <label class="form-label">Your Role</label>
         <select id="role" required>
-  <option value="">Select Role</option>
-  <option value="student">Student</option>
-  <option value="team">Team</option>
-  <option value="admin">Admin</option>
-</select>
-
+          <option value="">Select Role</option>
+          <option value="student">Student</option>
+          <option value="team">Team</option>
+          <option value="admin">Admin</option>
+        </select>
         <div class="role-grid" id="roleGrid">
           <div class="role-card" data-role="student">
             <i class="fas fa-graduation-cap"></i>
@@ -632,14 +551,14 @@
 
       <button type="submit" class="btn-submit" id="submitBtn">
         <div class="spinner" id="spinner"></div>
-        <span id="btnText">Sign In <i class="fas fa-arrow-right"></i></span>
+        <span id="btnText"><i class="fas fa-arrow-right"></i> Sign In</span>
       </button>
 
     </form>
 
     <div class="divider"><span>or</span></div>
 
-    <div class="signup-link">
+    <div class="signup-row">
       Don't have an account? <a href="signup.html">Create one</a>
     </div>
 
@@ -647,26 +566,20 @@
 
   <script>
   (() => {
-    /* ── THEME ────────────────────────────────────────── */
-    const html   = document.documentElement;
-    const tBtn   = document.getElementById('themeToggle');
-    const saved  = localStorage.getItem('clustr-theme') || 'light';
-    applyTheme(saved);
-
+    /* ── THEME ── */
+    const html = document.documentElement;
+    const tBtn = document.getElementById('themeToggle');
+    applyTheme(localStorage.getItem('clustr-theme') || 'light');
     function applyTheme(t) {
       html.setAttribute('data-theme', t);
       localStorage.setItem('clustr-theme', t);
       tBtn.querySelector('i').className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
     }
+    tBtn.addEventListener('click', () =>
+      applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
 
-    tBtn.addEventListener('click', () => {
-      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      tBtn.style.transform = 'scale(0.8) rotate(25deg)';
-      setTimeout(() => { tBtn.style.transform = ''; applyTheme(next); }, 140);
-    });
-
-    /* ── PASSWORD TOGGLE ──────────────────────────────── */
-     const pwInput = document.getElementById('password');
+    /* ── PASSWORD TOGGLE ── */
+    const pwInput = document.getElementById('password');
     const pwIcon  = document.getElementById('pwIcon');
     document.getElementById('togglePw').addEventListener('click', () => {
       const show = pwInput.type === 'password';
@@ -674,7 +587,7 @@
       pwIcon.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
     });
 
-    /* ── ROLE CARDS ───────────────────────────────────── */
+    /* ── ROLE CARDS ── */
     const roleSelect = document.getElementById('role');
     let selectedRole = '';
 
@@ -687,7 +600,7 @@
       roleSelect.value = selectedRole;
     });
 
-    /* ── ERROR HELPER ─────────────────────────────────── */
+    /* ── ERROR ── */
     function showError(msg) {
       const el = document.getElementById('errorMsg');
       document.getElementById('errorText').textContent = msg;
@@ -695,65 +608,54 @@
       setTimeout(() => el.classList.remove('show'), 4000);
     }
 
-    /* ── LOADING STATE ────────────────────────────────── */
+    /* ── LOADING ── */
     const submitBtn = document.getElementById('submitBtn');
     const spinner   = document.getElementById('spinner');
     const btnText   = document.getElementById('btnText');
-
     function setLoading(on) {
-      submitBtn.disabled = on;
-      spinner.style.display   = on ? 'block' : 'none';
-      btnText.style.display   = on ? 'none'  : 'flex';
+      submitBtn.disabled    = on;
+      spinner.style.display = on ? 'block' : 'none';
+      btnText.style.display = on ? 'none'  : 'flex';
     }
 
-    /* ── FORM SUBMIT ──────────────────────────────────── */
+    /* ── SUBMIT ── */
     document.getElementById('loginForm').addEventListener('submit', async e => {
       e.preventDefault();
-
       const email    = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-
+      const password = pwInput.value;
       if (!email || !password) { showError('Please fill in all fields.'); return; }
       if (!selectedRole)        { showError('Please select your role.');   return; }
 
       setLoading(true);
-
       try {
         const res  = await fetch('http://localhost:5000/api/auth/login', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ email, password, role: selectedRole }),
         });
-
         const data = await res.json();
-
         if (res.ok) {
           localStorage.setItem('user', JSON.stringify({
             email: data.user.email,
             name:  data.user.name || email.split('@')[0],
             role:  data.user.role || selectedRole,
           }));
-
           setLoading(false);
           document.getElementById('successOverlay').classList.add('show');
-
           setTimeout(() => {
-            if (selectedRole === 'admin')  location.href = 'admin-dashboard.html';
-            else if (selectedRole === 'team') location.href = 'portal.html';
-            else location.href = 'student-dashboard.html';
+            if (selectedRole === 'admin')      location.href = 'admin-dashboard.html';
+            else if (selectedRole === 'team')  location.href = 'portal.html';
+            else                               location.href = 'student-dashboard.html';
           }, 1500);
-
         } else {
           throw new Error(data.message || 'Invalid credentials. Please try again.');
         }
-
       } catch (err) {
         showError(err.message || 'Server error. Try again later.');
       } finally {
         setLoading(false);
       }
     });
-
   })();
   </script>
 </body>

@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
       const container = document.getElementById('teamGrid');
       const emptyState = document.getElementById('teamEmptyState');
-      if (!data || (!data.team?.length && !data.faculty?.length)) return;
+      if (!data || (!data.team?.length && !data.faculty?.length && !data.admin?.length)) return;
       emptyState.remove();
 
       // Render Team
@@ -303,6 +303,27 @@ document.addEventListener('DOMContentLoaded', () => {
               <p class="role">${m.teamRole || 'Team Member'} - ${m.team || 'General'}</p>
               ${linkedinHTML}
               ${m.phone ? `<p class="contact"><i class="fas fa-phone"></i> ${m.phone}</p>` : ''}
+            </div>
+          </div>`;
+      }).join(''));
+      }
+
+      // Render Admin
+      if (data.admin?.length) {
+        container.insertAdjacentHTML('beforeend', '<h3 style="grid-column:1/-1; text-align:center; margin:2rem 0 1rem; color:#c8623a;">Admin Team</h3>');
+        container.insertAdjacentHTML('beforeend', data.admin.map(a => {
+        const imageSrc = a.photo ? `data:${a.photoMime};base64,${a.photo}` : '/assets/default-avatar.png';
+        const linkedinHTML = a.linkedin ? `<p class="social"><a href="${a.linkedin}" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin"></i></a></p>` : '';
+        return `
+          <div class="team-card">
+            <div class="team-image">
+              <img src="${imageSrc}" alt="${a.name}" loading="lazy">
+            </div>
+            <div class="team-info">
+              <h3>${a.name}</h3>
+              <p class="role">${a.teamRole || 'Administrator'}</p>
+              ${linkedinHTML}
+              ${a.phone ? `<p class="contact"><i class="fas fa-phone"></i> ${a.phone}</p>` : ''}
             </div>
           </div>`;
       }).join(''));

@@ -116,10 +116,11 @@ router.get('/public/announcements', async (req, res) => {
 
 router.get('/public/team', async (req, res) => {
   try {
-    const teamMembers = await User.find({ role: 'team' }).select('name team teamRole phone').lean();
-    const facultyMembers = await Faculty.find({}).select('name designation department qualification ph_number').lean();
+    const teamMembers = await User.find({ role: 'team' }).select('name team teamRole phone photo photoMime linkedin').lean();
+    const facultyMembers = await Faculty.find({}).select('name designation department qualification ph_number photo photoMime').lean();
+    const adminMembers = await User.find({ role: 'admin' }).select('name teamRole phone photo photoMime linkedin').lean();
     // If no data, return dummy data for demo
-    if (!teamMembers.length && !facultyMembers.length) {
+    if (!teamMembers.length && !facultyMembers.length && !adminMembers.length) {
       res.json({
         team: [
           { name: 'John Doe', team: 'Events', teamRole: 'Coordinator', phone: '9876543210' },
@@ -128,11 +129,14 @@ router.get('/public/team', async (req, res) => {
         faculty: [
           { name: 'Dr. Alice Johnson', designation: 'Professor', department: 'Computer Science', qualification: 'PhD', ph_number: '9876543212' },
           { name: 'Prof. Bob Wilson', designation: 'Associate Professor', department: 'Information Technology', qualification: 'MTech', ph_number: '9876543213' }
+        ],
+        admin: [
+          { name: 'Admin User', teamRole: 'Administrator', phone: '9876543214' }
         ]
       });
       return;
     }
-    res.json({ team: teamMembers, faculty: facultyMembers });
+    res.json({ team: teamMembers, faculty: facultyMembers, admin: adminMembers });
   } catch (err) {
     // On DB error, return dummy data
     res.json({
@@ -143,6 +147,9 @@ router.get('/public/team', async (req, res) => {
       faculty: [
         { name: 'Dr. Alice Johnson', designation: 'Professor', department: 'Computer Science', qualification: 'PhD', ph_number: '9876543212' },
         { name: 'Prof. Bob Wilson', designation: 'Associate Professor', department: 'Information Technology', qualification: 'MTech', ph_number: '9876543213' }
+      ],
+      admin: [
+        { name: 'Admin User', teamRole: 'Administrator', phone: '9876543214' }
       ]
     });
   }
