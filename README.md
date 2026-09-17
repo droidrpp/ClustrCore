@@ -179,7 +179,7 @@ The application supports optional image uploads for supported:
 The following diagram represents the high-level architecture of ClustrCore.
 
 <p align="center">
-  <img src="diagram1.png" alt="ClustrCore System Architecture" width="950">
+  <img src="diagram (1).png" alt="ClustrCore System Architecture" width="900">
 </p>
 
 ### Architecture Overview
