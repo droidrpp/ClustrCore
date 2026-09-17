@@ -908,14 +908,6 @@ The following features can be considered for future versions of ClustrCore:
 
 ---
 
-# 📸 Architecture Diagram
-
-<p align="center">
-  <img src="diagram1.png" alt="ClustrCore Architecture Diagram" width="950">
-</p>
-
----
-
 # 🌐 Repository
 
 The complete source code for ClustrCore is available on GitHub:
@@ -934,25 +926,6 @@ https://github.com/droidrpp/clustrcore
 
 ClustrCore was developed as a full-stack web development project focused on creating a centralized platform for student club management.
 
-### Contributions
-
-- Full-stack application development
-- Express.js backend development
-- MongoDB database integration
-- Mongoose model integration
-- REST API development
-- Frontend development using HTML, CSS and JavaScript
-- Student portal development
-- Team dashboard development
-- Admin dashboard development
-- Event management workflows
-- Registration workflows
-- Resource and certificate workflows
-- Resume-generation functionality
-- Email and OTP integration
-- Application architecture and project organization
-
----
 
 # 📜 License
 
